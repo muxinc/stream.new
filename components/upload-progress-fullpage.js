@@ -82,7 +82,7 @@ export default function UploadProgressFullpage ({ file }) {
       {
         (errorMessage || error)
           ? <div><h1>{(error && 'Error fetching API') || errorMessage}</h1></div>
-          : <div className="percent"><h1>{progress ? `${progress}%` : 0}</h1></div>
+          : <div className="percent"><h1>{progress ? `${progress}%` : '0%'}</h1></div>
       }
       <style jsx>{`
         .percent {
