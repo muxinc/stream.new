@@ -1,0 +1,12 @@
+{
+  "env": {
+    "MUX_TOKEN_ID": "@stream_new_token_id",
+    "MUX_TOKEN_SECRET": "@stream_new_token_secret"
+  },
+  "build": {
+    "env": {
+      "MUX_TOKEN_ID": "@stream_new_token_id",
+      "MUX_TOKEN_SECRET": "@stream_new_token_secret"
+    }
+  }
+}
