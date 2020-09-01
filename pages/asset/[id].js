@@ -13,7 +13,7 @@ export default function Asset () {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const { data, error } = useSwr(
-    () => (router.query.id ? `/api/asset/${router.query.id}` : null),
+    () => (router.query.id ? `/api/assets/${router.query.id}` : null),
     fetcher,
     { refreshInterval: 5000 },
   );
@@ -62,7 +62,7 @@ export default function Asset () {
   }
 
   return (
-    <Layout footerLinks={[]} darkMode={isDarkMode}>
+    <Layout darkMode={isDarkMode}>
       <div className="preparing"><h1>Preparing</h1></div>
       <style jsx>{`
         .preparing {

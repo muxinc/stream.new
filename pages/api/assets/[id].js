@@ -23,8 +23,26 @@ export default async function assetHandler (req, res) {
         res.json({ error: 'Error getting upload/asset' });
       }
       break;
+    case 'DELETE':
+      if (
+        !process.env.SLACK_MODERATOR_PASSWORD
+        || (req.body.slack_moderator_password !== process.env.SLACK_MODERATOR_PASSWORD)
+      ) {
+        res.status(401).end('Unauthorized');
+        return;
+      }
+
+      try {
+        await Video.Assets.del(req.query.id);
+        res.status(200).end(`Deleted ${req.query.id}`);
+      } catch (e) {
+        res.statusCode = 500;
+        console.error('Request error', e); // eslint-disable-line no-console
+        res.end('Error deleting asset');
+      }
+      break;
     default:
-      res.setHeader('Allow', ['GET']);
+      res.setHeader('Allow', ['GET', 'DELETE']);
       res.status(405).end(`Method ${method} Not Allowed`);
   }
 }

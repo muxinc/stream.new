@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 import FullpageSpinner from '../../components/fullpage-spinner';
 import VideoPlayer from '../../components/video-player';
 import Layout from '../../components/layout';
@@ -12,9 +11,6 @@ export function getStaticProps ({ params: { id: playbackId } }) {
 
   return { props: { playbackId, shareUrl, poster } };
 }
-
-const InfoLink = () => <Link href="/about"><a>Info</a></Link>;
-const HomeLink = () => <Link href="/"><a>Home</a></Link>;
 
 export function getStaticPaths () {
   return {
@@ -33,7 +29,6 @@ export default function Playback ({ playbackId, shareUrl, poster }) {
       <Layout
         metaTitle="View this video created on stream.new"
         image={poster}
-        footerLinks={[<InfoLink />, <HomeLink />]}
         darkMode
       >
         <FullpageSpinner />;
@@ -50,7 +45,6 @@ export default function Playback ({ playbackId, shareUrl, poster }) {
     <Layout
       metaTitle="View this video created on stream.new"
       image={poster}
-      footerLinks={[<InfoLink />, <HomeLink />]}
       darkMode
     >
       {errorMessage && <h1 className="error-message">{errorMessage}</h1>}

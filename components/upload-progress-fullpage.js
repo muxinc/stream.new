@@ -14,7 +14,7 @@ export default function UploadProgressFullpage ({ file }) {
   const [errorMessage, setErrorMessage] = useState('');
 
   const { data, error } = useSwr(
-    () => (isPreparing ? `/api/upload/${uploadId}` : null),
+    () => (isPreparing ? `/api/uploads/${uploadId}` : null),
     fetcher,
     { refreshInterval: 5000 },
   );
@@ -23,7 +23,7 @@ export default function UploadProgressFullpage ({ file }) {
 
   const createUpload = async () => {
     try {
-      return fetch('/api/upload', {
+      return fetch('/api/uploads', {
         method: 'POST',
       })
         .then((res) => res.json())

@@ -5,10 +5,8 @@ import { useDropzone } from 'react-dropzone';
 import { breakpoints, transitionDuration } from '../style-vars';
 import Globe from './globe';
 import InfoModal from './info-modal';
-// import { MUX_HOME_PAGE_URL } from '../constants';
 
 const GlobeLink = () => <Link href="/"><a><Globe /></a></Link>;
-// const HomeLink = () => <Link href="/"><a><Globe /></a></Link>;
 
 export default function Layout ({
   title,
