@@ -52,6 +52,7 @@ Then, go to the [settings page](https://dashboard.mux.com/settings/access-tokens
 - `MUX_TOKEN_SECRET` should be `TOKEN SECRET`
 - `MUX_WEBHOOK_SIGNATURE_SECRET` (optional) - the webhook signing secret if you set up webhooks (see below)
 - `SLACK_WEBHOOK_ASSET_READY` (optional) - the slack webhook URL that will be used for the **Slackbot moderator** feature (see below)
+- `NEXT_PUBLIC_MUX_ENV_KEY` (optional) - this is the mux environment key for Mux Data integration
 
 ### Step 3. Deploy on Vercel
 

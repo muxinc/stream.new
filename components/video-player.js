@@ -63,12 +63,12 @@ export default function VideoPlayer ({ playbackId, poster, onLoaded, onError = n
           'This is an old browser that does not support MSE https://developer.mozilla.org/en-US/docs/Web/API/Media_Source_Extensions_API',
         );
       }
-      if (typeof mux !== 'undefined') {
+      if (typeof mux !== 'undefined' && process.env.NEXT_PUBLIC_MUX_ENV_KEY) {
         mux.monitor(video, {
           hlsjs: hls,
           Hls,
           data: {
-            env_key: 'cqtqt2jfbq235huvso0djbn56',
+            env_key: process.env.NEXT_PUBLIC_MUX_ENV_KEY,
             player_name: 'stream.new player',
             video_id: playbackId,
             video_title: playbackId,
