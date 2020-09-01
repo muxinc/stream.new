@@ -28,6 +28,7 @@ export default function VideoPlayer ({ playbackId, poster, onLoaded, onError = n
   const videoRef = useRef(null);
   const imageRef = useRef(null);
   const [isVertical, setIsVertical] = useState();
+  const [playerInitTime] = useState(Date.now());
 
   const error = (event) => onError(event);
 
@@ -69,10 +70,12 @@ export default function VideoPlayer ({ playbackId, poster, onLoaded, onError = n
           Hls,
           data: {
             env_key: process.env.NEXT_PUBLIC_MUX_ENV_KEY,
-            player_name: 'stream.new player',
+
+            player_name: 'hls.js player v1',
             video_id: playbackId,
             video_title: playbackId,
             video_stream_type: 'on-demand',
+            player_init_time: playerInitTime,
           },
         });
       }
