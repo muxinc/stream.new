@@ -4,7 +4,6 @@ import Link from 'next/link';
 import FullpageSpinner from '../../components/fullpage-spinner';
 import VideoPlayer from '../../components/video-player';
 import Layout from '../../components/layout';
-import { breakpoints } from '../../style-vars';
 import { HOST_URL } from '../../constants';
 
 export function getStaticProps ({ params: { id: playbackId } }) {
@@ -68,16 +67,12 @@ export default function Playback ({ playbackId, shareUrl, poster }) {
           display: ${isLoaded ? 'flex' : 'none'};
           flex-direction: column;
           flex-grow: 1;
+          align-items: center;
+          justify-content: center;
         }
         .share-url {
           word-break: break-word;
           color: #777;
-        }
-        @media only screen and (min-width: ${breakpoints.md}px) {
-          .wrapper {
-            align-items: center;
-            justify-content: center;
-          }
         }
       `}
       </style>
