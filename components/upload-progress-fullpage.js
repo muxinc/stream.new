@@ -65,7 +65,7 @@ export default function UploadProgressFullpage ({ file }) {
   useEffect(() => {
     if (upload && upload.asset_id) {
       Router.push({
-        pathname: `/asset/${upload.asset_id}`,
+        pathname: `/assets/${upload.asset_id}`,
         scroll: false,
       });
     }
