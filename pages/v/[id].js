@@ -5,10 +5,11 @@ import FullpageSpinner from '../../components/fullpage-spinner';
 import VideoPlayer from '../../components/video-player';
 import Layout from '../../components/layout';
 import { breakpoints } from '../../style-vars';
+import { HOST_URL } from '../../constants';
 
 export function getStaticProps ({ params: { id: playbackId } }) {
   const poster = `https://image.mux.com/${playbackId}/thumbnail.png`;
-  const shareUrl = `https://stream.new/v/${playbackId}`;
+  const shareUrl = `${HOST_URL}/v/${playbackId}`;
 
   return { props: { playbackId, shareUrl, poster } };
 }

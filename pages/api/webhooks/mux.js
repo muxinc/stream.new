@@ -1,40 +1,8 @@
 import Mux from '@mux/mux-node';
 import { buffer } from 'micro';
-import got from 'got';
+import { sendSlackWebhook } from '../../../lib/slack-notifier';
 
-const slackWebhook = process.env.SLACK_WEBHOOK_ASSET_READY;
 const webhookSignatureSecret = process.env.MUX_WEBHOOK_SIGNATURE_SECRET;
-
-const sendSlackWebhook = async ({ playbackId, assetId }) => {
-  if (!slackWebhook) {
-    console.log('No slack webhook configured'); // eslint-disable-line no-console
-    return Promise.resolve();
-  }
-  return got.post(slackWebhook, {
-    json: {
-      text: `New video created on stream.new. <https://stream.new/v/${playbackId}|View on stream.new>`,
-      icon_emoji: 'tv',
-      attachments: [
-        {
-          fallback: 'New video ready on stream.new',
-          fields: [
-            {
-              title: 'Asset ID',
-              value: assetId,
-              short: false,
-            },
-            {
-              title: 'Playback ID',
-              value: playbackId,
-              short: false,
-            },
-          ],
-          image_url: `https://image.mux.com/${playbackId}/thumbnail.png`,
-        },
-      ],
-    },
-  });
-};
 
 const verifyWebhookSignature = async (rawBody, req) => {
   if (webhookSignatureSecret) {
