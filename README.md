@@ -52,6 +52,7 @@ Then, go to the [settings page](https://dashboard.mux.com/settings/access-tokens
 - `MUX_TOKEN_SECRET` should be `TOKEN SECRET`
 - `MUX_WEBHOOK_SIGNATURE_SECRET` (optional) - the webhook signing secret if you set up webhooks (see below)
 - `SLACK_WEBHOOK_ASSET_READY` (optional) - the slack webhook URL that will be used for the **Slackbot moderator** feature (see below)
+- `SLACK_MODERATOR_PASSWORD` (optional) - this is the password when you want to take actions from the **Slackbot moderator** feature (see below)
 - `NEXT_PUBLIC_MUX_ENV_KEY` (optional) - this is the mux environment key for Mux Data integration
 
 ### Step 3. Deploy on Vercel
@@ -71,11 +72,13 @@ Then push the project to GitHub/GitLab/Bitbucket and [import to Vercel](https://
 
 ### Step 4 (optional) Slackbot Moderator
 
+[Slackbot message]('screenshots/slackbot-moderator.png')
+
 This application uses a slackbot to send message to a slack channel every time a new asset is ready for playback. This requires a few steps for setup.
 
 First, login to your Mux dashboard and in the left sidebar navigation find Settings > Webhooks. Create a new webhook and makes sure you are creating a webhook for the environment that matches the access token that you are using.
 
-[Mux Webhook Create]('./mux-webhook-create.png')
+[Mux Webhook Create]('screenshots/mux-webhook-create.png')
 
 For local development you may want to use a tool [like ngrok](https://ngrok.com/) to receive webhooks on localhost. The route for the webhook handler is `/api/webhooks/mux` (defined in this NextJS app under `./pages/api/webhooks/mux`).
 
@@ -83,7 +86,7 @@ For local development you may want to use a tool [like ngrok](https://ngrok.com/
 
 Create a Slack 'Incoming Webhook'. Configure the channel you want to post to, the icon, etc.
 
-[Slack Incoming Webhook]('./incoming-webhook.png')
+[Slack Incoming Webhook]('screenshots/incoming-webhook.png')
 
 When you're done with this, you should have a slack webhook URL that looks something like `https://hooks.slack.com/services/...`, set this variable as `SLACK_WEBHOOK_ASSET_READY`.
 
@@ -94,7 +97,14 @@ vercel secrets add stream_new_webhook_signature <MUX_WEBHOOK_SIGNATURE_SECRET>
 vercel secrets add stream_new_slack_webhook_ready <SLACK_WEBHOOK_ASSET_READY>
 ```
 
-### Videos to test:
+After all of this is set up the flow will be:
+
+1. Asset is uploaded
+1. Mux sends a webhook to your server (NextJS API funciont)
+1. (optional) Your server verifies the webhook signature
+1. If the webhook matches `video.asset.ready` then your server will post a message to your slack channel that has the Mux Asset ID, the Mux Playback ID, and a thumbnail of the video.
+
+### Videos to test in development:
 
 When developing, if you make any changes to the video player, make sure it works and looks good with videos of various dimensions:
 
@@ -114,10 +124,4 @@ Super vertical
 Also be sure to check: Safari, Mobile Safari, Chrome, Firefox because they all behave a little differently.
 
 
-After all of this is set up the flow will be:
-
-1. Asset is uploaded
-1. Mux sends a webhook to your server (NextJS API funciont)
-1. (optional) Your server verifies the webhook signature
-1. If the webhook matches `video.asset.ready` then your server will post a message to your slack channel that has the Mux Asset ID, the Mux Playback ID, and a thumbnail of the video.
 
