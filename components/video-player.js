@@ -92,6 +92,7 @@ export default function VideoPlayer ({ playbackId, poster, onLoaded, onError = n
   return (
     <>
       <video ref={videoRef} poster={poster} controls />
+      {/* See large comment above about what we're doing here */}
       <img ref={imageRef} src={poster} onLoad={onImageLoad} alt="Thumbnail" />
       <style jsx>{`
         img {
