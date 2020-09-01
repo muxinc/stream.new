@@ -95,7 +95,7 @@ Set the optional environment variables either directly in the vercel UI or by up
 After all of this is set up the flow will be:
 
 1. Asset is uploaded
-1. Mux sends a webhook to your server (NextJS API funciont)
+1. Mux sends a webhook to your server (NextJS API function)
 1. (optional) Your server verifies the webhook signature
 1. If the webhook matches `video.asset.ready` then your server will post a message to your slack channel that has the Mux Asset ID, the Mux Playback ID, and a thumbnail of the video.
 
