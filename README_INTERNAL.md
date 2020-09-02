@@ -1,4 +1,1 @@
-This is deploiyed to vercel
-
-- To deploy run `vercel deploy --prod`
-- This does not have automatic github integration b/c this is part of a monorepo (muxinc/examples)
+This is deployed to vercel automatically on the mux/stream.new project
