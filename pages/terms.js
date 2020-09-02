@@ -38,7 +38,7 @@ export default function Terms () {
           }
           p {
             font-size: 26px;
-            line-height: 28px;
+            line-height: 38px;
           }
         }
       `}
