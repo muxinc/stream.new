@@ -1,0 +1,48 @@
+import Mux from '@mux/mux-node';
+
+const { Video } = new Mux();
+
+export default async function assetHandler (req, res) {
+  const { method } = req;
+
+  switch (method) {
+    case 'GET':
+      try {
+        const asset = await Video.Assets.get(req.query.id);
+        res.json({
+          asset: {
+            id: asset.id,
+            status: asset.status,
+            errors: asset.errors,
+            playback_id: asset.playback_ids[0].id,
+          },
+        });
+      } catch (e) {
+        res.statusCode = 500;
+        console.error('Request error', e); // eslint-disable-line no-console
+        res.json({ error: 'Error getting upload/asset' });
+      }
+      break;
+    case 'DELETE':
+      if (
+        !process.env.SLACK_MODERATOR_PASSWORD
+        || (req.body.slack_moderator_password !== process.env.SLACK_MODERATOR_PASSWORD)
+      ) {
+        res.status(401).end('Unauthorized');
+        return;
+      }
+
+      try {
+        await Video.Assets.del(req.query.id);
+        res.status(200).end(`Deleted ${req.query.id}`);
+      } catch (e) {
+        res.statusCode = 500;
+        console.error('Request error', e); // eslint-disable-line no-console
+        res.end('Error deleting asset');
+      }
+      break;
+    default:
+      res.setHeader('Allow', ['GET', 'DELETE']);
+      res.status(405).end(`Method ${method} Not Allowed`);
+  }
+}
