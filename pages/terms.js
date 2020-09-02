@@ -19,7 +19,7 @@ export default function Terms () {
             As developers, we wanted a fast, frictionless way to share screencasts, desktop recordings,
             meetup talks, etc. that didn't include much overhead and where playback would Just Work for
             anyone with a link. So...that's what we built this for, but other stuff is ok too as long as
-            it's nice and clean. We reserve the right to take down *any* piece of content, but anything
+            it's nice and clean. We reserve the right to take down <strong>any</strong> piece of content, but anything
             hateful, pornographic, gore-y, or illegal is going to get insta-deleted.
           </p>
         </div>
