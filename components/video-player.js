@@ -33,7 +33,6 @@ export default function VideoPlayer ({ playbackId, poster, onLoaded, onError = n
   const error = (event) => onError(event);
 
   const onImageLoad = (event) => {
-    console.log('debug onImageLoad'); // eslint-disable-line no-console
     const [w, h] = [event.target.width, event.target.height];
     if (w && h) {
       setIsVertical((w / h) < 1);
@@ -49,7 +48,6 @@ export default function VideoPlayer ({ playbackId, poster, onLoaded, onError = n
    * which determines styles for the player
    */
   useEffect(() => {
-    console.log('debug new img'); // eslint-disable-line no-console
     const img = new Image();
     img.onload = onImageLoad;
     img.src = poster;
