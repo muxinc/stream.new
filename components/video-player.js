@@ -33,6 +33,7 @@ export default function VideoPlayer ({ playbackId, poster, onLoaded, onError = n
   const error = (event) => onError(event);
 
   const onImageLoad = (event) => {
+    console.log('debug onImageLoad'); // eslint-disable-line no-console
     event.persist();
     const [w, h] = [event.target.width, event.target.height];
     if (w && h) {
