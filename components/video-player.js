@@ -1,3 +1,4 @@
+/* globals Image */
 import { useState, useEffect, useRef } from 'react';
 import Hls from 'hls.js';
 import mux from 'mux-embed';
@@ -26,14 +27,12 @@ const noop = () => {};
  */
 export default function VideoPlayer ({ playbackId, poster, onLoaded, onError = noop }) {
   const videoRef = useRef(null);
-  const imageRef = useRef(null);
   const [isVertical, setIsVertical] = useState();
   const [playerInitTime] = useState(Date.now());
 
   const error = (event) => onError(event);
 
   const onImageLoad = (event) => {
-    event.persist();
     const [w, h] = [event.target.width, event.target.height];
     if (w && h) {
       setIsVertical((w / h) < 1);
@@ -43,6 +42,16 @@ export default function VideoPlayer ({ playbackId, poster, onLoaded, onError = n
       console.error('Error getting img dimensions', event); // eslint-disable-line no-console
     }
   };
+
+  /*
+   * See comment above -- we're loading the poster image just so we can grab the dimensions
+   * which determines styles for the player
+   */
+  useEffect(() => {
+    const img = new Image();
+    img.onload = onImageLoad;
+    img.src = poster;
+  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -92,12 +101,7 @@ export default function VideoPlayer ({ playbackId, poster, onLoaded, onError = n
   return (
     <>
       <video ref={videoRef} poster={poster} controls />
-      {/* See large comment above about what we're doing here */}
-      <img ref={imageRef} src={poster} onLoad={onImageLoad} alt="Thumbnail" />
       <style jsx>{`
-        img {
-          display: none;
-        }
         video {
           display: block;
           width: ${isVertical ? 'auto' : '1000px'};
