@@ -1,4 +1,5 @@
 import { useCallback, useState, useRef } from 'react';
+import Link from 'next/link';
 import { breakpoints } from '../style-vars';
 import Layout from '../components/layout';
 import Button from '../components/button';
@@ -48,6 +49,9 @@ export default function Index () {
             </Button>
             <input id="file-input" type="file" onChange={onInputChange} ref={inputRef} />
           </label>
+          <div className="cta-record">
+            <Link href="/record"><Button>Record from camera</Button></Link>
+          </div>
         </div>
       </div>
       <style jsx>{`
@@ -65,6 +69,9 @@ export default function Index () {
         }
         .cta {
           margin-top: 30px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
         }
         .cta-text-mobile {
           display: inline-block;
@@ -102,6 +109,7 @@ export default function Index () {
           }
           .cta-record {
             display: block;
+            margin-top: 30px;
           }
         }
       `}
