@@ -8,21 +8,50 @@ import logger from '../lib/logger';
 const DEVICE_ID_NO_MIC = 'no-mic';
 const MEDIA_RECORDER_TIMESLICE_MS = 2000;
 
+const noop = () => { };
+
 const ActionButtons = ({
+  hasMediaRecorder,
   isRecording,
   startRecording,
   stopRecording,
   reset,
 }) => (
   <div>
-    <Button type="button" onClick={startRecording} disabled={isRecording}>Start recording</Button>
+    {!hasMediaRecorder && <p className="error">Unable to record: your browser does not have MediaRecorder. You may need to enable this in Experimental Features.</p>}
+    <Button type="button" onClick={hasMediaRecorder ? startRecording : noop} disabled={!hasMediaRecorder || isRecording}>Start recording</Button>
     <Button type="button" onClick={stopRecording} disabled={!isRecording}>Stop & upload</Button>
     <Button type="button" onClick={reset} disabled={!isRecording}>reset</Button>
+    <style jsx>{`
+      .error {
+        color: red;
+        max-width: 400px;
+      }
+    `}
+    </style>
   </div>
 );
 
+const StopWatch = ({ startTimeUnixMs }) => {
+  const [time, setTime] = useState(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = (new Date()).valueOf();
+      const secs = (now - startTimeUnixMs) / 1000;
+      setTime(`${Math.floor(secs)} seconds`);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div>{time}</div>
+  );
+};
+
 function Recorder () {
   const [file, setFile] = useState(null);
+  const [startRecordTime, setStartRecordTime] = useState(null);
   const [isRecording, setRecording] = useState(false);
   const [haveDeviceAccess, setHaveDeviceAccess] = useState(false);
   const [videoDeviceId, setVideoDeviceId] = useState(null);
@@ -32,12 +61,14 @@ function Recorder () {
   const videoRef = useRef(null);
   const mediaChunks = useRef([]);
   const [deviceList, setDevices] = useState({ video: [], audio: [] });
+  const hasMediaRecorder = (typeof MediaRecorder !== 'undefined');
 
   const getDevices = async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
     const list = { video: [], audio: [] };
 
     devices.forEach((device) => {
+      logger('found device', device);
       if (device.kind === 'videoinput') {
         list.video.push(device);
       }
@@ -64,6 +95,16 @@ function Recorder () {
 
       const constraints = { video, audio };
       try {
+        /*
+         * If we try to getDevices() before getUserMedia(), then in firefox
+         * the device 'label' is empty.
+         *
+         * For that reason, we need to do a "fake" getUserMedia() first so that
+         * we get permissions, then getDevices(), then do getUserMedia() for real
+         * a 2nd time.
+         *
+         */
+        await navigator.mediaDevices.getUserMedia(constraints);
         await getDevices();
         logger('requesting user media with constraints', constraints);
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -93,6 +134,7 @@ function Recorder () {
 
   const startRecording = async () => {
     try {
+      setStartRecordTime((new Date()).valueOf());
       const preferredOptions = { mimeType: 'video/webm;codecs=vp9' };
       const backupOptions = { mimeType: 'video/webm;codecs=vp8,opus' };
       let options = preferredOptions;
@@ -153,7 +195,10 @@ function Recorder () {
   }
 
   return (
-    <div>
+    <Layout
+      title="stream.new"
+      description="Record a video"
+    >
       <h1>Camera setup</h1>
       {!haveDeviceAccess && <Button type="button" onClick={startPreview}>Allow the browser to use your camera/mic</Button>}
       <video ref={videoRef} width="400" autoPlay />
@@ -180,12 +225,19 @@ function Recorder () {
             </select>
           </div>
         )}
-      { haveDeviceAccess && <ActionButtons isRecording={isRecording} startRecording={startRecording} stopRecording={stopRecording} reset={reset} />}
+      <div className="stopwatch">
+        { isRecording && startRecordTime && <StopWatch startTimeUnixMs={startRecordTime} /> }
+      </div>
+      { haveDeviceAccess && <ActionButtons hasMediaRecorder={hasMediaRecorder} isRecording={isRecording} startRecording={startRecording} stopRecording={stopRecording} reset={reset} />}
       <style jsx>{`
         .device-pickers {
           display: flex;
           flex-direction: column;
           width: 400px;
+        }
+        .stopwatch {
+          padding-bottom: 20px 0 ;
+          height: 30px;
         }
         .audio-levels {
           display: flex;
@@ -227,22 +279,10 @@ function Recorder () {
         }
       `}
       </style>
-    </div>
+    </Layout>
   );
 }
 
 export default function RecordPage () {
-  return (
-    <Layout
-      title="stream.new"
-      description="Record a video"
-    >
-      <div>
-        <Recorder />
-      </div>
-      <style jsx>{`
-      `}
-      </style>
-    </Layout>
-  );
+  return <Recorder />;
 }
