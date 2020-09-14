@@ -1,7 +1,8 @@
-/* global navigator MediaRecorder Blob File */
+/* global navigator MediaRecorder AudioContext Blob File */
 import { useRef, useEffect, useState } from 'react';
 import Layout from './layout';
 import Button from './button';
+import StopWatch from './stop-watch';
 import UploadProgressFullpage from './upload-progress-fullpage';
 import logger from '../lib/logger';
 
@@ -32,24 +33,7 @@ const ActionButtons = ({
   </div>
 );
 
-const StopWatch = ({ startTimeUnixMs }) => {
-  const [time, setTime] = useState(null);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const now = (new Date()).valueOf();
-      const secs = (now - startTimeUnixMs) / 1000;
-      setTime(`${Math.floor(secs)} seconds`);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div>{time}</div>
-  );
-};
-
-function Recorder () {
+function RecordPage () {
   const [file, setFile] = useState(null);
   const [startRecordTime, setStartRecordTime] = useState(null);
   const [isRecording, setRecording] = useState(false);
@@ -80,6 +64,11 @@ function Recorder () {
     setDevices({ ...list });
   };
 
+  const updateAudioLevels = (analyser) => {
+    const dataArray = new Uint8Array(256);
+    analyser.getByteFrequencyData(dataArray);
+  };
+
   const startPreview = async () => {
     // todo - error if not supported
     if (navigator.mediaDevices) {
@@ -104,10 +93,20 @@ function Recorder () {
          * a 2nd time.
          *
          */
-        await navigator.mediaDevices.getUserMedia(constraints);
         await getDevices();
         logger('requesting user media with constraints', constraints);
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        const audioContext = new AudioContext();
+        const mediaStreamSource = audioContext.createMediaStreamSource(stream);
+        mediaStreamSource.connect(audioContext.destination);
+        const analyser = audioContext.createAnalyser();
+        analyser.fftSize = 1024;
+        mediaStreamSource.connect(analyser);
+
+        setInterval(() => {
+          updateAudioLevels(analyser);
+        }, 500);
+
         streamRef.current = stream;
         videoRef.current.srcObject = stream;
         videoRef.current.muted = true;
@@ -283,6 +282,4 @@ function Recorder () {
   );
 }
 
-export default function RecordPage () {
-  return <Recorder />;
-}
+export default RecordPage;
