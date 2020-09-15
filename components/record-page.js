@@ -8,6 +8,7 @@ import UploadProgressFullpage from './upload-progress-fullpage';
 import logger from '../lib/logger';
 
 const DEVICE_ID_NO_MIC = 'no-mic';
+const DEVICDE_ID_SCREEN = 'screenshare';
 const MEDIA_RECORDER_TIMESLICE_MS = 2000;
 
 const noop = () => { };
@@ -74,6 +75,7 @@ function RecordPage () {
       }
     });
     list.audio.push({ label: '--no microphone--', deviceId: DEVICE_ID_NO_MIC });
+    list.video.push({ label: '--Screenshare--', deviceId: DEVICDE_ID_SCREEN });
     setDevices({ ...list });
   };
 
@@ -134,7 +136,14 @@ function RecordPage () {
          */
         await getDevices();
         logger('requesting user media with constraints', constraints);
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        let stream;
+        if (video.deviceId === DEVICDE_ID_SCREEN) {
+          stream = await navigator.mediaDevices.getDisplayMedia();
+          const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          stream.addTrack(audioStream.getAudioTracks()[0]);
+        } else {
+          stream = await navigator.mediaDevices.getUserMedia(constraints);
+        }
         const audioContext = new AudioContext();
         const mediaStreamSource = audioContext.createMediaStreamSource(stream);
         const analyser = audioContext.createAnalyser();
