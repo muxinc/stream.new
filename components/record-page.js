@@ -1,4 +1,4 @@
-/* global navigator MediaRecorder AudioContext Blob File */
+/* global navigator MediaRecorder Blob File */
 import { useRef, useEffect, useState } from 'react';
 import Layout from './layout';
 import Button from './button';
@@ -42,6 +42,8 @@ const ActionButtons = ({
     </style>
   </div>
 );
+
+const getAudioContext = () => window.AudioContext || window.webkitAudioContext;
 
 function RecordPage () {
   const [file, setFile] = useState(null);
@@ -144,15 +146,18 @@ function RecordPage () {
         } else {
           stream = await navigator.mediaDevices.getUserMedia(constraints);
         }
-        const audioContext = new AudioContext();
-        const mediaStreamSource = audioContext.createMediaStreamSource(stream);
-        const analyser = audioContext.createAnalyser();
-        analyser.fftSize = 1024;
-        mediaStreamSource.connect(analyser);
+        const AudioContext = getAudioContext();
+        if (AudioContext) {
+          const audioContext = new AudioContext();
+          const mediaStreamSource = audioContext.createMediaStreamSource(stream);
+          const analyser = audioContext.createAnalyser();
+          analyser.fftSize = 1024;
+          mediaStreamSource.connect(analyser);
 
-        audioInterval.current = setInterval(() => {
-          updateAudioLevels(analyser);
-        }, 500);
+          audioInterval.current = setInterval(() => {
+            updateAudioLevels(analyser);
+          }, 500);
+        }
 
         streamRef.current = stream;
         videoRef.current.srcObject = stream;
@@ -310,8 +315,6 @@ function RecordPage () {
       )}
       <style jsx>{`
         .device-pickers {
-          display: flex;
-          flex-direction: column;
           width: 400px;
         }
         .stopwatch {
@@ -325,6 +328,7 @@ function RecordPage () {
           font-size: 26px;
           color: #b0b0b0;
           width: 400px;
+          line-height: 26px;
         }
       `}
       </style>
