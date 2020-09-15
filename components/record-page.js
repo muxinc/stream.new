@@ -15,19 +15,26 @@ const noop = () => { };
 const ActionButtons = ({
   hasMediaRecorder,
   isRecording,
+  isReviewing,
   startRecording,
   stopRecording,
+  submitRecording,
   reset,
 }) => (
-  <div>
+  <div className="container">
     {!hasMediaRecorder && <p className="error">Unable to record: your browser does not have MediaRecorder. You may need to enable this in Experimental Features.</p>}
-    <Button type="button" onClick={hasMediaRecorder ? startRecording : noop} disabled={!hasMediaRecorder || isRecording}>Start recording</Button>
-    <Button type="button" onClick={stopRecording} disabled={!isRecording}>Stop & upload</Button>
-    <Button type="button" onClick={reset} disabled={!isRecording}>reset</Button>
+    <Button type="button" onClick={hasMediaRecorder ? startRecording : noop} disabled={!hasMediaRecorder || isRecording || isReviewing}>Start recording</Button>
+    <Button type="button" onClick={stopRecording} disabled={!isRecording}>Stop</Button>
+    <Button type="button" onClick={submitRecording} disabled={!isReviewing}>Submit</Button>
+    <Button type="button" onClick={reset} disabled={!isReviewing}>Reset</Button>
     <style jsx>{`
       .error {
         color: red;
         max-width: 400px;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
       }
     `}
     </style>
@@ -37,7 +44,8 @@ const ActionButtons = ({
 function RecordPage () {
   const [file, setFile] = useState(null);
   const [startRecordTime, setStartRecordTime] = useState(null);
-  const [isRecording, setRecording] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isReviewing, setIsReviewing] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
   const [haveDeviceAccess, setHaveDeviceAccess] = useState(false);
   const [videoDeviceId, setVideoDeviceId] = useState(null);
@@ -45,7 +53,9 @@ function RecordPage () {
   const recorderRef = useRef(null);
   const streamRef = useRef(null);
   const videoRef = useRef(null);
+  const audioInterval = useRef(null);
   const mediaChunks = useRef([]);
+  const finalBlob = useRef(null);
   const [deviceList, setDevices] = useState({ video: [], audio: [] });
   const hasMediaRecorder = (typeof MediaRecorder !== 'undefined');
 
@@ -54,7 +64,6 @@ function RecordPage () {
     const list = { video: [], audio: [] };
 
     devices.forEach((device) => {
-      logger('found device', device);
       if (device.kind === 'videoinput') {
         list.video.push(device);
       }
@@ -77,9 +86,28 @@ function RecordPage () {
     setAudioLevel(audioLevelValue);
   };
 
-  const startPreview = async () => {
-    let updateAudioInterval;
+  const cleanup = () => {
+    logger('cleanup');
+    if (recorderRef.current) {
+      recorderRef.current.onstop = function onRecorderStop () {
+        mediaChunks.current = [];
+        logger('recorder cleanup');
+      };
+      if (recorderRef.current.state === 'inactive') {
+        logger('skipping recorder stop() b/c state is "inactive"');
+      } else {
+        recorderRef.current.stop();
+      }
+    }
+    if (audioInterval.current) {
+      clearInterval(audioInterval.current);
+    }
+    setIsRecording(false);
+  };
 
+  const startAv = async () => {
+    logger('start av');
+    cleanup();
     // todo - error if not supported
     if (navigator.mediaDevices) {
       const video = videoDeviceId ? { deviceId: videoDeviceId } : true;
@@ -112,7 +140,7 @@ function RecordPage () {
         analyser.fftSize = 1024;
         mediaStreamSource.connect(analyser);
 
-        updateAudioInterval = setInterval(() => {
+        audioInterval.current = setInterval(() => {
           updateAudioLevels(analyser);
         }, 500);
 
@@ -124,11 +152,15 @@ function RecordPage () {
         console.error(err); // eslint-disable-line no-console
       }
     }
-    return function cleanup () {
-      if (updateAudioInterval) {
-        clearInterval(updateAudioInterval);
-      }
+    return function teardown () {
+      cleanup();
     };
+  };
+
+  const reset = () => {
+    cleanup();
+    setIsReviewing(false);
+    startAv();
   };
 
   useEffect(() => {
@@ -141,11 +173,12 @@ function RecordPage () {
 
   useEffect(() => {
     if (videoDeviceId || audioDeviceId) {
-      startPreview();
+      startAv();
     }
   }, [videoDeviceId, audioDeviceId]);
 
   const startRecording = async () => {
+    logger('start recording');
     try {
       setStartRecordTime((new Date()).valueOf());
       const preferredOptions = { mimeType: 'video/webm;codecs=vp9' };
@@ -163,21 +196,35 @@ function RecordPage () {
         mediaChunks.current.push(evt.data);
         logger('added media recorder chunk', mediaChunks.current.length);
       };
-      setRecording(true);
+      setIsRecording(true);
     } catch (err) {
       console.error(err); // eslint-disable-line no-console
     }
   };
 
-  const stopRecording = async () => {
+  const submitRecording = () => {
+    if (!finalBlob.current) {
+      logger.error('Cannot submit recording without a blob');
+      return;
+    }
+    const createdFile = new File([finalBlob.current], 'video-from-camera');
+    setFile(createdFile);
+  };
+
+  const stopRecording = () => {
     if (!recorderRef.current) {
       logger.warn('cannot stopRecording() without a recorderRef');
       return;
     }
     recorderRef.current.onstop = function onRecorderStop () {
-      const blob = new Blob(mediaChunks.current, { type: 'video/webm' });
-      const createdFile = new File([blob], 'video-from-camera');
-      setFile(createdFile);
+      finalBlob.current = new Blob(mediaChunks.current, { type: 'video/webm' });
+      const objUrl = URL.createObjectURL(finalBlob.current);
+      videoRef.current.srcObject = null;
+      videoRef.current.src = objUrl;
+      videoRef.current.controls = true;
+      videoRef.current.muted = false;
+      cleanup();
+      setIsReviewing(true);
     };
     recorderRef.current.stop();
   };
@@ -190,19 +237,6 @@ function RecordPage () {
     await setAudioDeviceId(evt.target.value);
   };
 
-  const reset = async () => {
-    if (!recorderRef.current) {
-      logger.warn('cannot reset without a recorderRef');
-      return;
-    }
-    recorderRef.current.onstop = function onRecorderStop () {
-      mediaChunks.current = [];
-      logger('recorder reset');
-    };
-    recorderRef.current.stop();
-    setRecording(false);
-  };
-
   if (file) {
     return <UploadProgressFullpage file={file} />;
   }
@@ -213,7 +247,7 @@ function RecordPage () {
       description="Record a video"
     >
       <h1>Camera setup</h1>
-      {!haveDeviceAccess && <Button type="button" onClick={startPreview}>Allow the browser to use your camera/mic</Button>}
+      {!haveDeviceAccess && <Button type="button" onClick={startAv}>Allow the browser to use your camera/mic</Button>}
       <video ref={videoRef} width="400" autoPlay />
       {haveDeviceAccess
         && (
@@ -234,7 +268,17 @@ function RecordPage () {
       <div className="stopwatch">
         { isRecording && startRecordTime && <StopWatch startTimeUnixMs={startRecordTime} /> }
       </div>
-      { haveDeviceAccess && <ActionButtons hasMediaRecorder={hasMediaRecorder} isRecording={isRecording} startRecording={startRecording} stopRecording={stopRecording} reset={reset} />}
+      { haveDeviceAccess && (
+      <ActionButtons
+        hasMediaRecorder={hasMediaRecorder}
+        isRecording={isRecording}
+        isReviewing={isReviewing}
+        startRecording={startRecording}
+        stopRecording={stopRecording}
+        submitRecording={submitRecording}
+        reset={reset}
+      />
+      )}
       <style jsx>{`
         .device-pickers {
           display: flex;
