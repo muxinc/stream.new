@@ -84,23 +84,22 @@ function RecordPage () {
     analyser.getByteFrequencyData(dataArray);
     const average = (dataArray.reduce((a, b) => a + b) / dataArray.length);
     const audioLevelValue = Math.round((average / 255) * 100);
-    logger('detected audioLevelValue', audioLevelValue);
     setAudioLevel(audioLevelValue);
   };
 
   const cleanup = () => {
     logger('cleanup');
     if (recorderRef.current) {
-      recorderRef.current.onstop = function onRecorderStop () {
-        mediaChunks.current = [];
-        logger('recorder cleanup');
-      };
       if (recorderRef.current.state === 'inactive') {
         logger('skipping recorder stop() b/c state is "inactive"');
       } else {
+        recorderRef.current.onstop = function onRecorderStop () {
+          logger('recorder cleanup');
+        };
         recorderRef.current.stop();
       }
     }
+    mediaChunks.current = [];
     if (audioInterval.current) {
       clearInterval(audioInterval.current);
     }
