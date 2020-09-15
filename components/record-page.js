@@ -3,6 +3,7 @@ import { useRef, useEffect, useState } from 'react';
 import Layout from './layout';
 import Button from './button';
 import StopWatch from './stop-watch';
+import AudioBars from './audio-bars';
 import UploadProgressFullpage from './upload-progress-fullpage';
 import logger from '../lib/logger';
 
@@ -37,6 +38,7 @@ function RecordPage () {
   const [file, setFile] = useState(null);
   const [startRecordTime, setStartRecordTime] = useState(null);
   const [isRecording, setRecording] = useState(false);
+  const [audioLevel, setAudioLevel] = useState(0);
   const [haveDeviceAccess, setHaveDeviceAccess] = useState(false);
   const [videoDeviceId, setVideoDeviceId] = useState(null);
   const [audioDeviceId, setAudioDeviceId] = useState(null);
@@ -65,11 +67,19 @@ function RecordPage () {
   };
 
   const updateAudioLevels = (analyser) => {
-    const dataArray = new Uint8Array(256);
+    const sampleSize = 10;
+    // dataArray will give us an array of numbers ranging from 0 to 255
+    const dataArray = new Uint8Array(sampleSize);
     analyser.getByteFrequencyData(dataArray);
+    const average = (dataArray.reduce((a, b) => a + b) / dataArray.length);
+    const audioLevelValue = Math.round((average / 255) * 100);
+    logger('detected audioLevelValue', audioLevelValue);
+    setAudioLevel(audioLevelValue);
   };
 
   const startPreview = async () => {
+    let updateAudioInterval;
+
     // todo - error if not supported
     if (navigator.mediaDevices) {
       const video = videoDeviceId ? { deviceId: videoDeviceId } : true;
@@ -98,12 +108,11 @@ function RecordPage () {
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         const audioContext = new AudioContext();
         const mediaStreamSource = audioContext.createMediaStreamSource(stream);
-        mediaStreamSource.connect(audioContext.destination);
         const analyser = audioContext.createAnalyser();
         analyser.fftSize = 1024;
         mediaStreamSource.connect(analyser);
 
-        setInterval(() => {
+        updateAudioInterval = setInterval(() => {
           updateAudioLevels(analyser);
         }, 500);
 
@@ -115,6 +124,11 @@ function RecordPage () {
         console.error(err); // eslint-disable-line no-console
       }
     }
+    return function cleanup () {
+      if (updateAudioInterval) {
+        clearInterval(updateAudioInterval);
+      }
+    };
   };
 
   useEffect(() => {
@@ -209,14 +223,7 @@ function RecordPage () {
                 deviceList.video.map(({ label, deviceId }) => <option key={deviceId} value={deviceId}>{label}</option>)
               }
             </select>
-            <div className="audio-levels">
-              <div className="level-1" />
-              <div className="level-2" />
-              <div className="level-3" />
-              <div className="level-4" />
-              <div className="level-5" />
-              <div className="level-6" />
-            </div>
+            <AudioBars audioLevel={audioLevel} />
             <select onChange={selectAudio} disabled={isRecording} title={isRecording ? 'Cannot change audio devices while recording' : ''}>
               {
                 deviceList.audio.map(({ label, deviceId }) => <option key={deviceId} value={deviceId}>{label}</option>)
@@ -237,36 +244,6 @@ function RecordPage () {
         .stopwatch {
           padding-bottom: 20px 0 ;
           height: 30px;
-        }
-        .audio-levels {
-          display: flex;
-          justify-content: center;
-        }
-        .audio-levels > div {
-          width: 30px;
-          height: 10px;
-          margin-right: 10px;
-        }
-        .audio-levels > div:last-child {
-          margin-right: 0;
-        }
-        .level-1 {
-          background-color: #222;
-        }
-        .level-2 {
-          background-color: #222;
-        }
-        .level-3 {
-          background-color: #222;
-        }
-        .level-4 {
-          background-color: #ccc;
-        }
-        .level-5 {
-          background-color: #ccc;
-        }
-        .level-6 {
-          background-color: #ccc;
         }
         select {
           margin: 18px 0;
