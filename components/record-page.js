@@ -15,6 +15,7 @@ const noop = () => { };
 const ActionButtons = ({
   hasMediaRecorder,
   isRecording,
+  isLoadingPreview,
   isReviewing,
   startRecording,
   stopRecording,
@@ -25,7 +26,7 @@ const ActionButtons = ({
     {!hasMediaRecorder && <p className="error">Unable to record: your browser does not have MediaRecorder. You may need to enable this in Experimental Features.</p>}
     <Button type="button" onClick={hasMediaRecorder ? startRecording : noop} disabled={!hasMediaRecorder || isRecording || isReviewing}>Start recording</Button>
     <Button type="button" onClick={stopRecording} disabled={!isRecording}>Stop</Button>
-    <Button type="button" onClick={submitRecording} disabled={!isReviewing}>Submit</Button>
+    <Button type="button" onClick={submitRecording} disabled={!isReviewing || isLoadingPreview}>{ isLoadingPreview ? 'Loading preview...' : 'Submit' }</Button>
     <Button type="button" onClick={reset} disabled={!isReviewing}>Reset</Button>
     <style jsx>{`
       .error {
@@ -45,6 +46,7 @@ function RecordPage () {
   const [file, setFile] = useState(null);
   const [startRecordTime, setStartRecordTime] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
   const [isReviewing, setIsReviewing] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
   const [haveDeviceAccess, setHaveDeviceAccess] = useState(false);
@@ -147,6 +149,7 @@ function RecordPage () {
         streamRef.current = stream;
         videoRef.current.srcObject = stream;
         videoRef.current.muted = true;
+        videoRef.current.controls = false;
         setHaveDeviceAccess(true);
       } catch (err) {
         console.error(err); // eslint-disable-line no-console
@@ -157,9 +160,10 @@ function RecordPage () {
     };
   };
 
-  const reset = () => {
+  const reset = async () => {
     cleanup();
     setIsReviewing(false);
+    setIsLoadingPreview(false);
     startAv();
   };
 
@@ -223,8 +227,21 @@ function RecordPage () {
       videoRef.current.src = objUrl;
       videoRef.current.controls = true;
       videoRef.current.muted = false;
-      cleanup();
       setIsReviewing(true);
+      /*
+      setIsLoadingPreview(true);
+
+      videoRef.current.addEventListener('canplaythrough', () => {
+        videoRef.current.addEventListener('durationchange', () => {
+          logger('got video durationchange', isLoadingPreview);
+          if (isLoadingPreview) {
+            setIsLoadingPreview(false);
+            setIsReviewing(true);
+          }
+        });
+      });
+      */
+      cleanup();
     };
     recorderRef.current.stop();
   };
@@ -249,6 +266,9 @@ function RecordPage () {
       <h1>Camera setup</h1>
       {!haveDeviceAccess && <Button type="button" onClick={startAv}>Allow the browser to use your camera/mic</Button>}
       <video ref={videoRef} width="400" autoPlay />
+      <div>
+        { isLoadingPreview && 'Loading preview...' }
+      </div>
       {haveDeviceAccess
         && (
           <div className="device-pickers">
@@ -272,6 +292,7 @@ function RecordPage () {
       <ActionButtons
         hasMediaRecorder={hasMediaRecorder}
         isRecording={isRecording}
+        isLoadingPreview={isLoadingPreview}
         isReviewing={isReviewing}
         startRecording={startRecording}
         stopRecording={stopRecording}
