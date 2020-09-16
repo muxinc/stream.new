@@ -8,7 +8,17 @@ import InfoModal from './info-modal';
 
 const GlobeLink = () => <Link href="/"><a><Globe /></a></Link>;
 
-export default function Layout ({
+type Props = {
+  title?: string;
+  description?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  image?: string;
+  onFileDrop?: (acceptedFiles: File[]) => void;
+  darkMode?: boolean;
+};
+
+const Layout: React.FC<Props> = ({
   title,
   description,
   metaTitle,
@@ -17,7 +27,7 @@ export default function Layout ({
   onFileDrop,
   darkMode,
   children,
-}) {
+}) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const { getRootProps, isDragActive } = useDropzone({ onDrop: onFileDrop });
   const isDroppablePage = !!onFileDrop;
@@ -192,3 +202,5 @@ export default function Layout ({
     </>
   );
 }
+
+export default Layout;

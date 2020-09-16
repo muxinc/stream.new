@@ -1,8 +1,6 @@
 module.exports = {
-  parser: 'babel-eslint',
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 6,
-    sourceType: 'module',
     ecmaFeatures: {
       jsx: true,
     },
@@ -11,28 +9,25 @@ module.exports = {
   globals: {
     document: true,
     window: true,
-    graphql: true,
     fetch: true,
+    module: true,
+    console: true
   },
   env: {
     jest: true,
   },
-  extends: 'eslint-config-airbnb',
+  extends: [
+    'eslint:recommended', // eslint default rules
+    'plugin:@typescript-eslint/eslint-recommended', // eslint TypeScript rules (github.com/typescript-eslint/typescript-eslint)
+    'plugin:@typescript-eslint/recommended',
+    'plugin:react/recommended', // eslint react rules (github.com/yannickcr/eslint-plugin-react)
+    'plugin:jsx-a11y/recommended', // accessibility plugin
+  ],
   rules: {
-    'import/no-extraneous-dependencies': 0,
-    'jsx-a11y/anchor-is-valid': 0,
-    'max-len': 0,
-    'object-curly-newline': ['error', { consistent: true }],
-    'react/destructuring-assignment': 0,
-    'react/jsx-one-expression-per-line': 0,
-    'react/no-multi-comp': 0,
-    'react/no-unescaped-entities': 0,
-    'react/prop-types': 0,
-    'react/react-in-jsx-scope': 0,
-    'react/jsx-filename-extension': 0,
-    'react/jsx-props-no-spreading': 0,
-    'space-before-function-paren': ['error', 'always'],
-    'jsx-a11y/media-has-caption': 0,
-    'import/prefer-default-export': 0,
+    'react/prop-types': 'off',
+    'react/react-in-jsx-scope': 'off',
+    'jsx-a11y/anchor-is-valid': 'off',
+    'jsx-a11y/media-has-caption': 'off',
+    'import/prefer-default-export': 'off'
   },
 };

@@ -1,7 +1,11 @@
 import RecordPage from '../components/record-page';
 
-export default function Record () {
+type Props = null;
+
+const Record: React.FC<Props> = () => {
   return (
     <RecordPage />
   );
 }
+
+export default Record;

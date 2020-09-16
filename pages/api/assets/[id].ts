@@ -1,14 +1,18 @@
+import { NextApiRequest, NextApiResponse } from 'next'
 import Mux from '@mux/mux-node';
 
 const { Video } = new Mux();
 
-export default async function assetHandler (req, res) {
+export default async function assetHandler (req: NextApiRequest, res: NextApiResponse): Promise<void> {
   const { method } = req;
 
   switch (method) {
     case 'GET':
       try {
-        const asset = await Video.Assets.get(req.query.id);
+        const asset = await Video.Assets.get(req.query.id as string);
+        if (!(asset.playback_ids && asset.playback_ids[0])) {
+          throw new Error('Error getting playback_id from asset')
+        }
         res.json({
           asset: {
             id: asset.id,
@@ -33,7 +37,7 @@ export default async function assetHandler (req, res) {
       }
 
       try {
-        await Video.Assets.del(req.query.id);
+        await Video.Assets.del(req.query.id as string);
         res.status(200).end(`Deleted ${req.query.id}`);
       } catch (e) {
         res.statusCode = 500;

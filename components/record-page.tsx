@@ -1,5 +1,5 @@
 /* global navigator MediaRecorder Blob File */
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, ChangeEvent } from 'react';
 import Layout from './layout';
 import Button from './button';
 import StopWatch from './stop-watch';
@@ -8,13 +8,23 @@ import UploadProgressFullpage from './upload-progress-fullpage';
 import logger from '../lib/logger';
 
 const DEVICE_ID_NO_MIC = 'no-mic';
-const DEVICDE_ID_SCREEN = 'screenshare';
+// const DEVICDE_ID_SCREEN = 'screenshare';
 const MEDIA_RECORDER_TIMESLICE_MS = 2000;
 
-const noop = () => { };
+const noop = () => void 0;
 
-const ActionButtons = ({
-  hasMediaRecorder,
+type ActionButtonProps = {
+  hasMediaRecorder: boolean;
+  isRecording: boolean;
+  isLoadingPreview: boolean;
+  isReviewing: boolean;
+  startRecording: () => void;
+  stopRecording: () => void;
+  submitRecording: () => void;
+  reset: () => void;
+};
+
+const ActionButtons: React.FC<ActionButtonProps> = ({ hasMediaRecorder,
   isRecording,
   isLoadingPreview,
   isReviewing,
@@ -43,30 +53,38 @@ const ActionButtons = ({
   </div>
 );
 
-const getAudioContext = () => window.AudioContext || window.webkitAudioContext;
+const getAudioContext = () => typeof window !== undefined && window.AudioContext || window.webkitAudioContext;
 
-function RecordPage () {
-  const [file, setFile] = useState(null);
-  const [startRecordTime, setStartRecordTime] = useState(null);
+type DeviceItems = MediaDeviceInfo[];
+type DeviceList = {
+  video: DeviceItems;
+  audio: DeviceItems;
+};
+
+type NoProps = Record<never, never>
+
+const RecordPage: React.FC<NoProps> = () => {
+  const [file, setFile] = useState<File | null>(null);
+  const [startRecordTime, setStartRecordTime] = useState<number | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
   const [isReviewing, setIsReviewing] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
   const [haveDeviceAccess, setHaveDeviceAccess] = useState(false);
-  const [videoDeviceId, setVideoDeviceId] = useState(null);
-  const [audioDeviceId, setAudioDeviceId] = useState(null);
-  const recorderRef = useRef(null);
-  const streamRef = useRef(null);
-  const videoRef = useRef(null);
-  const audioInterval = useRef(null);
-  const mediaChunks = useRef([]);
-  const finalBlob = useRef(null);
-  const [deviceList, setDevices] = useState({ video: [], audio: [] });
-  const hasMediaRecorder = (typeof MediaRecorder !== 'undefined');
+  const [videoDeviceId, setVideoDeviceId] = useState('');
+  const [audioDeviceId, setAudioDeviceId] = useState('');
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const audioInterval = useRef<number | null>(null);
+  const mediaChunks = useRef<Blob[]>([]);
+  const finalBlob = useRef<Blob | null>(null);
+  const [deviceList, setDevices] = useState({ video: [], audio: [] } as DeviceList);
+  const hasMediaRecorder = (typeof window !== 'undefined' && typeof window.MediaRecorder !== 'undefined');
 
   const getDevices = async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
-    const list = { video: [], audio: [] };
+    const list: DeviceList = { video: [], audio: [] };
 
     devices.forEach((device) => {
       if (device.kind === 'videoinput') {
@@ -76,12 +94,10 @@ function RecordPage () {
         list.audio.push(device);
       }
     });
-    list.audio.push({ label: '--no microphone--', deviceId: DEVICE_ID_NO_MIC });
-    list.video.push({ label: '--Screenshare--', deviceId: DEVICDE_ID_SCREEN });
     setDevices({ ...list });
   };
 
-  const updateAudioLevels = (analyser) => {
+  const updateAudioLevels = (analyser: AnalyserNode) => {
     const sampleSize = 10;
     // dataArray will give us an array of numbers ranging from 0 to 255
     const dataArray = new Uint8Array(sampleSize);
@@ -94,7 +110,7 @@ function RecordPage () {
   const cleanup = () => {
     logger('cleanup');
     if (recorderRef.current) {
-      if (recorderRef.current.state === 'inactive') {
+      if (recorderRef?.current?.state === 'inactive') {
         logger('skipping recorder stop() b/c state is "inactive"');
       } else {
         recorderRef.current.onstop = function onRecorderStop () {
@@ -138,14 +154,14 @@ function RecordPage () {
          */
         await getDevices();
         logger('requesting user media with constraints', constraints);
-        let stream;
+        /*
         if (video.deviceId === DEVICDE_ID_SCREEN) {
           stream = await navigator.mediaDevices.getDisplayMedia();
           const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
           stream.addTrack(audioStream.getAudioTracks()[0]);
         } else {
-          stream = await navigator.mediaDevices.getUserMedia(constraints);
-        }
+        */
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
         const AudioContext = getAudioContext();
         if (AudioContext) {
           const audioContext = new AudioContext();
@@ -154,15 +170,17 @@ function RecordPage () {
           analyser.fftSize = 1024;
           mediaStreamSource.connect(analyser);
 
-          audioInterval.current = setInterval(() => {
+          audioInterval.current = window.setInterval(() => {
             updateAudioLevels(analyser);
           }, 500);
         }
 
         streamRef.current = stream;
-        videoRef.current.srcObject = stream;
-        videoRef.current.muted = true;
-        videoRef.current.controls = false;
+        if (videoRef.current !== null) {
+          (videoRef.current as HTMLVideoElement).srcObject = stream;
+          videoRef.current.muted = true;
+          videoRef.current.controls = false;
+        }
         setHaveDeviceAccess(true);
       } catch (err) {
         console.error(err); // eslint-disable-line no-console
@@ -236,11 +254,13 @@ function RecordPage () {
     recorderRef.current.onstop = function onRecorderStop () {
       finalBlob.current = new Blob(mediaChunks.current, { type: 'video/webm' });
       const objUrl = URL.createObjectURL(finalBlob.current);
-      videoRef.current.srcObject = null;
-      videoRef.current.src = objUrl;
-      videoRef.current.controls = true;
-      videoRef.current.muted = false;
-      setIsReviewing(true);
+      if (videoRef.current !== null) {
+        videoRef.current.srcObject = null;
+        videoRef.current.src = objUrl;
+        videoRef.current.controls = true;
+        videoRef.current.muted = false;
+        setIsReviewing(true);
+      }
       /*
       setIsLoadingPreview(true);
 
@@ -259,11 +279,11 @@ function RecordPage () {
     recorderRef.current.stop();
   };
 
-  const selectVideo = async (evt) => {
+  const selectVideo = async (evt: ChangeEvent<HTMLSelectElement>) => {
     await setVideoDeviceId(evt.target.value);
   };
 
-  const selectAudio = async (evt) => {
+  const selectAudio = async (evt: ChangeEvent<HTMLSelectElement>) => {
     await setAudioDeviceId(evt.target.value);
   };
 
@@ -285,13 +305,13 @@ function RecordPage () {
       {haveDeviceAccess
         && (
           <div className="device-pickers">
-            <select onChange={selectVideo} disabled={isRecording} title={isRecording ? 'Cannot change audio devices while recording' : ''}>
+            <select onBlur={selectVideo} disabled={isRecording} title={isRecording ? 'Cannot change audio devices while recording' : ''}>
               {
                 deviceList.video.map(({ label, deviceId }) => <option key={deviceId} value={deviceId}>{label}</option>)
               }
             </select>
             <AudioBars audioLevel={audioLevel} />
-            <select onChange={selectAudio} disabled={isRecording} title={isRecording ? 'Cannot change audio devices while recording' : ''}>
+            <select onBlur={selectAudio} disabled={isRecording} title={isRecording ? 'Cannot change audio devices while recording' : ''}>
               {
                 deviceList.audio.map(({ label, deviceId }) => <option key={deviceId} value={deviceId}>{label}</option>)
               }

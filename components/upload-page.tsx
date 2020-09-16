@@ -1,7 +1,12 @@
+import { ReactNode } from 'react';
 import Layout from './layout';
 import { MUX_HOME_PAGE_URL } from '../constants';
 
-export default function UploadPage ({ children }) {
+type Props = {
+  children: ReactNode
+};
+
+const UploadPage: React.FC<Props> = ({ children }) => {
   return (
     <Layout
       title="stream.new"
@@ -58,3 +63,5 @@ export default function UploadPage ({ children }) {
     </Layout>
   );
 }
+
+export default UploadPage;

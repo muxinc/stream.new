@@ -1,4 +1,6 @@
-export default function ErrorMessage ({ message }) {
+type Props = { message: string };
+
+const ErrorMessage: React.FC<Props> = ({ message }) => {
   return (
     <>
       <div className="message">{message || 'Unknown error'}</div>
@@ -15,3 +17,5 @@ export default function ErrorMessage ({ message }) {
     </>
   );
 }
+
+export default ErrorMessage;

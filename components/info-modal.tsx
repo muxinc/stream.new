@@ -2,7 +2,9 @@ import Link from 'next/link';
 import { breakpoints } from '../style-vars';
 import { MUX_HOME_PAGE_URL, OPEN_SOURCE_URL } from '../constants';
 
-export default function InfoModal ({ close }) {
+type Props = { close: () => void };
+
+const InfoModal: React.FC<Props> = ({ close }) => {
   return (
     <div className="container">
       <div className="wrapper">
@@ -62,3 +64,5 @@ export default function InfoModal ({ close }) {
     </div>
   );
 }
+
+export default InfoModal;

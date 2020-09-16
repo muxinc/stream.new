@@ -8,15 +8,17 @@ import Button from './button';
 import Spinner from './spinner';
 import ErrorMessage from './error-message';
 
-const fetcher = (url) => fetch(url).then((res) => res.json());
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-const UploadForm = () => {
+type Props = null;
+
+const UploadForm: React.FC<Props> = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isPreparing, setIsPreparing] = useState(false);
   const [uploadId, setUploadId] = useState(null);
-  const [progress, setProgress] = useState(null);
+  const [progress, setProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const { data, error } = useSwr(
     () => (isPreparing ? `/api/upload/${uploadId}` : null),
@@ -43,7 +45,7 @@ const UploadForm = () => {
     }
   };
 
-  const startUpload = (file) => {
+  const startUpload = (file: File) => {
     if (isUploading) {
       console.warn('already uploading'); // eslint-disable-line no-console
       return;
@@ -82,7 +84,6 @@ const UploadForm = () => {
     if (upload && upload.asset_id) {
       Router.push({
         pathname: `/asset/${upload.asset_id}`,
-        scroll: false,
       });
     }
   }, [upload]);
@@ -91,7 +92,9 @@ const UploadForm = () => {
   if (data && data.error) return <ErrorMessage message={data.error} />;
 
   const onInputChange = () => {
-    startUpload(inputRef.current.files[0]);
+    if (inputRef.current && inputRef.current.files !== null) {
+      startUpload(inputRef.current.files[0]);
+    }
   };
 
   if (errorMessage) return <ErrorMessage message={errorMessage} />;
@@ -112,7 +115,7 @@ const UploadForm = () => {
           <>
             <div {...getRootProps()} className={`drop-area ${isDragActive ? 'active' : ''}`}>
               <label htmlFor="file-input">
-                <Button type="button" onClick={() => inputRef.current.click()}>
+                <Button type="button" onClick={() => inputRef.current && inputRef.current.click()}>
                   Select a video file
                 </Button>
                 <input id="file-input" type="file" {...getInputProps()} onChange={onInputChange} ref={inputRef} />

@@ -1,12 +1,13 @@
+import { NextApiRequest, NextApiResponse } from 'next'
 import Mux from '@mux/mux-node';
 import { buffer } from 'micro';
 import { sendSlackWebhook } from '../../../lib/slack-notifier';
 
 const webhookSignatureSecret = process.env.MUX_WEBHOOK_SIGNATURE_SECRET;
 
-const verifyWebhookSignature = async (rawBody, req) => {
+const verifyWebhookSignature = async (rawBody: string | Buffer, req: NextApiRequest) => {
   if (webhookSignatureSecret) {
-    return Mux.Webhooks.verifyHeader(rawBody, req.headers['mux-signature'], webhookSignatureSecret);
+    return Mux.Webhooks.verifyHeader(rawBody, req.headers['mux-signature'] as string, webhookSignatureSecret);
   }
   console.log('Skipping webhook sig verification because no secret is configured'); // eslint-disable-line no-console
   return true;
@@ -28,7 +29,7 @@ export const config = {
   },
 };
 
-export default async function muxWebhookHandler (req, res) {
+export default async function muxWebhookHandler (req: NextApiRequest, res: NextApiResponse): Promise<void> {
   const { method } = req;
 
   switch (method) {

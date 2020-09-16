@@ -1,27 +1,40 @@
 import { useState } from 'react';
+import { GetStaticProps, GetStaticPaths } from 'next'
 import { useRouter } from 'next/router';
 import FullpageSpinner from '../../components/fullpage-spinner';
 import VideoPlayer from '../../components/video-player';
 import Layout from '../../components/layout';
 import { HOST_URL } from '../../constants';
 
-export function getStaticProps ({ params: { id: playbackId } }) {
+type Params = {
+  id: string;
+}
+
+export const getStaticProps: GetStaticProps = async (context)  => {
+  const { params } = context;
+  const { id: playbackId } = (params as Params);
   const poster = `https://image.mux.com/${playbackId}/thumbnail.png`;
   const shareUrl = `${HOST_URL}/v/${playbackId}`;
 
   return { props: { playbackId, shareUrl, poster } };
 }
 
-export function getStaticPaths () {
+export const getStaticPaths: GetStaticPaths = async () => {
   return {
     paths: [],
     fallback: true,
   };
 }
 
-export default function Playback ({ playbackId, shareUrl, poster }) {
+type Props = {
+  playbackId: string,
+  shareUrl: string,
+  poster: string
+};
+
+const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
 
   if (router.isFallback) {
@@ -36,7 +49,7 @@ export default function Playback ({ playbackId, shareUrl, poster }) {
     );
   }
 
-  const onError = (evt) => {
+  const onError = (evt: ErrorEvent) => {
     setErrorMessage('This video does not exist');
     console.error('Error', evt); // eslint-disable-line no-console
   };
@@ -73,3 +86,5 @@ export default function Playback ({ playbackId, shareUrl, poster }) {
     </Layout>
   );
 }
+
+export default Playback;

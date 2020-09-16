@@ -6,16 +6,17 @@
     "dev": "next dev",
     "build": "yarn lint && next build",
     "start": "next start",
-    "lint": "yarn eslint . --ext .js,.jsx",
+    "lint": "yarn eslint . --ext .js,.jsx,.ts,.tsx",
     "format": "yarn lint",
-    "test": "jest"
+    "test": "jest",
+    "tsc": "tsc"
   },
   "dependencies": {
     "@mux/mux-node": "^3.0",
     "@mux/upchunk": "^2.0",
     "got": "^11.5.1",
     "hls.js": "^0.14",
-    "micro": "^9.3.4",
+    "micro": "9.3.5-canary.3",
     "mux-embed": "^3.3.0",
     "next": "latest",
     "react": "^16.13.1",
@@ -24,15 +25,21 @@
     "swr": "^0.2.0"
   },
   "devDependencies": {
+    "@types/dom-mediacapture-record": "^1.0.7",
+    "@types/hls.js": "^0.13.1",
+    "@types/react": "^16.9.49",
+    "@types/webrtc": "^0.0.26",
+    "@typescript-eslint/eslint-plugin": "^4.1.1",
+    "@typescript-eslint/parser": "^4.1.1",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.3.0",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.4",
-    "eslint": "^7.4.0",
-    "eslint-config-airbnb": "^18.2.0",
-    "eslint-plugin-import": "^2.22.0",
+    "eslint": "^7.9.0",
     "eslint-plugin-jsx-a11y": "^6.3.1",
-    "eslint-plugin-react": "^7.20.3",
-    "jest": "^26.4.2"
+    "eslint-plugin-react": "^7.20.6",
+    "eslint-plugin-react-hooks": "^4.1.2",
+    "jest": "^26.4.2",
+    "typescript": "^4.0.2"
   }
 }
