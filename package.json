@@ -24,6 +24,7 @@
     "swr": "^0.2.0"
   },
   "devDependencies": {
+    "@types/react": "^16.9.49",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.3.0",
     "enzyme": "^3.11.0",
@@ -33,6 +34,7 @@
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-jsx-a11y": "^6.3.1",
     "eslint-plugin-react": "^7.20.3",
-    "jest": "^26.4.2"
+    "jest": "^26.4.2",
+    "typescript": "^4.0.2"
   }
 }

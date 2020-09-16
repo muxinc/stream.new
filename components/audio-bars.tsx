@@ -1,4 +1,6 @@
-const AudioBars = ({ audioLevel }) => {
+type AudioBarsProps = { audioLevel: number };
+
+const AudioBars = ({ audioLevel }: AudioBarsProps) => {
   const audioLevelThresholds = [0, 5, 10, 15, 20, 25];
 
   return (
