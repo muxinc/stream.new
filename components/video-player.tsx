@@ -1,5 +1,4 @@
 /* globals Image */
-/* eslint-disable jsx-a11y/media-has-caption */
 import { useState, useEffect, useRef } from 'react';
 import Hls from 'hls.js';
 import mux from 'mux-embed';

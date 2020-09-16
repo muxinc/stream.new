@@ -4,7 +4,9 @@ import Spinner from './spinner';
  *  Use this as a direct child of a <Layout /> component
  */
 
-const FullpageSpinner: React.FC<Record<never, never>> = () => {
+type NoProps = Record<never, never>
+
+const FullpageSpinner: React.FC<NoProps> = () => {
   return (
     <div className="wrapper">
       <Spinner />

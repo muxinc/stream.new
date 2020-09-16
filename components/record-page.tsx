@@ -1,5 +1,4 @@
 /* global navigator MediaRecorder Blob File */
-/* eslint-disable jsx-a11y/media-has-caption */
 import { useRef, useEffect, useState, ChangeEvent } from 'react';
 import Layout from './layout';
 import Button from './button';
@@ -62,7 +61,9 @@ type DeviceList = {
   audio: DeviceItems;
 };
 
-const RecordPage: React.FC<Record<never, never>> = () => {
+type NoProps = Record<never, never>
+
+const RecordPage: React.FC<NoProps> = () => {
   const [file, setFile] = useState<File | null>(null);
   const [startRecordTime, setStartRecordTime] = useState<number | null>(null);
   const [isRecording, setIsRecording] = useState(false);
