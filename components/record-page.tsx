@@ -54,7 +54,7 @@ const ActionButtons: React.FC<ActionButtonProps> = ({ hasMediaRecorder,
   </div>
 );
 
-const getAudioContext = () => window.AudioContext || window.webkitAudioContext;
+const getAudioContext = () => typeof window !== undefined && window.AudioContext || window.webkitAudioContext;
 
 type DeviceItems = MediaDeviceInfo[];
 type DeviceList = {
@@ -79,7 +79,7 @@ const RecordPage: React.FC<Record<never, never>> = () => {
   const mediaChunks = useRef<Blob[]>([]);
   const finalBlob = useRef<Blob | null>(null);
   const [deviceList, setDevices] = useState({ video: [], audio: [] } as DeviceList);
-  const hasMediaRecorder = (typeof window.MediaRecorder !== 'undefined');
+  const hasMediaRecorder = (typeof window !== 'undefined' && typeof window.MediaRecorder !== 'undefined');
 
   const getDevices = async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();

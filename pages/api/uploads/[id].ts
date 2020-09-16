@@ -9,7 +9,7 @@ export default async (req: NextApiRequest, res: NextApiResponse): Promise<void> 
   switch (method) {
     case 'GET':
       try {
-        const upload = await Video.Uploads.get(req.query.id);
+        const upload = await Video.Uploads.get(req.query.id as string);
         res.json({
           upload: {
             status: upload.status,
