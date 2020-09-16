@@ -14,6 +14,9 @@ module.exports = {
     graphql: true,
     fetch: true,
   },
+  env: {
+    jest: true,
+  },
   extends: 'eslint-config-airbnb',
   rules: {
     'import/no-extraneous-dependencies': 0,

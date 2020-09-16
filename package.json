@@ -7,7 +7,8 @@
     "build": "yarn lint && next build",
     "start": "next start",
     "lint": "yarn eslint . --ext .js,.jsx",
-    "format": "yarn lint"
+    "format": "yarn lint",
+    "test": "jest"
   },
   "dependencies": {
     "@mux/mux-node": "^3.0",
@@ -24,10 +25,14 @@
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
+    "babel-jest": "^26.3.0",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.4",
     "eslint": "^7.4.0",
     "eslint-config-airbnb": "^18.2.0",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-jsx-a11y": "^6.3.1",
-    "eslint-plugin-react": "^7.20.3"
+    "eslint-plugin-react": "^7.20.3",
+    "jest": "^26.4.2"
   }
 }
