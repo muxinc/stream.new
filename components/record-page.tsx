@@ -4,54 +4,12 @@ import Layout from './layout';
 import Button from './button';
 import StopWatch from './stop-watch';
 import AudioBars from './audio-bars';
+import RecordingControls from './recording-controls';
 import UploadProgressFullpage from './upload-progress-fullpage';
 import logger from '../lib/logger';
 
 const DEVICE_ID_NO_MIC = 'no-mic';
-// const DEVICDE_ID_SCREEN = 'screenshare';
 const MEDIA_RECORDER_TIMESLICE_MS = 2000;
-
-const noop = () => void 0;
-
-type ActionButtonProps = {
-  hasMediaRecorder: boolean;
-  isRecording: boolean;
-  isLoadingPreview: boolean;
-  isReviewing: boolean;
-  startRecording: () => void;
-  stopRecording: () => void;
-  submitRecording: () => void;
-  reset: () => void;
-};
-
-const ActionButtons: React.FC<ActionButtonProps> = ({ hasMediaRecorder,
-  isRecording,
-  isLoadingPreview,
-  isReviewing,
-  startRecording,
-  stopRecording,
-  submitRecording,
-  reset,
-}) => (
-  <div className="container">
-    {!hasMediaRecorder && <p className="error">Unable to record: your browser does not have MediaRecorder. You may need to enable this in Experimental Features.</p>}
-    <Button type="button" onClick={hasMediaRecorder ? startRecording : noop} disabled={!hasMediaRecorder || isRecording || isReviewing}>Start recording</Button>
-    <Button type="button" onClick={stopRecording} disabled={!isRecording}>Stop</Button>
-    <Button type="button" onClick={submitRecording} disabled={!isReviewing || isLoadingPreview}>{ isLoadingPreview ? 'Loading preview...' : 'Submit' }</Button>
-    <Button type="button" onClick={reset} disabled={!isReviewing}>Reset</Button>
-    <style jsx>{`
-      .error {
-        color: red;
-        max-width: 400px;
-      }
-      .container {
-        display: flex;
-        flex-direction: column;
-      }
-    `}
-    </style>
-  </div>
-);
 
 const getAudioContext = () => typeof window !== undefined && window.AudioContext || window.webkitAudioContext;
 
@@ -322,7 +280,7 @@ const RecordPage: React.FC<NoProps> = () => {
         { isRecording && startRecordTime && <StopWatch startTimeUnixMs={startRecordTime} /> }
       </div>
       { haveDeviceAccess && (
-      <ActionButtons
+      <RecordingControls
         hasMediaRecorder={hasMediaRecorder}
         isRecording={isRecording}
         isLoadingPreview={isLoadingPreview}
