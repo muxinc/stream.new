@@ -3,7 +3,8 @@ import Spinner from './spinner';
 /*
  *  Use this as a direct child of a <Layout /> component
  */
-export default function FullpageSpinner () {
+
+const FullpageSpinner: React.FC<Record<never, never>> = () => {
   return (
     <div className="wrapper">
       <Spinner />
@@ -19,3 +20,5 @@ export default function FullpageSpinner () {
     </div>
   );
 }
+
+export default FullpageSpinner;

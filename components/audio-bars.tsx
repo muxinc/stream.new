@@ -1,6 +1,6 @@
-type AudioBarsProps = { audioLevel: number };
+type Props = { audioLevel: number };
 
-const AudioBars = ({ audioLevel }: AudioBarsProps) => {
+const AudioBars: React.FC<Props> = ({ audioLevel }) => {
   const audioLevelThresholds = [0, 5, 10, 15, 20, 25];
 
   return (

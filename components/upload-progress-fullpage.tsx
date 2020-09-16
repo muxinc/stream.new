@@ -4,12 +4,17 @@ import * as UpChunk from '@mux/upchunk';
 import useSwr from 'swr';
 import Layout from './layout';
 
-const fetcher = (url) => fetch(url).then((res) => res.json());
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export default function UploadProgressFullpage ({ file }) {
+type Props = {
+  file: File
+};
+
+// export default function UploadProgressFullpage ({ file }) {
+const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadId, setUploadId] = useState(null);
-  const [progress, setProgress] = useState(null);
+  const [uploadId, setUploadId] = useState('');
+  const [progress, setProgress] = useState(0);
   const [isPreparing, setIsPreparing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -38,7 +43,7 @@ export default function UploadProgressFullpage ({ file }) {
     }
   };
 
-  const startUpload = (_file) => {
+  const startUpload = (_file: File) => {
     if (isUploading) {
       return;
     }
@@ -66,7 +71,6 @@ export default function UploadProgressFullpage ({ file }) {
     if (upload && upload.asset_id) {
       Router.push({
         pathname: `/assets/${upload.asset_id}`,
-        scroll: false,
       });
     }
   }, [upload]);
@@ -95,3 +99,5 @@ export default function UploadProgressFullpage ({ file }) {
     </Layout>
   );
 }
+
+export default UploadProgressFullpage;

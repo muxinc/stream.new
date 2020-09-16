@@ -6,9 +6,11 @@ import Layout from '../../components/layout';
 import Button from '../../components/button';
 import { transitionDuration } from '../../style-vars';
 
-const fetcher = (url) => fetch(url).then((res) => res.json());
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export default function Asset () {
+type Props = null;
+
+const Asset: React.FC<Props> = () => {
   const router = useRouter();
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -77,3 +79,5 @@ export default function Asset () {
     </Layout>
   );
 }
+
+export default Asset;

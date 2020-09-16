@@ -1,10 +1,45 @@
+/* globals process */
 import got from 'got';
 import { HOST_URL } from '../constants';
 
 const slackWebhook = process.env.SLACK_WEBHOOK_ASSET_READY;
 const moderatorPassword = process.env.SLACK_MODERATOR_PASSWORD;
 
-const baseBlocks = ({ playbackId, assetId }) => ([
+type BlockItem = {
+  type: string,
+  title?: {
+    type: string,
+    text: string,
+    emoji: boolean,
+  }
+  image_url?: string,
+  alt_text?: string,
+  text?: {
+    type: string,
+    text: string,
+  },
+  accessory?: {
+    type: string,
+    text: {
+      type: string,
+      text: string,
+    },
+    url: string,
+    style: string
+  },
+  elements?: [{
+    type: string,
+    text: {
+      type: string,
+      emoji: boolean,
+      text: string
+    },
+    style: string,
+    url: string,
+  }]
+};
+
+const baseBlocks = ({ playbackId, assetId }: {playbackId: string, assetId: string}): BlockItem[] => ([
   {
     type: 'section',
     text: {
@@ -52,10 +87,10 @@ const baseBlocks = ({ playbackId, assetId }) => ([
     ],
   }]);
 
-export const sendSlackWebhook = async ({ playbackId, assetId }) => {
+export const sendSlackWebhook = async ({ playbackId, assetId }: {playbackId: string, assetId: string}): Promise<null> => {
   if (!slackWebhook) {
     console.log('No slack webhook configured'); // eslint-disable-line no-console
-    return Promise.resolve();
+    return null;
   }
 
   const blocks = baseBlocks({ playbackId, assetId });
@@ -79,11 +114,12 @@ export const sendSlackWebhook = async ({ playbackId, assetId }) => {
     });
   }
 
-  return got.post(slackWebhook, {
+  await got.post(slackWebhook, {
     json: {
       text: `New video created on stream.new. <${HOST_URL}/v/${playbackId}|View on stream.new>`,
       icon_emoji: 'see_no_evil',
       blocks,
     },
   });
+  return null;
 };

@@ -5,9 +5,11 @@ import Layout from '../components/layout';
 import Button from '../components/button';
 import UploadProgressFullpage from '../components/upload-progress-fullpage';
 
-export default function Index () {
-  const [file, setFile] = useState(null);
-  const inputRef = useRef(null);
+type Props = null;
+
+const Index: React.FC<Props> = () => {
+  const [file, setFile] = useState<File | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const onDrop = useCallback((acceptedFiles) => {
     if (acceptedFiles && acceptedFiles[0]) {
@@ -18,8 +20,9 @@ export default function Index () {
   }, []);
 
   const onInputChange = () => {
-    setFile(inputRef.current.files[0]);
-    console.log('debug input changed'); // eslint-disable-line no-console
+    if (inputRef.current && inputRef.current.files && inputRef.current.files[0]) {
+      setFile(inputRef.current.files[0]);
+    }
   };
 
   if (file) {
@@ -43,7 +46,7 @@ export default function Index () {
         </div>
         <div className="cta">
           <label htmlFor="file-input">
-            <Button type="button" onClick={() => inputRef.current.click()}>
+            <Button type="button" onClick={() => inputRef.current && inputRef.current.click()}>
               <span className="cta-text-mobile">Add a video</span>
               <span className="cta-text-desktop">Upload a video</span>
             </Button>
@@ -117,3 +120,5 @@ export default function Index () {
     </Layout>
   );
 }
+
+export default Index;

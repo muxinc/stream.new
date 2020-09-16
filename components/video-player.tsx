@@ -1,10 +1,9 @@
 /* globals Image */
+/* eslint-disable jsx-a11y/media-has-caption */
 import { useState, useEffect, useRef } from 'react';
 import Hls from 'hls.js';
 import mux from 'mux-embed';
 import { breakpoints } from '../style-vars';
-
-const noop = () => {};
 
 /*
  * We need to set the width/height of the player depending on what the dimensions of
@@ -25,14 +24,29 @@ const noop = () => {};
  * jump or resize.
  *
  */
-export default function VideoPlayer ({ playbackId, poster, onLoaded, onError = noop }) {
-  const videoRef = useRef(null);
-  const [isVertical, setIsVertical] = useState();
+
+type Props = {
+  playbackId: string
+  poster: string
+  onLoaded: () => void
+  onError: (error: ErrorEvent) => void
+};
+
+type SizedEvent = {
+  target: {
+    width: number
+    height: number
+  }
+};
+
+const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError }) => {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [isVertical, setIsVertical] = useState<boolean | null>();
   const [playerInitTime] = useState(Date.now());
 
-  const error = (event) => onError(event);
+  const videoError = (event: ErrorEvent) => onError(event);
 
-  const onImageLoad = (event) => {
+  const onImageLoad = (event: SizedEvent) => {
     const [w, h] = [event.target.width, event.target.height];
     if (w && h) {
       setIsVertical((w / h) < 1);
@@ -49,16 +63,17 @@ export default function VideoPlayer ({ playbackId, poster, onLoaded, onError = n
    */
   useEffect(() => {
     const img = new Image();
-    img.onload = onImageLoad;
+    img.onload = (evt) => onImageLoad((evt as unknown) as SizedEvent);
     img.src = poster;
   }, []);
 
   useEffect(() => {
     const video = videoRef.current;
     const src = `https://stream.mux.com/${playbackId}.m3u8`;
-    let hls;
+    let hls: Hls | null;
+    hls = null;
     if (video) {
-      video.addEventListener('error', error);
+      video.addEventListener('error', videoError);
 
       if (video.canPlayType('application/vnd.apple.mpegurl')) {
         // This will run in safari, where HLS is supported natively
@@ -91,7 +106,9 @@ export default function VideoPlayer ({ playbackId, poster, onLoaded, onError = n
     }
 
     return () => {
-      video.removeEventListener('error', error);
+      if (video) {
+        video.removeEventListener('error', videoError);
+      }
       if (hls) {
         hls.destroy();
       }
@@ -122,3 +139,5 @@ export default function VideoPlayer ({ playbackId, poster, onLoaded, onError = n
     </>
   );
 }
+
+export default VideoPlayer;

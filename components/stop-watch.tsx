@@ -2,8 +2,12 @@ import { useState, useEffect } from 'react';
 
 const UPDATE_INTERVAL_MS = 1000;
 
-const StopWatch = ({ startTimeUnixMs }) => {
-  const [time, setTime] = useState(null);
+type Props = {
+  startTimeUnixMs: number
+};
+
+const StopWatch: React.FC<Props> = ({ startTimeUnixMs }) => {
+  const [time, setTime] = useState('');
 
   useEffect(() => {
     const interval = setInterval(() => {
