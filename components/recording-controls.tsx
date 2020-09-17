@@ -1,7 +1,6 @@
 import Button from './button';
 
-type ActionButtonProps = {
-  hasMediaRecorder: boolean;
+type Props = {
   isRecording: boolean;
   isLoadingPreview: boolean;
   isReviewing: boolean;
@@ -11,10 +10,7 @@ type ActionButtonProps = {
   reset: () => void;
 };
 
-const noop = () => void 0;
-
-const ActionButtons: React.FC<ActionButtonProps> = ({
-  hasMediaRecorder,
+const RecordingControls: React.FC<Props> = ({
   isRecording,
   isLoadingPreview,
   isReviewing,
@@ -24,16 +20,11 @@ const ActionButtons: React.FC<ActionButtonProps> = ({
   reset,
 }) => (
   <div className="container">
-    {!hasMediaRecorder && <p className="error">Unable to record: your browser does not have MediaRecorder. You may need to enable this in Experimental Features.</p>}
-    <Button type="button" onClick={hasMediaRecorder ? startRecording : noop} disabled={!hasMediaRecorder || isRecording || isReviewing}>Start recording</Button>
+    <Button type="button" onClick={startRecording} disabled={isRecording || isReviewing}>Start recording</Button>
     <Button type="button" onClick={stopRecording} disabled={!isRecording}>Stop</Button>
     <Button type="button" onClick={submitRecording} disabled={!isReviewing || isLoadingPreview}>{ isLoadingPreview ? 'Loading preview...' : 'Submit' }</Button>
-    <Button type="button" onClick={reset} disabled={!isReviewing}>Reset</Button>
+    <Button type="button" onClick={reset}>Reset</Button>
     <style jsx>{`
-      .error {
-        color: red;
-        max-width: 400px;
-      }
       .container {
         display: flex;
         flex-direction: column;
@@ -43,4 +34,4 @@ const ActionButtons: React.FC<ActionButtonProps> = ({
   </div>
 );
 
-export default ActionButtons;
+export default RecordingControls;

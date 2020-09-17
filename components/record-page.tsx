@@ -1,4 +1,5 @@
 /* global navigator MediaRecorder Blob File */
+/* eslint-disable jsx-a11y/no-onchange */
 import { useRef, useEffect, useState, ChangeEvent } from 'react';
 import Layout from './layout';
 import Button from './button';
@@ -8,7 +9,6 @@ import RecordingControls from './recording-controls';
 import UploadProgressFullpage from './upload-progress-fullpage';
 import logger from '../lib/logger';
 
-const DEVICE_ID_NO_MIC = 'no-mic';
 const MEDIA_RECORDER_TIMESLICE_MS = 2000;
 
 const getAudioContext = () => typeof window !== undefined && window.AudioContext || window.webkitAudioContext;
@@ -22,6 +22,7 @@ type DeviceList = {
 type NoProps = Record<never, never>
 
 const RecordPage: React.FC<NoProps> = () => {
+  const [videoSource, setVideoSource] = useState<'camera' | 'screen' | ''>('');
   const [file, setFile] = useState<File | null>(null);
   const [startRecordTime, setStartRecordTime] = useState<number | null>(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -38,7 +39,7 @@ const RecordPage: React.FC<NoProps> = () => {
   const mediaChunks = useRef<Blob[]>([]);
   const finalBlob = useRef<Blob | null>(null);
   const [deviceList, setDevices] = useState({ video: [], audio: [] } as DeviceList);
-  const hasMediaRecorder = (typeof window !== 'undefined' && typeof window.MediaRecorder !== 'undefined');
+  // const hasMediaRecorder = (typeof window !== 'undefined' && typeof window.MediaRecorder !== 'undefined');
 
   const getDevices = async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
@@ -65,6 +66,9 @@ const RecordPage: React.FC<NoProps> = () => {
     setAudioLevel(audioLevelValue);
   };
 
+  /*
+   * Stop all recording, cancel audio interval
+   */
   const cleanup = () => {
     logger('cleanup');
     if (recorderRef.current) {
@@ -84,76 +88,107 @@ const RecordPage: React.FC<NoProps> = () => {
     setIsRecording(false);
   };
 
-  const startAv = async () => {
-    logger('start av');
+  /*
+   * do a cleanup, and also cancel all media streams
+   */
+  const hardCleanup = () => {
     cleanup();
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+    }
+    setIsReviewing(false);
+    setIsLoadingPreview(false);
+    setHaveDeviceAccess(false);
+  }
+
+  const startAv = () => {
+    cleanup();
+    if (!videoSource) {
+      logger.error('Cannot startAv without a video source');
+      return
+    }
+    if (videoSource === 'camera') {
+      startCamera();
+    }
+    if (videoSource === 'screen') {
+      startScreenshare();
+    }
+  }
+
+  const setupStream = (stream: MediaStream) => {
+    const AudioContext = getAudioContext();
+    if (AudioContext) {
+      const audioContext = new AudioContext();
+      const mediaStreamSource = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 1024;
+      mediaStreamSource.connect(analyser);
+
+      audioInterval.current = window.setInterval(() => {
+        updateAudioLevels(analyser);
+      }, 500);
+      streamRef.current = stream;
+      if (videoRef.current !== null) {
+        (videoRef.current as HTMLVideoElement).srcObject = stream;
+        videoRef.current.muted = true;
+        videoRef.current.controls = false;
+      }
+      setHaveDeviceAccess(true);
+    }
+  }
+
+  const startCamera = async () => {
     // todo - error if not supported
     if (navigator.mediaDevices) {
+      setVideoSource('camera');
       const video = videoDeviceId ? { deviceId: videoDeviceId } : true;
-      let audio;
-      if (audioDeviceId === DEVICE_ID_NO_MIC) {
-        audio = false;
-      } else if (audioDeviceId) {
-        audio = { deviceId: audioDeviceId };
-      } else {
-        audio = true;
-      }
-
+      const audio = audioDeviceId ? { deviceId: audioDeviceId } : true;
       const constraints = { video, audio };
       try {
-        /*
-         * If we try to getDevices() before getUserMedia(), then in firefox
-         * the device 'label' is empty.
-         *
-         * For that reason, we need to do a "fake" getUserMedia() first so that
-         * we get permissions, then getDevices(), then do getUserMedia() for real
-         * a 2nd time.
-         *
-         */
         await getDevices();
         logger('requesting user media with constraints', constraints);
-        /*
-        if (video.deviceId === DEVICDE_ID_SCREEN) {
-          stream = await navigator.mediaDevices.getDisplayMedia();
-          const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          stream.addTrack(audioStream.getAudioTracks()[0]);
-        } else {
-        */
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        const AudioContext = getAudioContext();
-        if (AudioContext) {
-          const audioContext = new AudioContext();
-          const mediaStreamSource = audioContext.createMediaStreamSource(stream);
-          const analyser = audioContext.createAnalyser();
-          analyser.fftSize = 1024;
-          mediaStreamSource.connect(analyser);
-
-          audioInterval.current = window.setInterval(() => {
-            updateAudioLevels(analyser);
-          }, 500);
-        }
-
-        streamRef.current = stream;
-        if (videoRef.current !== null) {
-          (videoRef.current as HTMLVideoElement).srcObject = stream;
-          videoRef.current.muted = true;
-          videoRef.current.controls = false;
-        }
-        setHaveDeviceAccess(true);
+        setupStream(stream)
       } catch (err) {
         console.error(err); // eslint-disable-line no-console
       }
     }
     return function teardown () {
-      cleanup();
+      hardCleanup();
+    };
+  };
+
+  const startScreenshare = async () => {
+    // todo - error if not supported
+    if (navigator.mediaDevices) {
+      setVideoSource('screen');
+      const audio = audioDeviceId ? { deviceId: audioDeviceId } : true;
+      const constraints = { video: false, audio };
+      try {
+        logger('requesting user media with constraints', constraints);
+        const stream = streamRef.current || await navigator.mediaDevices.getDisplayMedia({ video: true });
+        const audioStream = await navigator.mediaDevices.getUserMedia(constraints);
+        await getDevices();
+        /*
+         * if we already have an audio track it needs to be removed
+         * this happens when a user changes the mic input
+         */
+        stream.getTracks().filter(track => track.kind === 'audio').forEach(track => {
+          stream.removeTrack(track);
+        });
+        stream.addTrack(audioStream.getAudioTracks()[0]);
+        setupStream(stream)
+      } catch (err) {
+        logger.error(err);
+      }
+    }
+    return function teardown () {
+      hardCleanup();
     };
   };
 
   const reset = async () => {
-    cleanup();
-    setIsReviewing(false);
-    setIsLoadingPreview(false);
-    startAv();
+    hardCleanup();
   };
 
   useEffect(() => {
@@ -177,8 +212,14 @@ const RecordPage: React.FC<NoProps> = () => {
       const preferredOptions = { mimeType: 'video/webm;codecs=vp9' };
       const backupOptions = { mimeType: 'video/webm;codecs=vp8,opus' };
       let options = preferredOptions;
-      if (!MediaRecorder.isTypeSupported(preferredOptions.mimeType)) {
-        options = backupOptions;
+      /*
+       * MediaRecorder.isTypeSupported is not a thing in safari,
+       * good thing safari supports the preferredOptions
+       */
+      if (typeof MediaRecorder.isTypeSupported === 'function') {
+        if (!MediaRecorder.isTypeSupported(preferredOptions.mimeType)) {
+          options = backupOptions;
+        }
       }
 
       const stream = streamRef.current;
@@ -254,22 +295,26 @@ const RecordPage: React.FC<NoProps> = () => {
       title="stream.new"
       description="Record a video"
     >
-      <h1>Camera setup</h1>
-      {!haveDeviceAccess && <Button type="button" onClick={startAv}>Allow the browser to use your camera/mic</Button>}
-      <video ref={videoRef} width="400" autoPlay />
+      <h1>Video setup</h1>
+      {!haveDeviceAccess && <Button type="button" onClick={startCamera}>Allow the browser to use your camera/mic</Button>}
+      {!haveDeviceAccess && <Button type="button" onClick={startScreenshare}>Allow the browser to access screenshare</Button>}
+      {<video ref={videoRef} width="400" autoPlay />}
       <div>
         { isLoadingPreview && 'Loading preview...' }
       </div>
       {haveDeviceAccess
         && (
           <div className="device-pickers">
-            <select onBlur={selectVideo} disabled={isRecording} title={isRecording ? 'Cannot change audio devices while recording' : ''}>
-              {
-                deviceList.video.map(({ label, deviceId }) => <option key={deviceId} value={deviceId}>{label}</option>)
-              }
-            </select>
-            <AudioBars audioLevel={audioLevel} />
-            <select onBlur={selectAudio} disabled={isRecording} title={isRecording ? 'Cannot change audio devices while recording' : ''}>
+            {
+              videoSource !== 'screen' && 
+              <select onChange={selectVideo} disabled={isRecording} title={isRecording ? 'Cannot change audio devices while recording' : ''}>
+                {
+                  deviceList.video.map(({ label, deviceId }) => <option key={deviceId} value={deviceId}>{label}</option>)
+                }
+              </select>
+            }
+            <div className="audio-bars"><AudioBars audioLevel={audioLevel} /></div>
+            <select onChange={selectAudio} disabled={isRecording} title={isRecording ? 'Cannot change audio devices while recording' : ''}>
               {
                 deviceList.audio.map(({ label, deviceId }) => <option key={deviceId} value={deviceId}>{label}</option>)
               }
@@ -281,7 +326,6 @@ const RecordPage: React.FC<NoProps> = () => {
       </div>
       { haveDeviceAccess && (
       <RecordingControls
-        hasMediaRecorder={hasMediaRecorder}
         isRecording={isRecording}
         isLoadingPreview={isLoadingPreview}
         isReviewing={isReviewing}
@@ -292,6 +336,9 @@ const RecordPage: React.FC<NoProps> = () => {
       />
       )}
       <style jsx>{`
+        video {
+          display: ${haveDeviceAccess ? 'block' : 'none'};
+        }
         .device-pickers {
           width: 400px;
         }
@@ -299,8 +346,10 @@ const RecordPage: React.FC<NoProps> = () => {
           padding-bottom: 20px 0 ;
           height: 30px;
         }
-        select {
+        .audio-bars {
           margin: 18px 0;
+        }
+        select {
           padding: 11px;
           background: transparent;
           font-size: 26px;

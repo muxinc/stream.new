@@ -25,10 +25,10 @@ const AudioBars: React.FC<Props> = ({ audioLevel }) => {
           margin-right: 0;
         }
         .level {
-          background-color: '#ccc';
+          background-color: #ccc;
         }
         .level.active {
-          background-color: '#222';
+          background-color: #222;
         }
       `}
       </style>
