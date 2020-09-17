@@ -185,6 +185,15 @@ const Layout: React.FC<Props> = ({
             line-height: 33px;
           }
 
+          select {
+            padding: 11px;
+            background: transparent;
+            font-size: 26px;
+            color: #b0b0b0;
+            width: 400px;
+            line-height: 26px;
+          }
+
           * {
             box-sizing: border-box;
           }

@@ -53,7 +53,10 @@ const Index: React.FC<Props> = () => {
             <input id="file-input" type="file" onChange={onInputChange} ref={inputRef} />
           </label>
           <div className="cta-record">
-            <Link href="/record"><Button>Record from camera</Button></Link>
+            <Link href="/record?source=camera"><Button>Record from camera</Button></Link>
+          </div>
+          <div className="cta-record">
+            <Link href="/record?source=screen"><Button>Record my screen</Button></Link>
           </div>
         </div>
       </div>
