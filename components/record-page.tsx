@@ -1,11 +1,14 @@
 /* global navigator MediaRecorder Blob File */
 /* eslint-disable jsx-a11y/no-onchange */
 import { useRef, useEffect, useState, ChangeEvent } from 'react';
+import { useRouter } from 'next/router';
 import Layout from './layout';
 import Button from './button';
 import StopWatch from './stop-watch';
-import AudioBars from './audio-bars';
+import VideoSourceToggle from './video-source-toggle';
 import RecordingControls from './recording-controls';
+import CameraOptions from './camera-options';
+import ScreenOptions from './screen-options';
 import UploadProgressFullpage from './upload-progress-fullpage';
 import logger from '../lib/logger';
 
@@ -14,14 +17,20 @@ const MEDIA_RECORDER_TIMESLICE_MS = 2000;
 const getAudioContext = () => typeof window !== undefined && window.AudioContext || window.webkitAudioContext;
 
 type DeviceItems = MediaDeviceInfo[];
+
 type DeviceList = {
   video: DeviceItems;
   audio: DeviceItems;
 };
 
-type NoProps = Record<never, never>
+type VideoSources = 'camera' | 'screen';
+
+type QueryParams = {
+  source: VideoSources
+};
 
 const RecordPage: React.FC<NoProps> = () => {
+  const router = useRouter();
   const [videoSource, setVideoSource] = useState<'camera' | 'screen' | ''>('');
   const [file, setFile] = useState<File | null>(null);
   const [startRecordTime, setStartRecordTime] = useState<number | null>(null);
@@ -30,6 +39,7 @@ const RecordPage: React.FC<NoProps> = () => {
   const [isReviewing, setIsReviewing] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
   const [haveDeviceAccess, setHaveDeviceAccess] = useState(false);
+  const [isMicDeviceEnabled, setIsMicDeviceEnabled] = useState(false);
   const [videoDeviceId, setVideoDeviceId] = useState('');
   const [audioDeviceId, setAudioDeviceId] = useState('');
   const recorderRef = useRef<MediaRecorder | null>(null);
@@ -40,6 +50,13 @@ const RecordPage: React.FC<NoProps> = () => {
   const finalBlob = useRef<Blob | null>(null);
   const [deviceList, setDevices] = useState({ video: [], audio: [] } as DeviceList);
   // const hasMediaRecorder = (typeof window !== 'undefined' && typeof window.MediaRecorder !== 'undefined');
+
+  useEffect(() => {
+    if (router.query && router.query.source) {
+      const source = (router.query as QueryParams).source;
+      setVideoSource(source);
+    }
+  }, [router]);
 
   const getDevices = async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
@@ -96,9 +113,11 @@ const RecordPage: React.FC<NoProps> = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
     }
+    streamRef.current = null;
     setIsReviewing(false);
     setIsLoadingPreview(false);
     setHaveDeviceAccess(false);
+    setIsMicDeviceEnabled(false);
   }
 
   const startAv = () => {
@@ -117,7 +136,7 @@ const RecordPage: React.FC<NoProps> = () => {
 
   const setupStream = (stream: MediaStream) => {
     const AudioContext = getAudioContext();
-    if (AudioContext) {
+    if (isMicDeviceEnabled && AudioContext) {
       const audioContext = new AudioContext();
       const mediaStreamSource = audioContext.createMediaStreamSource(stream);
       const analyser = audioContext.createAnalyser();
@@ -127,20 +146,19 @@ const RecordPage: React.FC<NoProps> = () => {
       audioInterval.current = window.setInterval(() => {
         updateAudioLevels(analyser);
       }, 500);
-      streamRef.current = stream;
-      if (videoRef.current !== null) {
-        (videoRef.current as HTMLVideoElement).srcObject = stream;
-        videoRef.current.muted = true;
-        videoRef.current.controls = false;
-      }
-      setHaveDeviceAccess(true);
     }
+    streamRef.current = stream;
+    if (videoRef.current !== null) {
+      (videoRef.current as HTMLVideoElement).srcObject = stream;
+      videoRef.current.muted = true;
+      videoRef.current.controls = false;
+    }
+    setHaveDeviceAccess(true);
   }
 
   const startCamera = async () => {
     // todo - error if not supported
     if (navigator.mediaDevices) {
-      setVideoSource('camera');
       const video = videoDeviceId ? { deviceId: videoDeviceId } : true;
       const audio = audioDeviceId ? { deviceId: audioDeviceId } : true;
       const constraints = { video, audio };
@@ -161,22 +179,22 @@ const RecordPage: React.FC<NoProps> = () => {
   const startScreenshare = async () => {
     // todo - error if not supported
     if (navigator.mediaDevices) {
-      setVideoSource('screen');
       const audio = audioDeviceId ? { deviceId: audioDeviceId } : true;
       const constraints = { video: false, audio };
       try {
-        logger('requesting user media with constraints', constraints);
         const stream = streamRef.current || await navigator.mediaDevices.getDisplayMedia({ video: true });
-        const audioStream = await navigator.mediaDevices.getUserMedia(constraints);
-        await getDevices();
-        /*
-         * if we already have an audio track it needs to be removed
-         * this happens when a user changes the mic input
-         */
-        stream.getTracks().filter(track => track.kind === 'audio').forEach(track => {
-          stream.removeTrack(track);
-        });
-        stream.addTrack(audioStream.getAudioTracks()[0]);
+        if (isMicDeviceEnabled) {
+          logger('requesting user media with constraints', constraints);
+          const audioStream = await navigator.mediaDevices.getUserMedia(constraints);
+          /*
+           * if we already have an audio track it needs to be removed
+           * this happens when a user changes the mic input
+           */
+          stream.getTracks().filter(track => track.kind === 'audio').forEach(track => {
+            stream.removeTrack(track);
+          });
+          stream.addTrack(audioStream.getAudioTracks()[0]);
+        }
         setupStream(stream)
       } catch (err) {
         logger.error(err);
@@ -200,10 +218,10 @@ const RecordPage: React.FC<NoProps> = () => {
   });
 
   useEffect(() => {
-    if (videoDeviceId || audioDeviceId) {
+    if (isMicDeviceEnabled || videoDeviceId || audioDeviceId) {
       startAv();
     }
-  }, [videoDeviceId, audioDeviceId]);
+  }, [videoDeviceId, audioDeviceId, isMicDeviceEnabled]);
 
   const startRecording = async () => {
     logger('start recording');
@@ -278,13 +296,23 @@ const RecordPage: React.FC<NoProps> = () => {
     recorderRef.current.stop();
   };
 
-  const selectVideo = async (evt: ChangeEvent<HTMLSelectElement>) => {
-    await setVideoDeviceId(evt.target.value);
+  const selectVideo = (evt: ChangeEvent<HTMLSelectElement>) => {
+    setVideoDeviceId(evt.target.value);
   };
 
-  const selectAudio = async (evt: ChangeEvent<HTMLSelectElement>) => {
-    await setAudioDeviceId(evt.target.value);
+  const selectAudio = (evt: ChangeEvent<HTMLSelectElement>) => {
+    setAudioDeviceId(evt.target.value);
   };
+
+  const changeVideoSource = (source: VideoSources) => {
+    hardCleanup();
+    router.push({ pathname: '/record', query: { source } });
+  }
+
+  const enableMicForScreenshare = async () => {
+    setIsMicDeviceEnabled(true);
+    await getDevices();
+  }
 
   if (file) {
     return <UploadProgressFullpage file={file} />;
@@ -296,31 +324,36 @@ const RecordPage: React.FC<NoProps> = () => {
       description="Record a video"
     >
       <h1>Video setup</h1>
-      {!haveDeviceAccess && <Button type="button" onClick={startCamera}>Allow the browser to use your camera/mic</Button>}
-      {!haveDeviceAccess && <Button type="button" onClick={startScreenshare}>Allow the browser to access screenshare</Button>}
+      <VideoSourceToggle activeSource={videoSource} onChange={changeVideoSource} />
+      {!haveDeviceAccess && videoSource === 'camera' && <Button type="button" onClick={startCamera}>Allow the browser to use your camera/mic</Button>}
+      {!haveDeviceAccess && videoSource === 'screen' && <Button type="button" onClick={startScreenshare}>Allow the browser to access screenshare</Button>}
+      { videoSource === '' && <div>Select camera or screenshare to get started</div>}
       {<video ref={videoRef} width="400" autoPlay />}
       <div>
         { isLoadingPreview && 'Loading preview...' }
       </div>
-      {haveDeviceAccess
-        && (
-          <div className="device-pickers">
-            {
-              videoSource !== 'screen' && 
-              <select onChange={selectVideo} disabled={isRecording} title={isRecording ? 'Cannot change audio devices while recording' : ''}>
-                {
-                  deviceList.video.map(({ label, deviceId }) => <option key={deviceId} value={deviceId}>{label}</option>)
-                }
-              </select>
-            }
-            <div className="audio-bars"><AudioBars audioLevel={audioLevel} /></div>
-            <select onChange={selectAudio} disabled={isRecording} title={isRecording ? 'Cannot change audio devices while recording' : ''}>
-              {
-                deviceList.audio.map(({ label, deviceId }) => <option key={deviceId} value={deviceId}>{label}</option>)
-              }
-            </select>
-          </div>
-        )}
+      {haveDeviceAccess && videoSource === 'camera' &&
+        <CameraOptions
+          isLoadingPreview={isLoadingPreview}
+          isRecording={isRecording}
+          deviceList={deviceList}
+          audioLevel={audioLevel}
+          selectVideo={selectVideo}
+          selectAudio={selectAudio}
+        />
+      }
+      {haveDeviceAccess && videoSource === 'screen' &&
+        <ScreenOptions
+          isMicDeviceEnabled={isMicDeviceEnabled}
+          enableMicForScreenshare={enableMicForScreenshare}
+          isLoadingPreview={isLoadingPreview}
+          isRecording={isRecording}
+          deviceList={deviceList}
+          audioLevel={audioLevel}
+          selectVideo={selectVideo}
+          selectAudio={selectAudio}
+        />
+      }
       <div className="stopwatch">
         { isRecording && startRecordTime && <StopWatch startTimeUnixMs={startRecordTime} /> }
       </div>
@@ -339,23 +372,9 @@ const RecordPage: React.FC<NoProps> = () => {
         video {
           display: ${haveDeviceAccess ? 'block' : 'none'};
         }
-        .device-pickers {
-          width: 400px;
-        }
         .stopwatch {
           padding-bottom: 20px 0 ;
           height: 30px;
-        }
-        .audio-bars {
-          margin: 18px 0;
-        }
-        select {
-          padding: 11px;
-          background: transparent;
-          font-size: 26px;
-          color: #b0b0b0;
-          width: 400px;
-          line-height: 26px;
         }
       `}
       </style>

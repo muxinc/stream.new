@@ -20,14 +20,24 @@ const RecordingControls: React.FC<Props> = ({
   reset,
 }) => (
   <div className="container">
-    <Button type="button" onClick={startRecording} disabled={isRecording || isReviewing}>Start recording</Button>
-    <Button type="button" onClick={stopRecording} disabled={!isRecording}>Stop</Button>
-    <Button type="button" onClick={submitRecording} disabled={!isReviewing || isLoadingPreview}>{ isLoadingPreview ? 'Loading preview...' : 'Submit' }</Button>
-    <Button type="button" onClick={reset}>Reset</Button>
+    <div className="button"><Button type="button" onClick={startRecording} disabled={isRecording || isReviewing}>Start recording</Button></div>
+    <div className="button"><Button type="button" onClick={stopRecording} disabled={!isRecording}>Stop recording</Button></div>
+    <div className="button"><Button type="button" onClick={submitRecording} disabled={!isReviewing || isLoadingPreview}>{ isLoadingPreview ? 'Loading preview...' : 'Submit' }</Button></div>
+    <div className="button"><Button type="button" onClick={reset}>Reset</Button></div>
     <style jsx>{`
       .container {
         display: flex;
         flex-direction: column;
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        align-items: flex-end;
+        justify-content: flex-end;
+        padding-bottom: 150px;
+        padding-right: 25px;
+      }
+      .container .button {
+        margin: 8px 0;
       }
     `}
     </style>

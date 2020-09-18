@@ -3,9 +3,6 @@ import Spinner from './spinner';
 /*
  *  Use this as a direct child of a <Layout /> component
  */
-
-type NoProps = Record<never, never>
-
 const FullpageSpinner: React.FC<NoProps> = () => {
   return (
     <div className="wrapper">

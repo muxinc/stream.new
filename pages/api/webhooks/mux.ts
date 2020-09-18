@@ -5,9 +5,10 @@ import { sendSlackWebhook } from '../../../lib/slack-notifier';
 
 const webhookSignatureSecret = process.env.MUX_WEBHOOK_SIGNATURE_SECRET;
 
-const verifyWebhookSignature = async (rawBody: string | Buffer, req: NextApiRequest) => {
+const verifyWebhookSignature = (rawBody: string | Buffer, req: NextApiRequest) => {
   if (webhookSignatureSecret) {
-    return Mux.Webhooks.verifyHeader(rawBody, req.headers['mux-signature'] as string, webhookSignatureSecret);
+    // this will raise an error if signature is not valid
+    Mux.Webhooks.verifyHeader(rawBody, req.headers['mux-signature'] as string, webhookSignatureSecret);
   }
   console.log('Skipping webhook sig verification because no secret is configured'); // eslint-disable-line no-console
   return true;
@@ -35,9 +36,10 @@ export default async function muxWebhookHandler (req: NextApiRequest, res: NextA
   switch (method) {
     case 'POST': {
       const rawBody = (await buffer(req)).toString();
-      const isValid = await verifyWebhookSignature(rawBody, req);
-      if (!isValid) {
-        res.status(400).json({ message: 'signature not verified' });
+      try {
+        verifyWebhookSignature(rawBody, req);
+      } catch (e) {
+        res.status(400).json({ message: e.message });
         return;
       }
       const jsonBody = JSON.parse(rawBody);
