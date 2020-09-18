@@ -32,6 +32,7 @@ type QueryParams = {
 const RecordPage: React.FC<NoProps> = () => {
   const router = useRouter();
   const [videoSource, setVideoSource] = useState<'camera' | 'screen' | ''>('');
+  const [errorMessage, setErrorMessage] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [startRecordTime, setStartRecordTime] = useState<number | null>(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -117,6 +118,7 @@ const RecordPage: React.FC<NoProps> = () => {
       clearInterval(audioInterval.current);
     }
     setIsRecording(false);
+    setErrorMessage('');
   };
 
   /*
@@ -259,6 +261,10 @@ const RecordPage: React.FC<NoProps> = () => {
 
   const startRecording = async () => {
     logger('start recording');
+    if (typeof MediaRecorder === 'undefined') {
+      setErrorMessage('MediaRecorder not available in your browser. You may be able to enable this in Experimental Features');
+      return;
+    }
     try {
       setStartRecordTime((new Date()).valueOf());
       const preferredOptions = { mimeType: 'video/webm;codecs=vp9' };
@@ -385,6 +391,7 @@ const RecordPage: React.FC<NoProps> = () => {
     >
       <h1>Video setup</h1>
       <VideoSourceToggle activeSource={videoSource} onChange={changeVideoSource} />
+      {errorMessage && <div className='error-message'>{errorMessage}</div>}
       {!haveDeviceAccess && videoSource === 'camera' &&
         <AccessSkeletonFrame onClick={startCamera} text='Allow the browser to use your camera/mic' />
       }
@@ -437,6 +444,12 @@ const RecordPage: React.FC<NoProps> = () => {
       />
       )}
       <style jsx>{`
+        .error-message {
+          color: red;
+          max-width: 400px;
+          color: red;
+          padding: 20px;
+        }
         video {
           display: ${haveDeviceAccess ? 'block' : 'none'};
         }
