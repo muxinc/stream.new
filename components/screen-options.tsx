@@ -18,7 +18,9 @@ type Props = {
   audioLevel: number,
   selectVideo: (evt: ChangeEvent<HTMLSelectElement>) => void,
   selectAudio: (evt: ChangeEvent<HTMLSelectElement>) => void,
-  enableMicForScreenshare: () => void
+  enableMicForScreenshare: () => void,
+  isMuted: boolean,
+  muteAudioTrack: (muted: boolean) => void,
 };
 
 const ScreenOptions: React.FC<Props> = ({
@@ -29,6 +31,8 @@ const ScreenOptions: React.FC<Props> = ({
   audioLevel,
   selectAudio,
   enableMicForScreenshare,
+  isMuted,
+  muteAudioTrack,
 }) => {
   return (
     <>
@@ -38,18 +42,21 @@ const ScreenOptions: React.FC<Props> = ({
       {
         isMicDeviceEnabled ?
         <div className="device-pickers">
-          <div className="audio-bars"><AudioBars audioLevel={audioLevel} /></div>
+          <div className="audio-bars"><AudioBars muteAudioTrack={muteAudioTrack} isMuted={isMuted} audioLevel={audioLevel} /></div>
           <select onChange={selectAudio} disabled={isRecording} title={isRecording ? 'Cannot change audio devices while recording' : ''}>
             {
               deviceList.audio.map(({ label, deviceId }) => <option key={deviceId} value={deviceId}>{label}</option>)
             }
           </select>
         </div> :
-        <Button onClick={enableMicForScreenshare}>Enable microphone</Button>
+        <div className="button"><Button onClick={enableMicForScreenshare}>Enable microphone</Button></div>
       }
       <style jsx>{`
         .audio-bars {
           margin: 20px 0;
+        }
+        .button {
+          margin-top: 20px;
         }
       `}</style>
     </>

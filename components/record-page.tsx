@@ -3,12 +3,12 @@
 import { useRef, useEffect, useState, ChangeEvent } from 'react';
 import { useRouter } from 'next/router';
 import Layout from './layout';
-import Button from './button';
 import StopWatch from './stop-watch';
 import VideoSourceToggle from './video-source-toggle';
 import RecordingControls from './recording-controls';
 import CameraOptions from './camera-options';
 import ScreenOptions from './screen-options';
+import AccessSkeletonFrame from './access-skeleton-frame';
 import UploadProgressFullpage from './upload-progress-fullpage';
 import logger from '../lib/logger';
 
@@ -55,6 +55,9 @@ const RecordPage: React.FC<NoProps> = () => {
     if (router.query && router.query.source) {
       const source = (router.query as QueryParams).source;
       setVideoSource(source);
+    }
+    if (router.query && !router.query.source) {
+      router.push({ pathname: '/record', query: { source: 'camera' } });
     }
   }, [router]);
 
@@ -111,7 +114,10 @@ const RecordPage: React.FC<NoProps> = () => {
   const hardCleanup = () => {
     cleanup();
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current.getTracks().forEach(track => {
+        logger('stopping track', track.kind, track.label);
+        track.stop();
+      });
     }
     streamRef.current = null;
     setIsReviewing(false);
@@ -302,6 +308,14 @@ const RecordPage: React.FC<NoProps> = () => {
     recorderRef.current.stop();
   };
 
+  const muteAudioTrack = (shouldMute: boolean) => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().filter(track => track.kind === 'audio').forEach(track => {
+        track.enabled = !shouldMute;
+      });
+    }
+  }
+
   const selectVideo = (evt: ChangeEvent<HTMLSelectElement>) => {
     setVideoDeviceId(evt.target.value);
   };
@@ -335,6 +349,13 @@ const RecordPage: React.FC<NoProps> = () => {
     return false
   }
 
+  const isMuted = (): boolean => {
+    if (streamRef.current) {
+      return !!streamRef.current.getTracks().filter(track => track.kind === 'audio' && !track.enabled).length
+    }
+    return false;
+  }
+
   return (
     <Layout
       title="stream.new"
@@ -342,8 +363,12 @@ const RecordPage: React.FC<NoProps> = () => {
     >
       <h1>Video setup</h1>
       <VideoSourceToggle activeSource={videoSource} onChange={changeVideoSource} />
-      {!haveDeviceAccess && videoSource === 'camera' && <Button type="button" onClick={startCamera}>Allow the browser to use your camera/mic</Button>}
-      {!haveDeviceAccess && videoSource === 'screen' && <Button type="button" onClick={startScreenshare}>Allow the browser to access screenshare</Button>}
+      {!haveDeviceAccess && videoSource === 'camera' &&
+        <AccessSkeletonFrame onClick={startCamera} text='Allow the browser to use your camera/mic' />
+      }
+      {!haveDeviceAccess && videoSource === 'screen' &&
+        <AccessSkeletonFrame onClick={startScreenshare} text='Allow the browser to access screenshare' />
+      }
       { videoSource === '' && <div>Select camera or screenshare to get started</div>}
       {<video className={showMirrorImage() ? 'mirror-image' : ''} ref={videoRef} width="400" autoPlay />}
       <div>
@@ -353,6 +378,8 @@ const RecordPage: React.FC<NoProps> = () => {
         <CameraOptions
           isLoadingPreview={isLoadingPreview}
           isRecording={isRecording}
+          isMuted={isMuted()}
+          muteAudioTrack={muteAudioTrack}
           deviceList={deviceList}
           audioLevel={audioLevel}
           selectVideo={selectVideo}
@@ -365,6 +392,8 @@ const RecordPage: React.FC<NoProps> = () => {
           enableMicForScreenshare={enableMicForScreenshare}
           isLoadingPreview={isLoadingPreview}
           isRecording={isRecording}
+          isMuted={isMuted()}
+          muteAudioTrack={muteAudioTrack}
           deviceList={deviceList}
           audioLevel={audioLevel}
           selectVideo={selectVideo}

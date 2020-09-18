@@ -16,6 +16,8 @@ type Props = {
   audioLevel: number,
   selectVideo: (evt: ChangeEvent<HTMLSelectElement>) => void,
   selectAudio: (evt: ChangeEvent<HTMLSelectElement>) => void,
+  isMuted: boolean,
+  muteAudioTrack: (muted: boolean) => void,
 };
 
 const CameraOptions: React.FC<Props> = ({
@@ -25,6 +27,8 @@ const CameraOptions: React.FC<Props> = ({
   audioLevel,
   selectVideo,
   selectAudio,
+  isMuted,
+  muteAudioTrack,
 }) => {
   return (
     <>
@@ -41,7 +45,7 @@ const CameraOptions: React.FC<Props> = ({
         }
         {
           <>
-            <div className="audio-bars"><AudioBars audioLevel={audioLevel} /></div>
+            <div className="audio-bars"><AudioBars muteAudioTrack={muteAudioTrack} isMuted={isMuted} audioLevel={audioLevel} /></div>
             <select onChange={selectAudio} disabled={isRecording} title={isRecording ? 'Cannot change audio devices while recording' : ''}>
               {
                 deviceList.audio.map(({ label, deviceId }) => <option key={deviceId} value={deviceId}>{label}</option>)
