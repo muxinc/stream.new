@@ -77,11 +77,12 @@ const RecordPage: React.FC<NoProps> = () => {
   };
 
   const updateAudioLevels = (analyser: AnalyserNode) => {
-    const sampleSize = 10;
     // dataArray will give us an array of numbers ranging from 0 to 255
-    const dataArray = new Uint8Array(sampleSize);
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
     analyser.getByteFrequencyData(dataArray);
     const average = (dataArray.reduce((a, b) => a + b) / dataArray.length);
+    // cthese values are between 0 - 255, we want the average and
+    // to convert it into a value between 0 - 100
     const audioLevelValue = Math.round((average / 255) * 100);
     setAudioLevel(audioLevelValue);
   };
@@ -152,12 +153,13 @@ const RecordPage: React.FC<NoProps> = () => {
       const audioContext = new AudioContext();
       const mediaStreamSource = audioContext.createMediaStreamSource(stream);
       const analyser = audioContext.createAnalyser();
+      analyser.smoothingTimeConstant = 0.3;
       analyser.fftSize = 1024;
       mediaStreamSource.connect(analyser);
 
       audioInterval.current = window.setInterval(() => {
         updateAudioLevels(analyser);
-      }, 500);
+      }, 100);
     }
     streamRef.current = stream;
     if (videoRef.current !== null) {
