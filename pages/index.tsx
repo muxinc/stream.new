@@ -122,6 +122,6 @@ const Index: React.FC<Props> = () => {
       </style>
     </Layout>
   );
-}
+};
 
 export default Index;

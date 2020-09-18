@@ -30,6 +30,6 @@ const AccessSkeletonFrame: React.FC<Props> = ({ onClick, text }) => {
       </style>
     </div>
   );
-}
+};
 
 export default AccessSkeletonFrame;

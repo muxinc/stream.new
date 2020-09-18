@@ -210,6 +210,6 @@ const Layout: React.FC<Props> = ({
       </div>
     </>
   );
-}
+};
 
 export default Layout;

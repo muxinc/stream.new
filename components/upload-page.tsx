@@ -62,6 +62,6 @@ const UploadPage: React.FC<Props> = ({ children }) => {
       </style>
     </Layout>
   );
-}
+};
 
 export default UploadPage;

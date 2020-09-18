@@ -63,7 +63,7 @@ const CameraOptions: React.FC<Props> = ({
         }
       `}</style>
     </>
-  )
-}
+  );
+};
 
 export default CameraOptions;

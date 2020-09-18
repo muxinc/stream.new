@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { NextApiRequest, NextApiResponse } from 'next';
 import Mux from '@mux/mux-node';
 import { buffer } from 'micro';
 import { sendSlackWebhook } from '../../../lib/slack-notifier';

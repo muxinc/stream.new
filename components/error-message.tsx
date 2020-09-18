@@ -16,6 +16,6 @@ const ErrorMessage: React.FC<Props> = ({ message }) => {
       </style>
     </>
   );
-}
+};
 
 export default ErrorMessage;

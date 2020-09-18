@@ -63,6 +63,6 @@ const InfoModal: React.FC<Props> = ({ close }) => {
       </style>
     </div>
   );
-}
+};
 
 export default InfoModal;

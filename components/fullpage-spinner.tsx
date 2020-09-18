@@ -18,6 +18,6 @@ const FullpageSpinner: React.FC<NoProps> = () => {
       </style>
     </div>
   );
-}
+};
 
 export default FullpageSpinner;

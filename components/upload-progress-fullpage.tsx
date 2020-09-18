@@ -98,6 +98,6 @@ const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
       </style>
     </Layout>
   );
-}
+};
 
 export default UploadProgressFullpage;

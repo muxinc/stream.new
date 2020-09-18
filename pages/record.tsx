@@ -6,6 +6,6 @@ const Record: React.FC<Props> = () => {
   return (
     <RecordPage />
   );
-}
+};
 
 export default Record;

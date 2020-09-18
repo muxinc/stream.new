@@ -60,7 +60,7 @@ const ScreenOptions: React.FC<Props> = ({
         }
       `}</style>
     </>
-  )
-}
+  );
+};
 
 export default ScreenOptions;

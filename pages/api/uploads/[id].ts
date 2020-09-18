@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { NextApiRequest, NextApiResponse } from 'next';
 import Mux from '@mux/mux-node';
 
 const { Video } = new Mux();
@@ -27,4 +27,4 @@ export default async (req: NextApiRequest, res: NextApiResponse): Promise<void> 
       res.setHeader('Allow', ['GET']);
       res.status(405).end(`Method ${method} Not Allowed`);
   }
-}
+};

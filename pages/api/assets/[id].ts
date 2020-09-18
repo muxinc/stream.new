@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { NextApiRequest, NextApiResponse } from 'next';
 import Mux from '@mux/mux-node';
 
 const { Video } = new Mux();
@@ -11,7 +11,7 @@ export default async function assetHandler (req: NextApiRequest, res: NextApiRes
       try {
         const asset = await Video.Assets.get(req.query.id as string);
         if (!(asset.playback_ids && asset.playback_ids[0])) {
-          throw new Error('Error getting playback_id from asset')
+          throw new Error('Error getting playback_id from asset');
         }
         res.json({
           asset: {

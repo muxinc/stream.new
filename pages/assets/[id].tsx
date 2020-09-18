@@ -78,6 +78,6 @@ const Asset: React.FC<Props> = () => {
       </style>
     </Layout>
   );
-}
+};
 
 export default Asset;

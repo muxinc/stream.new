@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { GetStaticProps, GetStaticPaths } from 'next'
+import { GetStaticProps, GetStaticPaths } from 'next';
 import { useRouter } from 'next/router';
 import FullpageSpinner from '../../components/fullpage-spinner';
 import VideoPlayer from '../../components/video-player';
@@ -17,14 +17,14 @@ export const getStaticProps: GetStaticProps = async (context)  => {
   const shareUrl = `${HOST_URL}/v/${playbackId}`;
 
   return { props: { playbackId, shareUrl, poster } };
-}
+};
 
 export const getStaticPaths: GetStaticPaths = async () => {
   return {
     paths: [],
     fallback: true,
   };
-}
+};
 
 type Props = {
   playbackId: string,
@@ -85,6 +85,6 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
       </style>
     </Layout>
   );
-}
+};
 
 export default Playback;

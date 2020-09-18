@@ -53,6 +53,6 @@ const Spinner: React.FC<Props> = ({ size = 6, color = '#999' }) => {
       </style>
     </>
   );
-}
+};
 
 export default Spinner;

@@ -95,7 +95,7 @@ const RecordPage: React.FC<NoProps> = () => {
       });
     }
     streamRef.current = null;
-  }
+  };
 
   /*
    * Stop all recording, cancel audio interval
@@ -131,13 +131,13 @@ const RecordPage: React.FC<NoProps> = () => {
     setIsMicDeviceEnabled(false);
     setVideoDeviceId('');
     setAudioDeviceId('');
-  }
+  };
 
   const startAv = () => {
     cleanup();
     if (!videoSource) {
       logger.error('Cannot startAv without a video source');
-      return
+      return;
     }
     if (videoSource === 'camera') {
       startCamera();
@@ -145,7 +145,7 @@ const RecordPage: React.FC<NoProps> = () => {
     if (videoSource === 'screen') {
       startScreenshare();
     }
-  }
+  };
 
   const setupStream = (stream: MediaStream) => {
     const AudioContext = getAudioContext();
@@ -172,7 +172,7 @@ const RecordPage: React.FC<NoProps> = () => {
       videoRef.current.controls = false;
     }
     setHaveDeviceAccess(true);
-  }
+  };
 
   const startCamera = async () => {
     // todo - error if not supported
@@ -200,7 +200,7 @@ const RecordPage: React.FC<NoProps> = () => {
         stopUserMedia();
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         await getDevices();
-        setupStream(stream)
+        setupStream(stream);
       } catch (err) {
         logger.error('getdevices error', err);
       }
@@ -229,7 +229,7 @@ const RecordPage: React.FC<NoProps> = () => {
           });
           stream.addTrack(audioStream.getAudioTracks()[0]);
         }
-        setupStream(stream)
+        setupStream(stream);
       } catch (err) {
         logger.error(err);
       }
@@ -336,7 +336,7 @@ const RecordPage: React.FC<NoProps> = () => {
         track.enabled = !shouldMute;
       });
     }
-  }
+  };
 
   const selectVideo = (evt: ChangeEvent<HTMLSelectElement>) => {
     setVideoDeviceId(evt.target.value);
@@ -349,12 +349,12 @@ const RecordPage: React.FC<NoProps> = () => {
   const changeVideoSource = (source: VideoSources) => {
     hardCleanup();
     router.push({ pathname: '/record', query: { source } });
-  }
+  };
 
   const enableMicForScreenshare = async () => {
     setIsMicDeviceEnabled(true);
     await getDevices();
-  }
+  };
 
   if (file) {
     return <UploadProgressFullpage file={file} />;
@@ -368,15 +368,15 @@ const RecordPage: React.FC<NoProps> = () => {
     if (videoSource === 'camera') {
       return !isReviewing;
     }
-    return false
-  }
+    return false;
+  };
 
   const isMuted = (): boolean => {
     if (streamRef.current) {
       return !!streamRef.current.getTracks().filter(track => track.kind === 'audio' && !track.enabled).length;
     }
     return false;
-  }
+  };
 
   return (
     <Layout
@@ -452,6 +452,6 @@ const RecordPage: React.FC<NoProps> = () => {
       </style>
     </Layout>
   );
-}
+};
 
 export default RecordPage;

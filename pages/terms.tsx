@@ -47,6 +47,6 @@ const Terms: React.FC<Props> = () => {
       </style>
     </Layout>
   );
-}
+};
 
 export default Terms;

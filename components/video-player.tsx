@@ -137,6 +137,6 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
       </style>
     </>
   );
-}
+};
 
 export default VideoPlayer;

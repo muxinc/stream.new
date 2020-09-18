@@ -31,7 +31,7 @@ const VideoSourceToggle: React.FC<Props> = ({ activeSource, onChange }) => {
       `}
       </style>
     </div>
-  )
-}
+  );
+};
 
 export default VideoSourceToggle;

@@ -65,6 +65,6 @@ const DeleteAsset: React.FC<Props> = () => {
       }
     </Layout>
   );
-}
+};
 
 export default DeleteAsset;
