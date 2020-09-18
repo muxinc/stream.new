@@ -87,6 +87,16 @@ const RecordPage: React.FC<NoProps> = () => {
     setAudioLevel(audioLevelValue);
   };
 
+  const stopUserMedia = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => {
+        logger('stopping track', track.kind, track.label);
+        track.stop();
+      });
+    }
+    streamRef.current = null;
+  }
+
   /*
    * Stop all recording, cancel audio interval
    */
@@ -114,13 +124,7 @@ const RecordPage: React.FC<NoProps> = () => {
    */
   const hardCleanup = () => {
     cleanup();
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => {
-        logger('stopping track', track.kind, track.label);
-        track.stop();
-      });
-    }
-    streamRef.current = null;
+    stopUserMedia();
     setIsReviewing(false);
     setIsLoadingPreview(false);
     setHaveDeviceAccess(false);
@@ -177,12 +181,28 @@ const RecordPage: React.FC<NoProps> = () => {
       const audio = audioDeviceId ? { deviceId: audioDeviceId } : true;
       const constraints = { video, audio };
       try {
+        /*
+         * We have to call getDevices() twice b/c of firefox.
+         * The first time we getDevices() in firefox the device.label is an empty string
+         * After getUserMedia() happens successfully, then we can getDevices() again to
+         * and the 2nd time then device.label will be populated :shrug:
+         */
         await getDevices();
         logger('requesting user media with constraints', constraints);
+        /*
+         * This gets called when a new device is selected, we want to stopUserMedia()
+         * when re-initializing a camera
+         *
+         * However, for screenshare behavior we don't want to stopUserMedia() because
+         * because we want the screenshare to stay the same while the microphone input
+         * gets changed
+         */
+        stopUserMedia();
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        await getDevices();
         setupStream(stream)
       } catch (err) {
-        console.error(err); // eslint-disable-line no-console
+        logger.error('getdevices error', err);
       }
     }
     return function teardown () {
@@ -353,7 +373,7 @@ const RecordPage: React.FC<NoProps> = () => {
 
   const isMuted = (): boolean => {
     if (streamRef.current) {
-      return !!streamRef.current.getTracks().filter(track => track.kind === 'audio' && !track.enabled).length
+      return !!streamRef.current.getTracks().filter(track => track.kind === 'audio' && !track.enabled).length;
     }
     return false;
   }
