@@ -183,7 +183,6 @@ const RecordPage: React.FC<NoProps> = () => {
       const constraints = { video: false, audio };
       try {
         const stream = streamRef.current || await navigator.mediaDevices.getDisplayMedia({ video: true });
-        console.log('debug isMicDeviceEnabled', isMicDeviceEnabled);
         if (isMicDeviceEnabled) {
           logger('requesting user media with constraints', constraints);
           const audioStream = await navigator.mediaDevices.getUserMedia(constraints);
