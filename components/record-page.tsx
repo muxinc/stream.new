@@ -118,6 +118,8 @@ const RecordPage: React.FC<NoProps> = () => {
     setIsLoadingPreview(false);
     setHaveDeviceAccess(false);
     setIsMicDeviceEnabled(false);
+    setVideoDeviceId('');
+    setAudioDeviceId('');
   }
 
   const startAv = () => {
@@ -136,7 +138,11 @@ const RecordPage: React.FC<NoProps> = () => {
 
   const setupStream = (stream: MediaStream) => {
     const AudioContext = getAudioContext();
-    if (isMicDeviceEnabled && AudioContext) {
+
+    if (
+        AudioContext && videoSource === 'camera' ||
+        AudioContext && videoSource === 'screen' && isMicDeviceEnabled
+    ) {
       const audioContext = new AudioContext();
       const mediaStreamSource = audioContext.createMediaStreamSource(stream);
       const analyser = audioContext.createAnalyser();
@@ -318,6 +324,17 @@ const RecordPage: React.FC<NoProps> = () => {
     return <UploadProgressFullpage file={file} />;
   }
 
+  /*
+   * When recording your own camera it is really disorienting if
+   * the video is not the mirror image.
+   */
+  const showMirrorImage = () => {
+    if (videoSource === 'camera') {
+      return !isReviewing;
+    }
+    return false
+  }
+
   return (
     <Layout
       title="stream.new"
@@ -328,7 +345,7 @@ const RecordPage: React.FC<NoProps> = () => {
       {!haveDeviceAccess && videoSource === 'camera' && <Button type="button" onClick={startCamera}>Allow the browser to use your camera/mic</Button>}
       {!haveDeviceAccess && videoSource === 'screen' && <Button type="button" onClick={startScreenshare}>Allow the browser to access screenshare</Button>}
       { videoSource === '' && <div>Select camera or screenshare to get started</div>}
-      {<video ref={videoRef} width="400" autoPlay />}
+      {<video className={showMirrorImage() ? 'mirror-image' : ''} ref={videoRef} width="400" autoPlay />}
       <div>
         { isLoadingPreview && 'Loading preview...' }
       </div>
@@ -371,6 +388,10 @@ const RecordPage: React.FC<NoProps> = () => {
       <style jsx>{`
         video {
           display: ${haveDeviceAccess ? 'block' : 'none'};
+        }
+        video.mirror-image {
+          -webkit-transform: scaleX(-1);
+          transform: scaleX(-1);
         }
         .stopwatch {
           padding-bottom: 20px 0 ;
