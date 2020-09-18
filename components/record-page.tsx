@@ -376,9 +376,6 @@ const RecordPage: React.FC<NoProps> = () => {
           padding-bottom: 20px 0 ;
           height: 30px;
         }
-        .audio-bars {
-          margin: 18px 0;
-        }
       `}
       </style>
     </Layout>
