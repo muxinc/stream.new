@@ -218,7 +218,6 @@ const RecordPage: React.FC<NoProps> = () => {
   });
 
   useEffect(() => {
-    console.log('debug startAv', isMicDeviceEnabled, videoDeviceId, audioDeviceId);
     if (isMicDeviceEnabled || videoDeviceId || audioDeviceId) {
       startAv();
     }
