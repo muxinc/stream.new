@@ -38,7 +38,7 @@ export default function Index () {
           <h1>Stream it anywhere.</h1>
         </div>
         <div className="headline-desktop">
-          <h1>Add a video. Stream it anywhere.</h1>
+          <h1>Add a cool video. Stream it anywhere.</h1>
         </div>
         <div className="cta">
           <label htmlFor="file-input">
