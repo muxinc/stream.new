@@ -34,21 +34,20 @@ const Asset: React.FC<Props> = () => {
 
   useEffect(() => {
     if (asset && asset.playback_id && asset.status === 'ready') {
-      Router.push(`/v/${asset.playback_id}`);
+    //  Router.push(`/v/${asset.playback_id}`);
     }
   }, [asset]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIsDarkMode((val) => !val);
-    }, 3000);
-    return () => clearInterval(interval);
+      setTimeout(() => {
+        setIsDarkMode(true);
+      })
   }, []);
 
-  if (asset && asset.status === 'errored') {
-    const message = asset.errors && asset.errors.messages[0];
-    errorMessage = `Error creating this asset: ${message}`;
-  }
+//  if (asset && asset.status === 'errored') {
+//    const message = asset.errors && asset.errors.messages[0];
+//    errorMessage = `Error creating this asset: ${message}`;
+//  }
 
   if (errorMessage) {
     return (

@@ -3,10 +3,10 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useDropzone } from 'react-dropzone';
 import { breakpoints, transitionDuration } from '../style-vars';
-import Globe from './globe';
+import Asterisk from './asterisk';
 import InfoModal from './info-modal';
 
-const GlobeLink = () => <Link href="/"><a><Globe /></a></Link>;
+const AsteriskLink = () => <Link href="/"><a><Asterisk /></a></Link>;
 
 type Props = {
   title?: string;
@@ -37,7 +37,7 @@ const Layout: React.FC<Props> = ({
     <>
       <Head>
         <title>stream.new</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/stream-new-asterisk.svg" />
         {metaTitle && <meta property="og:title" content={metaTitle} />}
         {metaTitle && <meta property="twitter:title" content={metaTitle} />}
         {metaDescription && (
@@ -61,7 +61,7 @@ const Layout: React.FC<Props> = ({
         </main>
         <footer>
           <div className="footer-link"><a role="presentation" onClick={() => setModalOpen(true)}>Info</a></div>
-          <div className="footer-link"><GlobeLink /></div>
+          <div className="footer-link"><AsteriskLink /></div>
         </footer>
 
         <style jsx>{`
@@ -78,7 +78,6 @@ const Layout: React.FC<Props> = ({
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: ${darkMode ? '#111' : '#f8f8f8'};
             transition: background ${transitionDuration} ease;
           }
           .drag-overlay {
@@ -120,7 +119,7 @@ const Layout: React.FC<Props> = ({
             justify-content: space-between;
             padding-left: 30px;
             padding-right: 30px;
-            padding-bottom: 30px;
+            padding-bottom: 10px;
             height: 120px;
           }
 
@@ -147,6 +146,7 @@ const Layout: React.FC<Props> = ({
         <style jsx global>{`
           html, body, #__next, .container {
             height: 100%;
+            background: ${darkMode ? '#111' : '#f8f8f8'};
           }
 
           html,

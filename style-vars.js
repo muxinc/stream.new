@@ -3,4 +3,4 @@ export const breakpoints = {
   md: 756,
 };
 
-export const transitionDuration = '5s';
+export const transitionDuration = '12s';
