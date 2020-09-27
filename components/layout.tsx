@@ -57,8 +57,8 @@ const Layout: React.FC<Props> = ({
       <div className="container" {...containerProps}>
         <div className={`drag-overlay ${isDragActive ? 'active' : ''}`}><h1>Upload to stream.new</h1></div>
 
+        <div className="modal-wrapper"><InfoModal close={() => setModalOpen(false)} /></div>
         <main>
-          <div className="modal-wrapper"><InfoModal close={() => setModalOpen(false)} /></div>
           <div className={`${centered ? "content-wrapper-centered" : ""}`}>{children}</div>
         </main>
         <footer>
@@ -86,6 +86,7 @@ const Layout: React.FC<Props> = ({
           }
           .container {
             transition: background ${transitionDuration} ease;
+            outline: none;
             height: 100vh;
           }
           .drag-overlay {
@@ -161,6 +162,10 @@ const Layout: React.FC<Props> = ({
             height: 100%;
             background: ${darkMode ? '#111' : '#f8f8f8'};
           }
+          p {
+            font-size: 18px;
+            line-height: 20px;
+          }
 
           html,
           body,
@@ -216,6 +221,10 @@ const Layout: React.FC<Props> = ({
               font-size: 64px;
               line-height: 80px;
               text-align: left;
+            }
+            p {
+              font-size: 26px;
+              line-height: 38px;
             }
           }
         `}

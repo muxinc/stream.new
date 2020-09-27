@@ -7,10 +7,12 @@ type Props = {
 const AudioBars: React.FC<Props> = ({ audioLevel, isMuted, muteAudioTrack }) => {
   const audioLevelThresholds = [0, 5, 10, 15, 20, 25];
 
+  const toggleMuted = () => muteAudioTrack(!isMuted);
+
   return (
     <>
       <div className="audio-levels">
-        <div className='mute-action'><a onClick={() => muteAudioTrack(isMuted ? false : true)}>{isMuted ? 'unmute' : 'mute'}</a></div>
+        <div className='mute-action'><a role="button" tabIndex={0} onKeyDown={toggleMuted} onClick={toggleMuted}>{isMuted ? 'unmute' : 'mute'}</a></div>
         <div className={`level ${audioLevel > audioLevelThresholds[0] ? 'active' : ''}`} />
         <div className={`level ${audioLevel > audioLevelThresholds[1] ? 'active' : ''}`} />
         <div className={`level ${audioLevel > audioLevelThresholds[2] ? 'active' : ''}`} />

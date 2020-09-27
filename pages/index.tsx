@@ -71,8 +71,8 @@ const Index: React.FC<Props> = () => {
           bottom: 0;
           align-items: flex-end;
           justify-content: flex-end;
-          padding-bottom: 150px;
-          padding-right: 25px;
+          margin-bottom: 150px;
+          margin-right: 25px;
         }
         .cta .button {
           margin: 8px 0;
