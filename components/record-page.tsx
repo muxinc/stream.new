@@ -388,6 +388,7 @@ const RecordPage: React.FC<NoProps> = () => {
     <Layout
       title="stream.new"
       description="Record a video"
+      centered
     >
       <h1>Video setup</h1>
       <VideoSourceToggle activeSource={videoSource} onChange={changeVideoSource} />

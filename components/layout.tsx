@@ -16,6 +16,7 @@ type Props = {
   image?: string;
   onFileDrop?: (acceptedFiles: File[]) => void;
   darkMode?: boolean;
+  centered?: boolean;
 };
 
 const Layout: React.FC<Props> = ({
@@ -26,6 +27,7 @@ const Layout: React.FC<Props> = ({
   image,
   onFileDrop,
   darkMode,
+  centered,
   children,
 }) => {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -57,7 +59,7 @@ const Layout: React.FC<Props> = ({
 
         <main>
           <div className="modal-wrapper"><InfoModal close={() => setModalOpen(false)} /></div>
-          {children}
+          <div className={`${centered ? "content-wrapper-centered" : ""}`}>{children}</div>
         </main>
         <footer>
           <div className="nav">
@@ -75,6 +77,12 @@ const Layout: React.FC<Props> = ({
             height: 100%;
             z-index: 2;
             width: 100%;
+          }
+          .content-wrapper-centered {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
           }
           .container {
             transition: background ${transitionDuration} ease;
@@ -105,7 +113,6 @@ const Layout: React.FC<Props> = ({
 
           main {
             padding: 20px;
-            position: relative;
             margin-bottom: -120px;
             height: 100%;
           }
