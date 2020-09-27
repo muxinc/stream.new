@@ -60,7 +60,10 @@ const Layout: React.FC<Props> = ({
           {children}
         </main>
         <footer>
-          <div className="footer-link"><a role="presentation" onClick={() => setModalOpen(true)}>Info</a></div>
+          <div className="nav">
+            <div className="footer-link">Build by Mux</div>
+            <div className="footer-link"><a role="presentation" onClick={() => setModalOpen(true)}>Info</a></div>
+          </div>
           <div className="footer-link"><AsteriskLink /></div>
         </footer>
 
@@ -74,11 +77,8 @@ const Layout: React.FC<Props> = ({
             width: 100%;
           }
           .container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
             transition: background ${transitionDuration} ease;
+            height: 100vh;
           }
           .drag-overlay {
             height: 100%;
@@ -105,11 +105,9 @@ const Layout: React.FC<Props> = ({
 
           main {
             padding: 20px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            max-width: 1100px;
+            position: relative;
+            margin-bottom: -120px;
+            height: 100%;
           }
 
           footer {
@@ -121,6 +119,14 @@ const Layout: React.FC<Props> = ({
             padding-right: 30px;
             padding-bottom: 10px;
             height: 120px;
+          }
+
+          .nav {
+            display: flex;
+            align-items: center;
+          }
+          .nav > .footer-link {
+            padding-right: 40px;
           }
 
           .footer-link {

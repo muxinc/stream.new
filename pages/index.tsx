@@ -33,16 +33,11 @@ const Index: React.FC<Props> = () => {
     <Layout
       onFileDrop={onDrop}
     >
-      <div className="drop-notice">
-        <h2>Drag and drop a file anywhere</h2>
-      </div>
-      <div className="create-video-actions">
-        <div className="headline-mobile">
+      <div>
+        <div>
           <h1>Add a video.</h1>
-          <h1>Stream it anywhere.</h1>
-        </div>
-        <div className="headline-desktop">
-          <h1>Add a video. Stream it anywhere.</h1>
+          <h1>Get a sharable</h1>
+          <h1>link to stream it.</h1>
         </div>
         <div className="cta">
           <label htmlFor="file-input">
@@ -64,20 +59,29 @@ const Index: React.FC<Props> = () => {
         input {
           display: none;
         }
-        .headline-mobile {
-          display: block;
-        }
-        .headline-desktop {
-          display: none;
-        }
         .drop-notice {
           display: none;
         }
+
+        .cta {
+          display: flex;
+          flex-direction: column;
+          position: absolute;
+          right: 0;
+          bottom: 0;
+          align-items: flex-end;
+          justify-content: flex-end;
+          padding-bottom: 150px;
+          padding-right: 25px;
+        }
+        .cta .button {
+          margin: 8px 0;
+        }
+
         .cta {
           margin-top: 30px;
           display: flex;
           flex-direction: column;
-          align-items: center;
         }
         .cta-text-mobile {
           display: inline-block;
@@ -93,19 +97,6 @@ const Index: React.FC<Props> = () => {
           .drop-notice {
             display: block;
             text-align: center;
-          }
-          .create-video-actions {
-            padding-top: 20vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-          }
-          .headline-mobile {
-            display: none;
-          }
-          .headline-desktop {
-            display: block;
           }
           .cta-text-mobile {
             display: none;
