@@ -66,9 +66,6 @@ const InfoModal: React.FC<Props> = ({ close }) => {
           flex-direction: column;
           background: #f8f8f8;
         }
-        h1, a, a:visited {
-          color: #383838;
-        }
         footer {
           width: 100%;
           display: flex;

@@ -10,7 +10,6 @@ type Props = {
   file: File
 };
 
-// export default function UploadProgressFullpage ({ file }) {
 const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadId, setUploadId] = useState('');

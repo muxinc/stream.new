@@ -5,6 +5,7 @@ import { useDropzone } from 'react-dropzone';
 import { breakpoints, transitionDuration } from '../style-vars';
 import Asterisk from './asterisk';
 import InfoModal from './info-modal';
+import { MUX_HOME_PAGE_URL } from '../constants';
 
 const AsteriskLink = () => <Link href="/"><a><Asterisk /></a></Link>;
 
@@ -63,8 +64,8 @@ const Layout: React.FC<Props> = ({
         </main>
         <footer>
           <div className="nav">
-            <div className="footer-link">Build by Mux</div>
             <div className="footer-link"><a role="presentation" onClick={() => setModalOpen(true)}>Info</a></div>
+            <div className="footer-link mux"><a href={MUX_HOME_PAGE_URL}>Built by Mux</a></div>
           </div>
           <div className="footer-link"><AsteriskLink /></div>
         </footer>
@@ -142,10 +143,16 @@ const Layout: React.FC<Props> = ({
             line-height: 33px;
           }
 
-          .footer-link :global(a), .footer-link :global(a:visited) {
-            color: ${darkMode ? '#ccc' : '#383838'};
+
+          .footer-link a, .footer-link a:visited {
+            mix-blend-mode: exclusion;
+            color: #f8f8f8;
             text-decoration: none;
             cursor: pointer;
+          }
+
+          .footer-link.mux a, .footer-link.mux a:visited {
+            color: #777;
           }
 
           @media only screen and (min-width: ${breakpoints.md}px) {
@@ -178,11 +185,13 @@ const Layout: React.FC<Props> = ({
 
           a, a:visited {
             cursor: pointer;
-            color: ${darkMode ? '#ccc' : '#383838'};
+            mix-blend-mode: exclusion;
+            color: #f8f8f8;
           }
 
           h1, h2 {
-            color: ${darkMode ? '#ccc' : '#383838'};
+            mix-blend-mode: exclusion;
+            color: #ccc;
           }
 
           h1 {
