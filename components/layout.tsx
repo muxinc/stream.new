@@ -5,7 +5,6 @@ import { useDropzone } from 'react-dropzone';
 import { breakpoints, transitionDuration } from '../style-vars';
 import Asterisk from './asterisk';
 import InfoModal from './info-modal';
-import { MUX_HOME_PAGE_URL } from '../constants';
 
 type AsteriskProps = {
   spinning?: boolean;
@@ -87,7 +86,7 @@ const Layout: React.FC<Props> = ({
         <footer>
           <div className="nav">
             <div className="footer-link"><a role="presentation" onClick={() => setModalOpen(true)}>Info</a></div>
-            <div className="footer-link mux"><a href={MUX_HOME_PAGE_URL}>Built by Mux</a></div>
+            <div className="footer-link mux">Built by Mux</div>
           </div>
           <div className="footer-link"><AsteriskLink spinning={spinningLogo} /></div>
         </footer>
@@ -175,7 +174,7 @@ const Layout: React.FC<Props> = ({
             cursor: pointer;
           }
 
-          .footer-link.mux a, .footer-link.mux a:visited {
+          .footer-link.mux {
             color: #777;
           }
 

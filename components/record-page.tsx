@@ -195,7 +195,7 @@ const RecordPage: React.FC<NoProps> = () => {
          * This gets called when a new device is selected, we want to stopUserMedia()
          * when re-initializing a camera
          *
-         * However, for screenshare behavior we don't want to stopUserMedia() because
+         * You will notice that in startScreenshare() we do not call stopUserMedia()
          * because we want the screenshare to stay the same while the microphone input
          * gets changed
          */
