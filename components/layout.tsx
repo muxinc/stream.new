@@ -82,7 +82,6 @@ const Layout: React.FC<Props> = ({
         <div className="modal-wrapper"><InfoModal close={() => setModalOpen(false)} /></div>
         <main>
           <div className={`${centered ? "content-wrapper-centered" : ""}`}>{children}</div>
-          <div className="push-footer" />
         </main>
         <div className="footer-wrapper">
           <footer>
@@ -115,7 +114,6 @@ const Layout: React.FC<Props> = ({
           .container {
             transition: background ${transitionDuration} ease;
             outline: none;
-            height: 100vh;
           }
           .drag-overlay {
             height: 100%;
@@ -210,9 +208,8 @@ const Layout: React.FC<Props> = ({
 
         <style jsx global>{`
           html, body, #__next, .container {
-            height: 100%;
-            min-height: -webkit-fill-available;
             background: ${darkMode ? '#111' : '#f8f8f8'};
+            height: 100%;
           }
           p {
             font-size: 18px;
