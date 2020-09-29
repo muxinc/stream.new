@@ -6,6 +6,7 @@ type Props = {
   href?: string;
   disabled?: boolean;
   otherProps?: unknown;
+  fullW?: boolean;
   type?: "button" | "submit" | "reset" | undefined;
   children: string | ReactNode;
 };
@@ -14,7 +15,7 @@ type ButtonOrAnchor = Ref<HTMLButtonElement | HTMLAnchorElement>;
 
 const Button = forwardRef<ButtonOrAnchor, Props>(
   function Button (props, ref) {
-    const { buttonLink, type, children, onClick, href, disabled, ...otherProps } = props;
+    const { buttonLink, type, children, onClick, href, fullW, disabled, ...otherProps } = props;
     return (
       <>
         {buttonLink
@@ -23,6 +24,7 @@ const Button = forwardRef<ButtonOrAnchor, Props>(
         <style jsx>{`
           button {
             cursor: pointer;
+            width: ${fullW ? '100%' : 'auto'};
           }
           a {
             text-decoration: none;

@@ -36,6 +36,7 @@ const RecordPage: React.FC<NoProps> = () => {
   const [file, setFile] = useState<File | null>(null);
   const [startRecordTime, setStartRecordTime] = useState<number | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [isRequestingMedia, setIsRequestingMedia] = useState(false);
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
   const [isReviewing, setIsReviewing] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
@@ -200,11 +201,16 @@ const RecordPage: React.FC<NoProps> = () => {
          * gets changed
          */
         stopUserMedia();
+        setIsRequestingMedia(true);
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        setIsRequestingMedia(false);
+        setErrorMessage('');
         await getDevices();
         setupStream(stream);
       } catch (err) {
         logger.error('getdevices error', err);
+        setIsRequestingMedia(false);
+        setErrorMessage('Error getting devices, you may have denied access already, if so you will have to allow access in browser settings.');
       }
     }
     return function teardown () {
@@ -234,6 +240,8 @@ const RecordPage: React.FC<NoProps> = () => {
         setupStream(stream);
       } catch (err) {
         logger.error(err);
+        setIsRequestingMedia(false);
+        setErrorMessage('Error getting screenshare. You may have denied access already, if so you will have to allow access in browser settings.');
       }
     }
     return function teardown () {
@@ -290,7 +298,8 @@ const RecordPage: React.FC<NoProps> = () => {
       };
       setIsRecording(true);
     } catch (err) {
-      console.error(err); // eslint-disable-line no-console
+      logger.error(err); // eslint-disable-line no-console
+      setErrorMessage('Error attempting to start recording, check console for details');
     }
   };
 
@@ -393,12 +402,14 @@ const RecordPage: React.FC<NoProps> = () => {
       <h1>Video setup</h1>
       <VideoSourceToggle activeSource={videoSource} onChange={changeVideoSource} />
       {errorMessage && <div className='error-message'>{errorMessage}</div>}
-      {!haveDeviceAccess && videoSource === 'camera' &&
-        <AccessSkeletonFrame onClick={startCamera} text='Allow the browser to use your camera/mic' />
-      }
-      {!haveDeviceAccess && videoSource === 'screen' &&
-        <AccessSkeletonFrame onClick={startScreenshare} text='Allow the browser to access screenshare' />
-      }
+      <div className="skeleton-container">
+        {!haveDeviceAccess && videoSource === 'camera' &&
+          <AccessSkeletonFrame onClick={startCamera} text={ isRequestingMedia ? 'Loading device...' : 'Allow the browser to use your camera/mic' } />
+        }
+        {!haveDeviceAccess && videoSource === 'screen' &&
+          <AccessSkeletonFrame onClick={startScreenshare} text={ isRequestingMedia ? 'Loading device...' : 'Allow the browser to access screenshare' } />
+        }
+      </div>
       { videoSource === '' && <div>Select camera or screenshare to get started</div>}
       {<video className={showMirrorImage() ? 'mirror-image' : ''} ref={videoRef} width="400" autoPlay />}
       <div>
@@ -450,6 +461,11 @@ const RecordPage: React.FC<NoProps> = () => {
           max-width: 400px;
           color: red;
           padding: 20px;
+        }
+        .skeleton-container {
+          width: 100%;
+          display: flex;
+          justify-content: center;
         }
         video {
           display: ${haveDeviceAccess ? 'block' : 'none'};

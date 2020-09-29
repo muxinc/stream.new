@@ -7,14 +7,10 @@ type Props = {
 
 const AccessSkeletonFrame: React.FC<Props> = ({ onClick, text }) => {
   return (
-    <div className='skeleton-frame'>
+    <div>
       <div className='video-box' />
-      <div className='button'><Button type="button" onClick={onClick}>{text}</Button></div>
+      <div className='button'><Button type="button" fullW onClick={onClick}>{text}</Button></div>
       <style jsx>{`
-        .skeleton-frame {
-          position: absolute;
-          margin-top: 180px;
-        }
         .video-box {
           background-color: white;
           width: 400px;
@@ -25,6 +21,7 @@ const AccessSkeletonFrame: React.FC<Props> = ({ onClick, text }) => {
         .button {
           top: -160px;
           position: relative;
+          min-width: 440px;
         }
       `}
       </style>
