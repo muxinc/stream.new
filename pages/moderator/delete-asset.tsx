@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../../components/layout';
 import Button from '../../components/button';
-import FullpageSpinner from '../../components/fullpage-spinner';
+import FullpageLoader from '../../components/fullpage-loader';
 
 type Props = null;
 
@@ -48,7 +48,7 @@ const DeleteAsset: React.FC<Props> = () => {
     <Layout>
       {
         isLoading
-          ? <FullpageSpinner />
+          ? <FullpageLoader />
           : (
             <div className="wrapper">
               { isDeleted ? <div>Asset {assetId} is deleted</div> : <Button onClick={deleteAsset}>Delete asset {assetId}</Button> }

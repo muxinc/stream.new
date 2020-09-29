@@ -82,14 +82,17 @@ const Layout: React.FC<Props> = ({
         <div className="modal-wrapper"><InfoModal close={() => setModalOpen(false)} /></div>
         <main>
           <div className={`${centered ? "content-wrapper-centered" : ""}`}>{children}</div>
+          <div className="push-footer" />
         </main>
-        <footer>
-          <div className="nav">
-            <div className="footer-link"><a role="presentation" onClick={() => setModalOpen(true)}>Info</a></div>
-            <div className="footer-link mux">Built by Mux</div>
-          </div>
-          <div className="footer-link"><AsteriskLink spinning={spinningLogo} /></div>
-        </footer>
+        <div className="footer-wrapper">
+          <footer>
+            <div className="nav">
+              <div className="footer-link"><a role="presentation" onClick={() => setModalOpen(true)}>Info</a></div>
+              <div className="footer-link mux">Built by Mux</div>
+            </div>
+            <div className="footer-link"><AsteriskLink spinning={spinningLogo} /></div>
+          </footer>
+        </div>
 
         <style jsx>{`
           .modal-wrapper {
@@ -141,6 +144,12 @@ const Layout: React.FC<Props> = ({
             padding: 20px;
             margin-bottom: -${FOOTER_HEIGHT};
             height: 100%;
+          }
+
+          .footer-wrapper {
+            position: absolute;
+            width: 100%;
+            bottom: 0;
           }
 
           footer {
@@ -202,6 +211,7 @@ const Layout: React.FC<Props> = ({
         <style jsx global>{`
           html, body, #__next, .container {
             height: 100%;
+            min-height: -webkit-fill-available;
             background: ${darkMode ? '#111' : '#f8f8f8'};
           }
           p {

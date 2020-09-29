@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { GetStaticProps, GetStaticPaths } from 'next';
 import { useRouter } from 'next/router';
-import FullpageSpinner from '../../components/fullpage-spinner';
+import FullpageLoader from '../../components/fullpage-loader';
 import VideoPlayer from '../../components/video-player';
 import Layout from '../../components/layout';
 import { HOST_URL } from '../../constants';
@@ -13,7 +13,7 @@ type Params = {
 export const getStaticProps: GetStaticProps = async (context)  => {
   const { params } = context;
   const { id: playbackId } = (params as Params);
-  const poster = `https://image.mux.com/${playbackId}/thumbnail.png`;
+  const poster = `https://image.mux.com/${playbackId}/animated.gif`;
   const shareUrl = `${HOST_URL}/v/${playbackId}`;
 
   return { props: { playbackId, shareUrl, poster } };
@@ -32,6 +32,8 @@ type Props = {
   poster: string
 };
 
+const META_TITLE = "View this video created on stream.new";
+
 const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -45,7 +47,7 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
         centered
         darkMode
       >
-        <FullpageSpinner />;
+        <FullpageLoader text="Loading player..." />;
       </Layout>
     );
   }
@@ -55,14 +57,17 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
     console.error('Error', evt); // eslint-disable-line no-console
   };
 
+  const showLoading = (!isLoaded && !errorMessage);
+
   return (
     <Layout
-      metaTitle="View this video created on stream.new"
+      metaTitle={META_TITLE}
       image={poster}
+      centered={showLoading}
       darkMode
     >
       {errorMessage && <h1 className="error-message">{errorMessage}</h1>}
-      {!isLoaded && !errorMessage && <FullpageSpinner />}
+      {showLoading && <FullpageLoader text="Loading player" />}
       <div className="wrapper">
         <VideoPlayer playbackId={playbackId} poster={poster} onLoaded={() => setIsLoaded(true)} onError={onError} />
         <div className="share-url">{shareUrl}</div>
