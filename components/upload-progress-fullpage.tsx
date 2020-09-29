@@ -81,7 +81,7 @@ const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
   }, [file]);
 
   return (
-    <Layout>
+    <Layout centered spinningLogo>
       {
         (errorMessage || error)
           ? <div><h1>{(error && 'Error fetching API') || errorMessage}</h1></div>

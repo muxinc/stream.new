@@ -7,7 +7,27 @@ import Asterisk from './asterisk';
 import InfoModal from './info-modal';
 import { MUX_HOME_PAGE_URL } from '../constants';
 
-const AsteriskLink = () => <Link href="/"><a><Asterisk /></a></Link>;
+type AsteriskProps = {
+  spinning?: boolean;
+}
+
+const AsteriskLink: React.FC<AsteriskProps> = ({ spinning }) => {
+  return (
+    <>
+      <Link href="/"><a><Asterisk /></a></Link>
+      <style jsx>{`
+        a {
+          animation: ${ spinning ? 'rotation 4s linear infinite' : 'none'};
+          width: 46px;
+          height: 46px;
+          display: block;
+        }
+      `}</style>
+    </>
+  );
+};
+
+const FOOTER_HEIGHT = '100px';
 
 type Props = {
   title?: string;
@@ -18,6 +38,7 @@ type Props = {
   onFileDrop?: (acceptedFiles: File[]) => void;
   darkMode?: boolean;
   centered?: boolean;
+  spinningLogo?: boolean;
 };
 
 const Layout: React.FC<Props> = ({
@@ -25,10 +46,11 @@ const Layout: React.FC<Props> = ({
   description,
   metaTitle,
   metaDescription,
-  image,
+  image = "/stream-new-og-image.png",
   onFileDrop,
   darkMode,
   centered,
+  spinningLogo,
   children,
 }) => {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -67,7 +89,7 @@ const Layout: React.FC<Props> = ({
             <div className="footer-link"><a role="presentation" onClick={() => setModalOpen(true)}>Info</a></div>
             <div className="footer-link mux"><a href={MUX_HOME_PAGE_URL}>Built by Mux</a></div>
           </div>
-          <div className="footer-link"><AsteriskLink /></div>
+          <div className="footer-link"><AsteriskLink spinning={spinningLogo} /></div>
         </footer>
 
         <style jsx>{`
@@ -78,6 +100,9 @@ const Layout: React.FC<Props> = ({
             height: 100%;
             z-index: 2;
             width: 100%;
+          }
+          .spinning {
+            animation: rotation 2s infinite linear;
           }
           .content-wrapper-centered {
             display: flex;
@@ -115,7 +140,7 @@ const Layout: React.FC<Props> = ({
 
           main {
             padding: 20px;
-            margin-bottom: -120px;
+            margin-bottom: -${FOOTER_HEIGHT};
             height: 100%;
           }
 
@@ -126,8 +151,7 @@ const Layout: React.FC<Props> = ({
             justify-content: space-between;
             padding-left: 30px;
             padding-right: 30px;
-            padding-bottom: 10px;
-            height: 120px;
+            height: ${FOOTER_HEIGHT};
           }
 
           .nav {
@@ -139,7 +163,7 @@ const Layout: React.FC<Props> = ({
           }
 
           .footer-link {
-            font-size: 26px;
+            font-size: 20px;
             line-height: 33px;
           }
 
@@ -159,6 +183,18 @@ const Layout: React.FC<Props> = ({
             .drag-overlay h1 {
               font-size: 96px;
               line-height: 120px;
+            }
+            .footer-link {
+              font-size: 26px;
+            }
+          }
+
+          @keyframes rotation {
+            from {
+              transform: rotate(0deg);
+            }
+            to {
+              transform: rotate(359deg);
             }
           }
         `}
@@ -189,9 +225,9 @@ const Layout: React.FC<Props> = ({
             color: #f8f8f8;
           }
 
-          h1, h2 {
+          h1 {
             mix-blend-mode: exclusion;
-            color: #ccc;
+            color: #f8f8f8;
           }
 
           h1 {
@@ -234,6 +270,15 @@ const Layout: React.FC<Props> = ({
             p {
               font-size: 26px;
               line-height: 38px;
+            }
+          }
+
+          @keyframes rotation {
+            from {
+              transform: rotate(0deg);
+            }
+            to {
+              transform: rotate(359deg);
             }
           }
         `}

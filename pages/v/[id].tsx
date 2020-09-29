@@ -42,6 +42,7 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
       <Layout
         metaTitle="View this video created on stream.new"
         image={poster}
+        centered
         darkMode
       >
         <FullpageSpinner />;

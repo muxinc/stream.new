@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import Router, { useRouter } from 'next/router';
+import { breakpoints } from '../../style-vars';
 import Link from 'next/link';
 import useSwr from 'swr';
 import Layout from '../../components/layout';
 import Button from '../../components/button';
-import { transitionDuration } from '../../style-vars';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -65,15 +65,37 @@ const Asset: React.FC<Props> = () => {
   }
 
   return (
-    <Layout darkMode={isDarkMode}>
+    <Layout centered darkMode={isDarkMode} spinningLogo>
       <div className="preparing"><h1>Preparing</h1></div>
       <style jsx>{`
         .preparing {
           flex-grow: 1;
           display: flex;
           align-items: center;
-          color: ${isDarkMode ? '#fff' : '#111'};
-          transition: color ${transitionDuration} ease;
+        }
+        .preparing:after {
+          display: inline-block;
+          animation: dotty steps(1, end) 2.5s infinite;
+          content: '';
+          mix-blend-mode: exclusion;
+          color: #f8f8f8;
+          font-size: 36px;
+          line-height: 45px;
+        }
+
+        @media only screen and (min-width: ${breakpoints.md}px) {
+          .preparing:after {
+            font-size: 64px;
+            line-height: 80px;
+          }
+        }
+
+        @keyframes dotty {
+          0%   { content: ''; }
+          25%  { content: '.'; }
+          50%  { content: '..'; }
+          75%  { content: '...'; }
+          100% { content: ''; }
         }
       `}
       </style>

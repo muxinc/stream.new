@@ -39,6 +39,9 @@ const Index: React.FC<Props> = () => {
           <h1>Get a sharable</h1>
           <h1>link to stream it.</h1>
         </div>
+        <div className="drop-notice">
+          <h2>Drop a video file anywhere on this page</h2>
+        </div>
         <div className="cta">
           <label htmlFor="file-input">
             <Button type="button" onClick={() => inputRef.current && inputRef.current.click()}>
@@ -96,7 +99,9 @@ const Index: React.FC<Props> = () => {
         @media only screen and (min-width: ${breakpoints.md}px) {
           .drop-notice {
             display: block;
-            text-align: center;
+            text-align: right;
+            padding-top: 156px;
+            padding-right: 156px;
           }
           .cta-text-mobile {
             display: none;
