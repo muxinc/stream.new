@@ -1,27 +1,42 @@
 import { useState } from 'react';
+import { GetStaticProps, GetStaticPaths } from 'next';
 import { useRouter } from 'next/router';
-import FullpageSpinner from '../../components/fullpage-spinner';
+import FullpageLoader from '../../components/fullpage-loader';
 import VideoPlayer from '../../components/video-player';
 import Layout from '../../components/layout';
 import { HOST_URL } from '../../constants';
 
-export function getStaticProps ({ params: { id: playbackId } }) {
-  const poster = `https://image.mux.com/${playbackId}/thumbnail.png`;
+type Params = {
+  id: string;
+}
+
+export const getStaticProps: GetStaticProps = async (context)  => {
+  const { params } = context;
+  const { id: playbackId } = (params as Params);
+  const poster = `https://image.mux.com/${playbackId}/animated.gif`;
   const shareUrl = `${HOST_URL}/v/${playbackId}`;
 
   return { props: { playbackId, shareUrl, poster } };
-}
+};
 
-export function getStaticPaths () {
+export const getStaticPaths: GetStaticPaths = async () => {
   return {
     paths: [],
     fallback: true,
   };
-}
+};
 
-export default function Playback ({ playbackId, shareUrl, poster }) {
+type Props = {
+  playbackId: string,
+  shareUrl: string,
+  poster: string
+};
+
+const META_TITLE = "View this video created on stream.new";
+
+const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
 
   if (router.isFallback) {
@@ -29,26 +44,30 @@ export default function Playback ({ playbackId, shareUrl, poster }) {
       <Layout
         metaTitle="View this video created on stream.new"
         image={poster}
+        centered
         darkMode
       >
-        <FullpageSpinner />;
+        <FullpageLoader text="Loading player..." />;
       </Layout>
     );
   }
 
-  const onError = (evt) => {
+  const onError = (evt: ErrorEvent) => {
     setErrorMessage('This video does not exist');
     console.error('Error', evt); // eslint-disable-line no-console
   };
 
+  const showLoading = (!isLoaded && !errorMessage);
+
   return (
     <Layout
-      metaTitle="View this video created on stream.new"
+      metaTitle={META_TITLE}
       image={poster}
+      centered={showLoading}
       darkMode
     >
       {errorMessage && <h1 className="error-message">{errorMessage}</h1>}
-      {!isLoaded && !errorMessage && <FullpageSpinner />}
+      {showLoading && <FullpageLoader text="Loading player" />}
       <div className="wrapper">
         <VideoPlayer playbackId={playbackId} poster={poster} onLoaded={() => setIsLoaded(true)} onError={onError} />
         <div className="share-url">{shareUrl}</div>
@@ -72,4 +91,6 @@ export default function Playback ({ playbackId, shareUrl, poster }) {
       </style>
     </Layout>
   );
-}
+};
+
+export default Playback;

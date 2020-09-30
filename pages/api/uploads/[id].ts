@@ -1,14 +1,15 @@
+import { NextApiRequest, NextApiResponse } from 'next';
 import Mux from '@mux/mux-node';
 
 const { Video } = new Mux();
 
-export default async function uploadHandler (req, res) {
+export default async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   const { method } = req;
 
   switch (method) {
     case 'GET':
       try {
-        const upload = await Video.Uploads.get(req.query.id);
+        const upload = await Video.Uploads.get(req.query.id as string);
         res.json({
           upload: {
             status: upload.status,
@@ -26,4 +27,4 @@ export default async function uploadHandler (req, res) {
       res.setHeader('Allow', ['GET']);
       res.status(405).end(`Method ${method} Not Allowed`);
   }
-}
+};

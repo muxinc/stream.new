@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../../components/layout';
 import Button from '../../components/button';
-import FullpageSpinner from '../../components/fullpage-spinner';
+import FullpageLoader from '../../components/fullpage-loader';
 
-export default function Asset () {
+type Props = null;
+
+const DeleteAsset: React.FC<Props> = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const { asset_id: assetId, slack_moderator_password: slackModeratorPassword } = router.query;
 
@@ -46,7 +48,7 @@ export default function Asset () {
     <Layout>
       {
         isLoading
-          ? <FullpageSpinner />
+          ? <FullpageLoader />
           : (
             <div className="wrapper">
               { isDeleted ? <div>Asset {assetId} is deleted</div> : <Button onClick={deleteAsset}>Delete asset {assetId}</Button> }
@@ -63,4 +65,6 @@ export default function Asset () {
       }
     </Layout>
   );
-}
+};
+
+export default DeleteAsset;

@@ -1,8 +1,9 @@
+import { NextApiRequest, NextApiResponse } from 'next';
 import Mux from '@mux/mux-node';
 
 const { Video } = new Mux();
 
-export default async function uploadHandler (req, res) {
+export default async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   const { method } = req;
 
   switch (method) {
@@ -26,4 +27,4 @@ export default async function uploadHandler (req, res) {
       res.setHeader('Allow', ['POST']);
       res.status(405).end(`Method ${method} Not Allowed`);
   }
-}
+};

@@ -4,11 +4,13 @@ import Link from 'next/link';
 import useSwr from 'swr';
 import Layout from '../../components/layout';
 import Button from '../../components/button';
-import { transitionDuration } from '../../style-vars';
+import FullpageLoader from '../../components/fullpage-loader';
 
-const fetcher = (url) => fetch(url).then((res) => res.json());
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export default function Asset () {
+type Props = null;
+
+const Asset: React.FC<Props> = () => {
   const router = useRouter();
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -32,18 +34,20 @@ export default function Asset () {
 
   useEffect(() => {
     if (asset && asset.playback_id && asset.status === 'ready') {
+      // Comment out the next line to simulate a constant 'Preparing...' state
       Router.push(`/v/${asset.playback_id}`);
     }
   }, [asset]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIsDarkMode((val) => !val);
-    }, 3000);
-    return () => clearInterval(interval);
+    /*
+     * We want the page to finish rendering with light mode,
+     * Then after load toggle to dark mode, which does a transition animation
+     */
+      setTimeout(() => setIsDarkMode(true));
   }, []);
 
-  if (asset && asset.status === 'errored') {
+ if (asset && asset.status === 'errored') {
     const message = asset.errors && asset.errors.messages[0];
     errorMessage = `Error creating this asset: ${message}`;
   }
@@ -62,18 +66,10 @@ export default function Asset () {
   }
 
   return (
-    <Layout darkMode={isDarkMode}>
-      <div className="preparing"><h1>Preparing</h1></div>
-      <style jsx>{`
-        .preparing {
-          flex-grow: 1;
-          display: flex;
-          align-items: center;
-          color: ${isDarkMode ? '#fff' : '#111'};
-          transition: color ${transitionDuration} ease;
-        }
-      `}
-      </style>
+    <Layout centered darkMode={isDarkMode} spinningLogo>
+      <FullpageLoader text="Preparing" />
     </Layout>
   );
-}
+};
+
+export default Asset;

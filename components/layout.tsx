@@ -3,21 +3,55 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useDropzone } from 'react-dropzone';
 import { breakpoints, transitionDuration } from '../style-vars';
-import Globe from './globe';
+import Asterisk from './asterisk';
 import InfoModal from './info-modal';
 
-const GlobeLink = () => <Link href="/"><a><Globe /></a></Link>;
+type AsteriskProps = {
+  spinning?: boolean;
+}
 
-export default function Layout ({
+const AsteriskLink: React.FC<AsteriskProps> = ({ spinning }) => {
+  return (
+    <>
+      <Link href="/"><a><Asterisk /></a></Link>
+      <style jsx>{`
+        a {
+          animation: ${ spinning ? 'rotation 4s linear infinite' : 'none'};
+          width: 46px;
+          height: 46px;
+          display: block;
+        }
+      `}</style>
+    </>
+  );
+};
+
+const FOOTER_HEIGHT = '100px';
+
+type Props = {
+  title?: string;
+  description?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  image?: string;
+  onFileDrop?: (acceptedFiles: File[]) => void;
+  darkMode?: boolean;
+  centered?: boolean;
+  spinningLogo?: boolean;
+};
+
+const Layout: React.FC<Props> = ({
   title,
   description,
   metaTitle,
   metaDescription,
-  image,
+  image = "/stream-new-og-image.png",
   onFileDrop,
   darkMode,
+  centered,
+  spinningLogo,
   children,
-}) {
+}) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const { getRootProps, isDragActive } = useDropzone({ onDrop: onFileDrop });
   const isDroppablePage = !!onFileDrop;
@@ -27,7 +61,7 @@ export default function Layout ({
     <>
       <Head>
         <title>stream.new</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/stream-new-asterisk.svg" />
         {metaTitle && <meta property="og:title" content={metaTitle} />}
         {metaTitle && <meta property="twitter:title" content={metaTitle} />}
         {metaDescription && (
@@ -45,14 +79,19 @@ export default function Layout ({
       <div className="container" {...containerProps}>
         <div className={`drag-overlay ${isDragActive ? 'active' : ''}`}><h1>Upload to stream.new</h1></div>
 
+        <div className="modal-wrapper"><InfoModal close={() => setModalOpen(false)} /></div>
         <main>
-          <div className="modal-wrapper"><InfoModal close={() => setModalOpen(false)} /></div>
-          {children}
+          <div className={`${centered ? "content-wrapper-centered" : ""}`}>{children}</div>
         </main>
-        <footer>
-          <div className="footer-link"><a role="presentation" onClick={() => setModalOpen(true)}>Info</a></div>
-          <div className="footer-link"><GlobeLink /></div>
-        </footer>
+        <div className="footer-wrapper">
+          <footer>
+            <div className="nav">
+              <div className="footer-link"><a role="presentation" onClick={() => setModalOpen(true)}>Info</a></div>
+              <div className="footer-link mux">Built by Mux</div>
+            </div>
+            <div className="footer-link"><AsteriskLink spinning={spinningLogo} /></div>
+          </footer>
+        </div>
 
         <style jsx>{`
           .modal-wrapper {
@@ -63,13 +102,18 @@ export default function Layout ({
             z-index: 2;
             width: 100%;
           }
-          .container {
+          .spinning {
+            animation: rotation 2s infinite linear;
+          }
+          .content-wrapper-centered {
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            background: ${darkMode ? '#111' : '#f8f8f8'};
+            height: 100%;
+          }
+          .container {
             transition: background ${transitionDuration} ease;
+            outline: none;
           }
           .drag-overlay {
             height: 100%;
@@ -96,11 +140,14 @@ export default function Layout ({
 
           main {
             padding: 20px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            max-width: 1100px;
+            margin-bottom: -${FOOTER_HEIGHT};
+            height: 100%;
+          }
+
+          .footer-wrapper {
+            position: absolute;
+            width: 100%;
+            bottom: 0;
           }
 
           footer {
@@ -110,19 +157,32 @@ export default function Layout ({
             justify-content: space-between;
             padding-left: 30px;
             padding-right: 30px;
-            padding-bottom: 30px;
-            height: 120px;
+            height: ${FOOTER_HEIGHT};
+          }
+
+          .nav {
+            display: flex;
+            align-items: center;
+          }
+          .nav > .footer-link {
+            padding-right: 40px;
           }
 
           .footer-link {
-            font-size: 26px;
+            font-size: 20px;
             line-height: 33px;
           }
 
-          .footer-link :global(a), .footer-link :global(a:visited) {
-            color: ${darkMode ? '#ccc' : '#383838'};
+
+          .footer-link a, .footer-link a:visited {
+            mix-blend-mode: exclusion;
+            color: #f8f8f8;
             text-decoration: none;
             cursor: pointer;
+          }
+
+          .footer-link.mux {
+            color: #777;
           }
 
           @media only screen and (min-width: ${breakpoints.md}px) {
@@ -130,13 +190,30 @@ export default function Layout ({
               font-size: 96px;
               line-height: 120px;
             }
+            .footer-link {
+              font-size: 26px;
+            }
+          }
+
+          @keyframes rotation {
+            from {
+              transform: rotate(0deg);
+            }
+            to {
+              transform: rotate(359deg);
+            }
           }
         `}
         </style>
 
         <style jsx global>{`
           html, body, #__next, .container {
+            background: ${darkMode ? '#111' : '#f8f8f8'};
             height: 100%;
+          }
+          p {
+            font-size: 18px;
+            line-height: 20px;
           }
 
           html,
@@ -150,11 +227,13 @@ export default function Layout ({
 
           a, a:visited {
             cursor: pointer;
-            color: ${darkMode ? '#ccc' : '#383838'};
+            mix-blend-mode: exclusion;
+            color: #f8f8f8;
           }
 
-          h1, h2 {
-            color: ${darkMode ? '#ccc' : '#383838'};
+          h1 {
+            mix-blend-mode: exclusion;
+            color: #f8f8f8;
           }
 
           h1 {
@@ -175,6 +254,15 @@ export default function Layout ({
             line-height: 33px;
           }
 
+          select {
+            padding: 11px;
+            background: transparent;
+            font-size: 26px;
+            color: #b0b0b0;
+            width: 400px;
+            line-height: 26px;
+          }
+
           * {
             box-sizing: border-box;
           }
@@ -185,10 +273,25 @@ export default function Layout ({
               line-height: 80px;
               text-align: left;
             }
+            p {
+              font-size: 26px;
+              line-height: 38px;
+            }
+          }
+
+          @keyframes rotation {
+            from {
+              transform: rotate(0deg);
+            }
+            to {
+              transform: rotate(359deg);
+            }
           }
         `}
         </style>
       </div>
     </>
   );
-}
+};
+
+export default Layout;
