@@ -13,7 +13,7 @@ type Params = {
 export const getStaticProps: GetStaticProps = async (context)  => {
   const { params } = context;
   const { id: playbackId } = (params as Params);
-  const poster = `https://image.mux.com/${playbackId}/animated.gif`;
+  const poster = `https://image.mux.com/${playbackId}/thumbnail.png`;
   const shareUrl = `${HOST_URL}/v/${playbackId}`;
 
   return { props: { playbackId, shareUrl, poster } };
