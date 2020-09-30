@@ -35,12 +35,12 @@ const Index: React.FC<Props> = () => {
     >
       <div>
         <div>
+          <div className="drop-notice">
+            <h2>Drop a video file anywhere on this page</h2>
+          </div>
           <h1>Add a video.</h1>
           <h1>Get a sharable</h1>
           <h1>link to stream it.</h1>
-        </div>
-        <div className="drop-notice">
-          <h2>Drop a video file anywhere on this page</h2>
         </div>
         <div className="cta">
           <label htmlFor="file-input">
@@ -100,9 +100,16 @@ const Index: React.FC<Props> = () => {
           .drop-notice {
             display: block;
             text-align: right;
-            padding-top: 156px;
-            padding-right: 156px;
+            float: right;
+            max-width: 200px;
+            color: #fff;
+            opacity: 0.5;
+            mix-blend-mode: exclusion;
           }
+          .drop-notice h2 {
+            margin-top: 0;
+          }
+
           .cta-text-mobile {
             display: none;
           }
