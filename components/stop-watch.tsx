@@ -9,17 +9,34 @@ type Props = {
 const StopWatch: React.FC<Props> = ({ startTimeUnixMs }) => {
   const [time, setTime] = useState('');
 
+  const updateTimer = () => {
+    const now = (new Date()).valueOf();
+    let secs = Math.floor((now - startTimeUnixMs) / 1000);
+    let mins;
+    let text;
+    if (secs > 60) {
+      mins = Math.floor(secs / 60);
+    }
+    if (typeof mins !== 'undefined') {
+      secs = secs - (60 * mins);
+      if (mins === 1) {
+        text = `${mins} minute ${secs} seconds`;
+      } else {
+        text = `${mins} minutes ${secs} seconds`;
+      }
+    } else {
+      text = `${secs} seconds`;
+    }
+    setTime(text);
+  };
+
   useEffect(() => {
-    const interval = setInterval(() => {
-      const now = (new Date()).valueOf();
-      const secs = (now - startTimeUnixMs) / 1000;
-      setTime(`${Math.floor(secs)} seconds`);
-    }, UPDATE_INTERVAL_MS);
+    const interval = setInterval(updateTimer, UPDATE_INTERVAL_MS);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div>{time}</div>
+    <div>{time || '0 seconds'}</div>
   );
 };
 

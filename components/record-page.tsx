@@ -178,7 +178,6 @@ const RecordPage: React.FC<NoProps> = () => {
   };
 
   const startCamera = async () => {
-    // todo - error if not supported
     if (navigator.mediaDevices) {
       const video = videoDeviceId ? { deviceId: videoDeviceId } : true;
       const audio = audioDeviceId ? { deviceId: audioDeviceId } : true;
@@ -212,6 +211,8 @@ const RecordPage: React.FC<NoProps> = () => {
         setIsRequestingMedia(false);
         setErrorMessage('Error getting devices, you may have denied access already, if so you will have to allow access in browser settings.');
       }
+    } else {
+      setErrorMessage('navigator.mediaDevices not available in this browser');
     }
     return function teardown () {
       hardCleanup();
@@ -219,7 +220,6 @@ const RecordPage: React.FC<NoProps> = () => {
   };
 
   const startScreenshare = async () => {
-    // todo - error if not supported
     if (navigator.mediaDevices) {
       const audio = audioDeviceId ? { deviceId: audioDeviceId } : true;
       const constraints = { video: false, audio };
@@ -243,6 +243,8 @@ const RecordPage: React.FC<NoProps> = () => {
         setIsRequestingMedia(false);
         setErrorMessage('Error getting screenshare. You may have denied access already, if so you will have to allow access in browser settings.');
       }
+    } else {
+      setErrorMessage('navigator.mediaDevices not available in this browser');
     }
     return function teardown () {
       hardCleanup();
@@ -399,7 +401,7 @@ const RecordPage: React.FC<NoProps> = () => {
       description="Record a video"
       centered
     >
-      <h1>Video setup</h1>
+      <h1>{(isRecording && startRecordTime && <StopWatch startTimeUnixMs={startRecordTime} />) || 'Video setup'}</h1>
       <VideoSourceToggle activeSource={videoSource} onChange={changeVideoSource} />
       {errorMessage && <div className='error-message'>{errorMessage}</div>}
       <div className="skeleton-container">
@@ -441,9 +443,6 @@ const RecordPage: React.FC<NoProps> = () => {
           selectAudio={selectAudio}
         />
       }
-      <div className="stopwatch">
-        { isRecording && startRecordTime && <StopWatch startTimeUnixMs={startRecordTime} /> }
-      </div>
       { haveDeviceAccess && (
       <RecordingControls
         isRecording={isRecording}
@@ -473,10 +472,6 @@ const RecordPage: React.FC<NoProps> = () => {
         video.mirror-image {
           -webkit-transform: scaleX(-1);
           transform: scaleX(-1);
-        }
-        .stopwatch {
-          padding-bottom: 20px 0 ;
-          height: 30px;
         }
       `}
       </style>
