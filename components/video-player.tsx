@@ -134,6 +134,7 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
           cursor: pointer;
           margin-top: 40px;
           margin-bottom: 40px;
+          border-radius: 30px;
         }
         @media only screen and (min-width: ${breakpoints.md}px) {
           video {

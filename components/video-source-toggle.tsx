@@ -18,15 +18,20 @@ const VideoSourceToggle: React.FC<Props> = ({ activeSource, onChange }) => {
           border: 0;
           background: none;
           font-size: 18px;
-          padding: 0 10px;
+          padding: 0 10px 5px 10px;
           text-align: center;
           color: #ccc;
           border-bottom: 2px solid #ccc;
           width: 120px;
+          transition: all 0.2s ease;
+          margin-bottom: 20px;
         }
         .tab.active {
           color: #222;
           border-bottom: 2px solid #222;
+        }
+        .tab:hover {
+          color: #222
         }
       `}
       </style>
