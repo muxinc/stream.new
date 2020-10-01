@@ -94,7 +94,7 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
       {showLoading && <FullpageLoader text="Loading player" />}
       <div className="wrapper">
         <VideoPlayer playbackId={playbackId} poster={poster} onLoaded={() => setIsLoaded(true)} onError={onError} />
-        <a onClick={copyUrl} onKeyPress={copyUrl} role="button" tabIndex={0} className="share-url">{ isCopied ? 'Copied to clipboard' :'Copy video URL' }</a>
+        <a onClick={copyUrl} onKeyPress={copyUrl} role="button" tabIndex={0}>{ isCopied ? 'Copied to clipboard' :'Copy video URL' }</a>
       </div>
       <style jsx>{`
         .error-message {
@@ -106,10 +106,6 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
           flex-grow: 1;
           align-items: center;
           justify-content: center;
-        }
-        .share-url {
-          word-break: break-word;
-          color: #777;
         }
       `}
       </style>
