@@ -73,8 +73,9 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
     copy(shareUrl, { message:  'Copy'});
     setIsCopied(true);
     /*
-     * We might need to clear this timeout if the user
-     * navigates away before the timeout expires
+     * We need a ref to the setTimeout because if the user
+     * navigates away before the timeout expires we will
+     * clear it out
      */
     copyTimeoutRef.current = window.setTimeout(()=> {
       setIsCopied(false);
