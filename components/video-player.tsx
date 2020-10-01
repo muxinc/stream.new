@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Hls from 'hls.js';
 import mux from 'mux-embed';
+import logger from '../lib/logger';
 import { breakpoints } from '../style-vars';
 
 /*
@@ -82,6 +83,12 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
         hls = new Hls();
         hls.loadSource(src);
         hls.attachMedia(video);
+        hls.on(Hls.Events.ERROR, function (event, data) {
+          if (data.fatal) {
+            logger.error('hls.js fatal error');
+            videoError(new ErrorEvent('HLS.js fatal error'));
+          }
+        });
       } else {
         console.error( // eslint-disable-line no-console
           'This is an old browser that does not support MSE https://developer.mozilla.org/en-US/docs/Web/API/Media_Source_Extensions_API',

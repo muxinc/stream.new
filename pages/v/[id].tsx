@@ -63,6 +63,7 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
 
   const onError = (evt: ErrorEvent) => {
     setErrorMessage('This video does not exist');
+    setIsLoaded(false);
     console.error('Error', evt); // eslint-disable-line no-console
   };
 
