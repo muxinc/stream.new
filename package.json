@@ -14,6 +14,7 @@
   "dependencies": {
     "@mux/mux-node": "^3.0",
     "@mux/upchunk": "^2.0",
+    "copy-to-clipboard": "^3.3.1",
     "got": "^11.5.1",
     "hls.js": "^0.14",
     "micro": "9.3.5-canary.3",
