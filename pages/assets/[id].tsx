@@ -57,7 +57,7 @@ const Asset: React.FC<Props> = () => {
     return (
       <Layout darkMode={false}>
         <div><h1>{errorMessage}</h1></div>
-        {errorMessage && <p>{errorDetails}</p>}
+        {errorDetails && <p>{errorDetails}</p>}
         <div>
           <Link href="/">
             <Button>Home</Button>
