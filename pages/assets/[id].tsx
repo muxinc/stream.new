@@ -49,14 +49,19 @@ const Asset: React.FC<Props> = () => {
 
  if (asset && asset.status === 'errored') {
     const message = asset.errors && asset.errors.messages[0];
-    errorMessage = `Error creating this asset: ${message}`;
-  }
+    errorMessage = {
+      initial: 'Error creating this asset: Please upload a valid video file (gifs are not supported)',
+      apiError: message
+  }}
 
   if (errorMessage) {
     return (
       <Layout darkMode={false}>
-        <div><h1>{errorMessage}</h1></div>
+        <div><h1>{errorMessage.initial}</h1></div>
         <div>
+          <p>
+            {errorMessage.apiError}
+            </p>
           <Link href="/">
             <Button>Home</Button>
           </Link>
