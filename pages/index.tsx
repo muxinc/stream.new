@@ -48,7 +48,7 @@ const Index: React.FC<Props> = () => {
               <span className="cta-text-mobile">Add a video</span>
               <span className="cta-text-desktop">Upload a video</span>
             </Button>
-            <input id="file-input" type="file" onChange={onInputChange} ref={inputRef} />
+            <input id="file-input" type="file" accept="video/*" onChange={onInputChange} ref={inputRef} />
           </label>
           <div className="cta-record">
             <Link href="/record?source=camera"><Button>Record from camera</Button></Link>
