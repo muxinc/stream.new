@@ -17,6 +17,7 @@ const AccessSkeletonFrame: React.FC<Props> = ({ onClick, text }) => {
           height: 261px;
           border: 2px solid #CCC;
           margin: 0 auto;
+          border-radius: 30px;
         }
         .button {
           top: -160px;

@@ -32,12 +32,19 @@ const Button = forwardRef<ButtonOrAnchor, Props>(
           }
           a, button {
             font-size: 26px;
+            font-family: Akkurat;
             line-height: 33px;
             background: #fff;
             border: 2px solid ${disabled ? '#b0b0b0' : '#222222'};
             color: ${disabled ? '#b0b0b0' : '#222222'};
             padding: 10px 20px;
             border-radius: 50px;
+            transition: all 0.2s ease;
+          }
+          button:hover {
+            background: ${disabled ? '#fff' : '#222'};
+            color: ${disabled ? '#b0b0b0' : '#fff'};
+            cursor: ${disabled ? 'not-allowed' : 'pointer'};
           }
         `}
         </style>

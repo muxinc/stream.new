@@ -241,7 +241,7 @@ const RecordPage: React.FC<NoProps> = () => {
       } catch (err) {
         logger.error(err);
         setIsRequestingMedia(false);
-        setErrorMessage('Error getting screenshare. You may have denied access already, if so you will have to allow access in browser settings.');
+        setErrorMessage('Error getting screenshare. Please allow screen access in your browser settings.');
       }
     } else {
       setErrorMessage('navigator.mediaDevices not available in this browser');
@@ -456,10 +456,11 @@ const RecordPage: React.FC<NoProps> = () => {
       )}
       <style jsx>{`
         .error-message {
-          color: red;
+          color: #C9473F;
           max-width: 400px;
-          color: red;
-          padding: 20px;
+          padding-bottom: 20px;
+          text-align: center;
+          line-height: 24px;
         }
         .skeleton-container {
           width: 100%;
@@ -468,6 +469,7 @@ const RecordPage: React.FC<NoProps> = () => {
         }
         video {
           display: ${haveDeviceAccess ? 'block' : 'none'};
+          border-radius: 30px;
         }
         video.mirror-image {
           -webkit-transform: scaleX(-1);
