@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useDropzone } from 'react-dropzone';
 import { breakpoints, transitionDuration } from '../style-vars';
 import Asterisk from './asterisk';
 import InfoModal from './info-modal';
+import { OPEN_SOURCE_URL, MUX_HOME_PAGE_URL } from '../constants';
 
 type AsteriskProps = {
   spinning?: boolean;
@@ -38,6 +40,7 @@ type Props = {
   darkMode?: boolean;
   centered?: boolean;
   spinningLogo?: boolean;
+  backNav?: boolean;
 };
 
 const Layout: React.FC<Props> = ({
@@ -50,8 +53,10 @@ const Layout: React.FC<Props> = ({
   darkMode,
   centered,
   spinningLogo,
+  backNav,
   children,
 }) => {
+  const router = useRouter();
   const [isModalOpen, setModalOpen] = useState(false);
   const { getRootProps, isDragActive } = useDropzone({ onDrop: onFileDrop });
   const isDroppablePage = !!onFileDrop;
@@ -86,8 +91,17 @@ const Layout: React.FC<Props> = ({
         <div className="footer-wrapper">
           <footer>
             <div className="nav">
-              <div className="footer-link"><a role="presentation" onClick={() => setModalOpen(true)}>Info</a></div>
-              <div className="footer-link mux">Built by Mux</div>
+             {
+               backNav ?
+               <div className="footer-link back"><a onClick={() => router.back()} role="presentation">Back</a></div> :
+               <>
+                <div className="footer-link info"><a role="presentation" onClick={() => setModalOpen(true)}>Info</a></div>
+                <div className="footer-link mux">An <a href={OPEN_SOURCE_URL}>open source</a> project by <a href={MUX_HOME_PAGE_URL}>Mux</a></div>
+                <div className="divider" />
+                <div className="footer-link terms"><Link href="/terms"><a>Terms</a></Link></div>
+               </>
+
+             }
             </div>
             <div className="footer-link"><AsteriskLink spinning={spinningLogo} /></div>
           </footer>
@@ -168,21 +182,35 @@ const Layout: React.FC<Props> = ({
             padding-right: 40px;
           }
 
+          .divider {
+            display: none;
+          }
+
           .footer-link {
-            font-size: 20px;
+            font-size: 26px;
             line-height: 33px;
+            mix-blend-mode: exclusion;
+            color: #f8f8f8;
           }
 
 
           .footer-link a, .footer-link a:visited {
             mix-blend-mode: exclusion;
             color: #f8f8f8;
-            text-decoration: none;
             cursor: pointer;
+            text-decoration: none;
           }
 
           .footer-link.mux {
-            color: #777;
+            display: none;
+          }
+
+          .footer-link.terms {
+            display: none;
+          }
+
+          .footer-link.back a {
+            border-bottom: none;
           }
 
           @media only screen and (min-width: ${breakpoints.md}px) {
@@ -190,9 +218,34 @@ const Layout: React.FC<Props> = ({
               font-size: 96px;
               line-height: 120px;
             }
-            .footer-link {
-              font-size: 26px;
+            .nav > .footer-link {
+              padding-right: 0;
             }
+
+            .footer-link a, .footer-link a:visited {
+              border-bottom: 2px solid #f8f8f8;
+            }
+
+            .divider {
+              display: block;
+              margin: 0 20px;
+              height: 26px;
+              width: 2px;
+              mix-blend-mode: exclusion;
+              background-color: #f8f8f8;
+            }
+
+            .footer-link.info {
+              display: none;
+            }
+            .footer-link.mux {
+              display: block;
+            }
+
+            .footer-link.terms {
+              display: block;
+            }
+
           }
 
           @keyframes rotation {
