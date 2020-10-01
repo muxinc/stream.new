@@ -23,6 +23,7 @@ const Asset: React.FC<Props> = () => {
   const asset = data && data.asset;
 
   let errorMessage;
+  let errorDetails;
 
   if (error) {
     errorMessage = 'Error fetching api';
@@ -48,14 +49,15 @@ const Asset: React.FC<Props> = () => {
   }, []);
 
  if (asset && asset.status === 'errored') {
-    const message = asset.errors && asset.errors.messages[0];
-    errorMessage = `Error creating this asset: ${message}`;
+    errorMessage = 'Error creating this asset: Please upload a valid video file (gifs are not supported)'
+    errorDetails = asset.errors && asset.errors.messages[0];
   }
 
   if (errorMessage) {
     return (
       <Layout darkMode={false}>
         <div><h1>{errorMessage}</h1></div>
+        {errorMessage && <p>{errorDetails}</p>}
         <div>
           <Link href="/">
             <Button>Home</Button>
