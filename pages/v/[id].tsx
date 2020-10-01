@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { GetStaticProps, GetStaticPaths } from 'next';
 import { useRouter } from 'next/router';
+import copy from 'copy-to-clipboard';
 import FullpageLoader from '../../components/fullpage-loader';
 import VideoPlayer from '../../components/video-player';
 import Layout from '../../components/layout';
@@ -37,7 +38,15 @@ const META_TITLE = "View this video created on stream.new";
 const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isCopied, setIsCopied] = useState(false);
+  const copyTimeoutRef = useRef<number | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+    };
+  }, []);
 
   if (router.isFallback) {
     return (
@@ -59,6 +68,19 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
 
   const showLoading = (!isLoaded && !errorMessage);
 
+  const copyUrl = () => {
+    copy(shareUrl, { message:  'Copy'});
+    setIsCopied(true);
+    /*
+     * We might need to clear this timeout if the user
+     * navigates away before the timeout expires
+     */
+    copyTimeoutRef.current = window.setTimeout(()=> {
+      setIsCopied(false);
+      copyTimeoutRef.current = null;
+    }, 5000);
+  };
+
   return (
     <Layout
       metaTitle={META_TITLE}
@@ -70,7 +92,7 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
       {showLoading && <FullpageLoader text="Loading player" />}
       <div className="wrapper">
         <VideoPlayer playbackId={playbackId} poster={poster} onLoaded={() => setIsLoaded(true)} onError={onError} />
-        <div className="share-url">{shareUrl}</div>
+        <a onClick={copyUrl} onKeyPress={copyUrl} role="button" tabIndex={0} className="share-url">{ isCopied ? 'Copied to clipboard' :'Copy video URL' }</a>
       </div>
       <style jsx>{`
         .error-message {
