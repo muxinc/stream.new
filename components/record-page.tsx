@@ -475,6 +475,10 @@ const RecordPage: React.FC<NoProps> = () => {
           -webkit-transform: scaleX(-1);
           transform: scaleX(-1);
         }
+        h1 {
+          margin-top: 3vh;
+          font-size: 3.5vw;
+        }
       `}
       </style>
     </Layout>

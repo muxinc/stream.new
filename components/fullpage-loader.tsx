@@ -27,6 +27,8 @@ const FullpageLoader: React.FC<Props> = ({ text }) => {
 
         h1 {
           display: inline-block;
+          font-size: 8vw;
+          max-width: 100%;
         }
         h1 span {
           opacity: 0;

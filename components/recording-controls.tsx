@@ -33,8 +33,8 @@ const RecordingControls: React.FC<Props> = ({
         bottom: 0;
         align-items: flex-end;
         justify-content: flex-end;
-        margin-bottom: 150px;
-        margin-right: 25px;
+        margin-bottom: 100px;
+        margin-right: 30px;
       }
       .container .button {
         margin: 8px 0;

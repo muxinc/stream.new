@@ -35,14 +35,13 @@ const Index: React.FC<Props> = () => {
     >
       <div>
         <div>
-          <div className="drop-notice">
-            <h2>Drop a video file anywhere on this page</h2>
-          </div>
           <h1>Add a video.</h1>
-          <h1>Get a sharable</h1>
-          <h1>link to stream it.</h1>
+          <h1>Get a shareable link to stream it.</h1>
         </div>
         <div className="cta">
+          <div className="drop-notice">
+            <h2>↓ Drag & drop a video file anywhere</h2>
+          </div>
           <label htmlFor="file-input">
             <Button type="button" onClick={() => inputRef.current && inputRef.current.click()}>
               <span className="cta-text-mobile">Add a video</span>
@@ -74,8 +73,8 @@ const Index: React.FC<Props> = () => {
           bottom: 0;
           align-items: flex-end;
           justify-content: flex-end;
-          margin-bottom: 150px;
-          margin-right: 25px;
+          margin-bottom: 100px;
+          margin-right: 30px;
         }
         .cta .button {
           margin: 8px 0;
@@ -101,8 +100,8 @@ const Index: React.FC<Props> = () => {
             display: block;
             text-align: right;
             float: right;
-            max-width: 200px;
             color: #fff;
+            margin-bottom: 5px;
             opacity: 0.5;
             mix-blend-mode: exclusion;
           }

@@ -85,13 +85,17 @@ const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
       {
         (errorMessage || error)
           ? <div><h1>{(error && 'Error fetching API') || errorMessage}</h1></div>
-          : <div className="percent"><h1>{progress ? `${progress}%` : '0%'}</h1></div>
+          : <div className="percent"><h1>{progress ? `${progress}` : '0'}</h1></div>
       }
       <style jsx>{`
         .percent {
           flex-grow: 1;
           display: flex;
           align-items: center;
+        }
+
+        h1 {
+          font-size: 8vw;
         }
       `}
       </style>
