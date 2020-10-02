@@ -13,7 +13,7 @@ const Terms: React.FC<NoProps> = () => {
         </p>
         <p>
           As developers, we wanted a fast, frictionless way to share screencasts, desktop recordings,
-          meetup talks, etc. that did not include much overhead and where playback would Just Work for
+          meetup talks, etc. that did not include much overhead and where playback would JustWork&trade; for
           anyone with a link. So...that&apos;s what we built this for, but other stuff is ok too as long as
           it is nice and clean. We reserve the right to take down <strong>any</strong> piece of content, but anything
           hateful, pornographic, gore-y, or illegal is going to get insta-deleted.
