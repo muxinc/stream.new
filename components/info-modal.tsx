@@ -37,7 +37,7 @@ const InfoModal: React.FC<Props> = ({ close }) => {
           padding-left: 30px;
           padding-right: 30px;
           padding-bottom: 30px;
-          height: 100px;
+          height: 70px;
         }
 
         .footer-link {

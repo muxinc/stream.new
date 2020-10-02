@@ -91,7 +91,7 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
       darkMode
     >
       {errorMessage && <h1 className="error-message">{errorMessage}</h1>}
-      {showLoading && <FullpageLoader text="Loading player" />}
+      {showLoading && <FullpageLoader className="loading" text="Loading player" />}
       <div className="wrapper">
         <VideoPlayer playbackId={playbackId} poster={poster} onLoaded={() => setIsLoaded(true)} onError={onError} />
         <a onClick={copyUrl} onKeyPress={copyUrl} role="button" tabIndex={0}>{ isCopied ? 'Copied to clipboard' :'Copy video URL' }</a>
@@ -99,6 +99,10 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
       <style jsx>{`
         .error-message {
           color: #ccc;
+        }
+        .loading {
+          font-size: 8vw;
+          max-width: 100%;
         }
         .wrapper {
           display: ${isLoaded ? 'flex' : 'none'};

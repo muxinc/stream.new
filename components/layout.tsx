@@ -23,6 +23,10 @@ const AsteriskLink: React.FC<AsteriskProps> = ({ spinning }) => {
           height: 46px;
           display: block;
         }
+
+        a:hover {
+          opacity: 0.5;
+        }
       `}</style>
     </>
   );
@@ -191,6 +195,7 @@ const Layout: React.FC<Props> = ({
             line-height: 33px;
             mix-blend-mode: exclusion;
             color: #f8f8f8;
+            opacity: 0.85;
           }
 
 
@@ -233,6 +238,7 @@ const Layout: React.FC<Props> = ({
               width: 2px;
               mix-blend-mode: exclusion;
               background-color: #f8f8f8;
+              opacity: 0.4;
             }
 
             .footer-link.info {
@@ -244,6 +250,10 @@ const Layout: React.FC<Props> = ({
 
             .footer-link.terms {
               display: block;
+            }
+
+            .footer-link a:hover {
+              opacity: 0.5;
             }
 
           }
@@ -263,6 +273,7 @@ const Layout: React.FC<Props> = ({
           html, body, #__next, .container {
             background: ${darkMode ? '#111' : '#f8f8f8'};
             height: 100%;
+            -webkit-font-smoothing: antialiased;
           }
           p {
             font-size: 18px;
@@ -297,34 +308,49 @@ const Layout: React.FC<Props> = ({
             line-height: 45px;
             margin: 0;
             text-align: left;
+            max-width: 90vw;
           }
 
           h2 {
             font-family: Akkurat;
             font-style: normal;
             font-weight: normal;
-            font-size: 26px;
+            font-size: 20px;
             line-height: 33px;
           }
 
           select {
-            padding: 11px;
+            padding: 5px;
+            font-family: Akkurat;
             background: transparent;
-            font-size: 26px;
-            color: #b0b0b0;
+            font-size: 20px;
+            color: #222;
             width: 400px;
-            line-height: 26px;
+            line-height: 20px;
+            border: none;
+            background: #E8E8E8;
+            border-radius: 5px;
+          }
+
+          select:hover {
+            opacity: 0.75;
           }
 
           * {
             box-sizing: border-box;
           }
 
+          ::selection {
+            background: darkgray;
+            color: white;
+          }
+
           @media only screen and (min-width: ${breakpoints.md}px) {
             h1 {
-              font-size: 64px;
-              line-height: 80px;
+              font-size: 5vw;
+              line-height: 6vw;
               text-align: left;
+              max-width: 45vw;
             }
             p {
               font-size: 26px;

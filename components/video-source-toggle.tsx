@@ -10,28 +10,37 @@ const VideoSourceToggle: React.FC<Props> = ({ activeSource, onChange }) => {
       <button className={`tab ${activeSource === 'screen' ? 'active' : ''}`} onClick={() => onChange('screen')} >Screenshare</button>
       <style jsx>{`
         .tabs {
-          margin: 20px 0;
+          margin: 30px 5px 20px;
           display: flex;
         }
         .tab {
           cursor: pointer;
           border: 0;
           background: none;
-          font-size: 18px;
-          padding: 0 10px 5px 10px;
+          font-size: 20px;
+          font-family: Akkurat;
+          font-weight: normal;
+          padding: 5px 5px 8px;
           text-align: center;
-          color: #ccc;
-          border-bottom: 2px solid #ccc;
-          width: 120px;
-          transition: all 0.2s ease;
-          margin-bottom: 20px;
+          color: #666;
+          width: 190px;
+          background: #e8e8e8;
+          transition: all 0.1s ease;
+          border-radius: 20px;
+          margin-right: 20px;
         }
-        .tab.active {
-          color: #222;
-          border-bottom: 2px solid #222;
+
+        .tab:nth-child(2) {
+          margin-right: 0px;
+        }
+
+        .tab.active, hover {
+          color: #f8f8f8;
+          background: #222;
         }
         .tab:hover {
-          color: #222
+          color: #f8f8f8;
+          background: #222;
         }
       `}
       </style>

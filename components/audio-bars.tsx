@@ -12,7 +12,7 @@ const AudioBars: React.FC<Props> = ({ audioLevel, isMuted, muteAudioTrack }) => 
   return (
     <>
       <div className="audio-levels">
-        <div className='mute-action'><a role="button" tabIndex={0} onKeyDown={toggleMuted} onClick={toggleMuted}>{isMuted ? 'unmute' : 'mute'}</a></div>
+        <div className='mute-action'><a role="button" tabIndex={0} onKeyDown={toggleMuted} onClick={toggleMuted}>{isMuted ? 'Unmute audio' : 'Mute audio'}</a></div>
         <div className={`level ${audioLevel > audioLevelThresholds[0] ? 'active' : ''}`} />
         <div className={`level ${audioLevel > audioLevelThresholds[1] ? 'active' : ''}`} />
         <div className={`level ${audioLevel > audioLevelThresholds[2] ? 'active' : ''}`} />
@@ -22,7 +22,10 @@ const AudioBars: React.FC<Props> = ({ audioLevel, isMuted, muteAudioTrack }) => 
         <style jsx>{`
           .mute-action {
             margin-right: 10px;
+            margin-top: -3px;
+            font-size: 20px;
           }
+
           .audio-levels {
             display: flex;
             justify-content: center;
