@@ -124,7 +124,7 @@ export const sendSlackWebhook = async ({ playbackId, assetId }: {playbackId: str
   return null;
 };
 
-export const sendAbuseReport = async ({ playbackId, reason }: {playbackId: string, reason: string}): Promise<null> => {
+export const sendAbuseReport = async ({ playbackId, reason, comment }: {playbackId: string, reason: string, comment?: string}): Promise<null> => {
   if (!slackWebhook) {
     console.log('No slack webhook configured'); // eslint-disable-line no-console
     return null;
@@ -132,7 +132,7 @@ export const sendAbuseReport = async ({ playbackId, reason }: {playbackId: strin
 
   await got.post(slackWebhook, {
     json: {
-      text: `Reported for abuse: ${reason}. ${playbackId} <${HOST_URL}/v/${playbackId}|View on stream.new>`,
+      text: `Reported for abuse: ${reason}. ${comment}. ${playbackId} <${HOST_URL}/v/${playbackId}|View on stream.new>`,
       icon_emoji: 'rotating_light',
     },
   });

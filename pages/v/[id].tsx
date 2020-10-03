@@ -5,7 +5,7 @@ import copy from 'copy-to-clipboard';
 import FullpageLoader from '../../components/fullpage-loader';
 import VideoPlayer from '../../components/video-player';
 import Layout from '../../components/layout';
-import Button from '../../components/button';
+import ReportForm from '../../components/report-form';
 import { HOST_URL } from '../../constants';
 
 type Params = {
@@ -35,21 +35,11 @@ type Props = {
 };
 
 const META_TITLE = "View this video created on stream.new";
-const REPORT_REASONS = [
-  'Promotes violence',
-  'Pornography or graphic',
-  'Copyright infringement',
-  'Other',
-];
-
 const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isCopied, setIsCopied] = useState(false);
   const [openReport, setOpenReport] = useState(false);
-  const [isSavingReport, setIsSavingReport] = useState(false);
-  const [hasSavedReport, setHasSavedReport] = useState(false);
-  const [reportReason, setReportReason] = useState(REPORT_REASONS[0]);
   const copyTimeoutRef = useRef<number | null>(null);
   const router = useRouter();
 
@@ -94,27 +84,6 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
     }, 5000);
   };
 
-  const saveReport = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSavingReport(true);
-    try {
-      return fetch('/api/report', {
-        method: 'POST',
-        headers: {'content-type': 'application/json'},
-        body: JSON.stringify({
-          reason: reportReason,
-          playbackId: playbackId 
-        }),
-      }).then(() => {
-          setOpenReport(false);
-          setIsSavingReport(false);
-          setHasSavedReport(true);
-        });
-    } catch (e) {
-      setErrorMessage('Error saving this report, please try again');
-    }
-  };
-
   return (
     <Layout
       metaTitle={META_TITLE}
@@ -125,24 +94,22 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
       {errorMessage && <h1 className="error-message">{errorMessage}</h1>}
       {showLoading && <FullpageLoader text="Loading player" />}
       <div className="wrapper">
-        <VideoPlayer playbackId={playbackId} poster={poster} onLoaded={() => setIsLoaded(true)} onError={onError} />
+        {!openReport && <VideoPlayer playbackId={playbackId} poster={poster} onLoaded={() => setIsLoaded(true)} onError={onError} />}
         <div className="actions">
-          <a onClick={copyUrl} onKeyPress={copyUrl} role="button" tabIndex={0}>{ isCopied ? 'Copied to clipboard' :'Copy video URL' }</a>
-          <a onClick={() => setOpenReport(!openReport)} onKeyPress={() => setOpenReport(!openReport)} role="button" tabIndex={0} className="report">Report abuse</a>
-          {
-            hasSavedReport && <div className="report thank-you">Thank you for reporting this content</div>
-          }
+          {!openReport && <a onClick={copyUrl} onKeyPress={copyUrl} role="button" tabIndex={0}>{ isCopied ? 'Copied to clipboard' :'Copy video URL' }</a>}
+          {!openReport && (
+            <a
+              onClick={() => setOpenReport(!openReport)}
+              onKeyPress={() => setOpenReport(!openReport)}
+              role="button"
+              tabIndex={0}
+              className="report">{ openReport ? 'Back' : 'Report abuse' }
+            </a>
+          )}
         </div>
-        { openReport &&
-            <form onSubmit={saveReport} className="report-form">
-              <select value={reportReason} onChange={(evt) => setReportReason(evt.target.value)} onBlur={(evt) => setReportReason(evt.target.value) }>
-               {REPORT_REASONS.map((reason) => {
-                  return <option key={reason} value={reason}>{reason}</option>;
-                })}
-              </select>
-            { isSavingReport ? 'Saving...' : <Button type="submit">Submit</Button> }
-            </form>
-        }
+        <div className="report-form">
+          { openReport && <ReportForm playbackId={playbackId} close={() => setOpenReport(false)} /> }
+        </div>
       </div>
       <style jsx>{`
         .actions a:first-child {
@@ -151,21 +118,8 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
         .error-message {
           color: #ccc;
         }
-        .report {
-          margin-top: 20px;
-        }
         .report-form {
-          margin-top: 8px;
-        }
-        .report-form select {
-          margin-right: 10px;
-        }
-        .report-form select, .report-form :global(button) {
-          font-size: 16px;
-          padding: 4px;
-        }
-        .thank-you {
-          color: #8aea8a;
+          margin-top: 20px;
         }
         .wrapper {
           display: ${isLoaded ? 'flex' : 'none'};
