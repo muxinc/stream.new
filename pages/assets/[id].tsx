@@ -49,7 +49,7 @@ const Asset: React.FC<Props> = () => {
   }, []);
 
  if (asset && asset.status === 'errored') {
-    errorMessage = 'Error creating this asset: Please upload a valid video file (gifs are not supported)'
+    errorMessage = 'Error creating this asset: Please upload a valid video file (gifs are not supported)';
     errorDetails = asset.errors && asset.errors.messages[0];
   }
 
