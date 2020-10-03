@@ -138,7 +138,7 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
         }
         @media only screen and (min-width: ${breakpoints.md}px) {
           video {
-            max-height: calc(100vh - 240px);
+            max-height: 70vh;
           }
         }
       `}
