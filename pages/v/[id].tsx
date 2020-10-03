@@ -37,7 +37,7 @@ type Props = {
 const META_TITLE = "View this video created on stream.new";
 const REPORT_REASONS = [
   'Promotes violence',
-  'Pornographic or graphic',
+  'Pornography or graphic',
   'Copyright infringement',
   'Other',
 ];
@@ -100,6 +100,7 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
     try {
       return fetch('/api/report', {
         method: 'POST',
+        headers: {'content-type': 'application/json'},
         body: JSON.stringify({
           reason: reportReason,
           playbackId: playbackId 
