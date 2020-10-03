@@ -39,6 +39,7 @@ const REPORT_REASONS = [
   'Promotes violence',
   'Pornographic or violent',
   'Copyright infringement',
+  'Other',
 ];
 
 const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
@@ -124,11 +125,13 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
       {showLoading && <FullpageLoader text="Loading player" />}
       <div className="wrapper">
         <VideoPlayer playbackId={playbackId} poster={poster} onLoaded={() => setIsLoaded(true)} onError={onError} />
-        <a onClick={copyUrl} onKeyPress={copyUrl} role="button" tabIndex={0}>{ isCopied ? 'Copied to clipboard' :'Copy video URL' }</a>
-        {
-          hasSavedReport ? <div className="report thank-you">Thank you for reporting this content</div> :
+        <div className="actions">
+          <a onClick={copyUrl} onKeyPress={copyUrl} role="button" tabIndex={0}>{ isCopied ? 'Copied to clipboard' :'Copy video URL' }</a>
           <a onClick={() => setOpenReport(!openReport)} onKeyPress={() => setOpenReport(!openReport)} role="button" tabIndex={0} className="report">Report abuse</a>
-        }
+          {
+            hasSavedReport && <div className="report thank-you">Thank you for reporting this content</div>
+          }
+        </div>
         { openReport &&
             <form onSubmit={saveReport} className="report-form">
               <select value={reportReason} onChange={(evt) => setReportReason(evt.target.value)} onBlur={(evt) => setReportReason(evt.target.value) }>
@@ -141,6 +144,9 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
         }
       </div>
       <style jsx>{`
+        .actions a:first-child {
+          padding-right: 30px;
+        }
         .error-message {
           color: #ccc;
         }
