@@ -11,11 +11,10 @@ const notify = async ({playbackId, reason, comment }: { playbackId: string, reas
         },
         json: {
           records: [
-            {fields: { playbackId, reason, comment } },
+            {fields: { playbackId, reason, comment, status: "Pending" } },
           ]
         }
       });
-      console.log('debug resp', resp.body);
     } catch (e) {
       console.error('Error reporting to airtable', e); // eslint-disable-line no-console
     }

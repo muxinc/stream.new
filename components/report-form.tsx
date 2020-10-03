@@ -61,7 +61,7 @@ const ReportForm: React.FC<Props> = ({ playbackId, close }) => {
   }
 
   return (
-    <div>
+    <div className="wrapper">
       <form onSubmit={saveReport} className="report-form">
         <p>Tell us why you are reporting this video</p>
         <select value={reportReason} onChange={(evt) => setReportReason(evt.target.value)} onBlur={(evt) => setReportReason(evt.target.value) }>
@@ -81,6 +81,10 @@ const ReportForm: React.FC<Props> = ({ playbackId, close }) => {
         </div>
       </form>
       <style jsx>{`
+        .wrapper {
+          max-width: 100%;
+          padding: 40px;
+        }
         form {
           margin-top: 8px;
           display: flex;
@@ -90,8 +94,7 @@ const ReportForm: React.FC<Props> = ({ playbackId, close }) => {
         }
         select, textarea {
           margin-bottom: 20px;
-          width: 400px;
-          max-width: 100%;
+          width: 100%;
         }
         form textarea, form select, form :global(button) {
           font-size: 16px;
