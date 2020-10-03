@@ -295,6 +295,11 @@ const Layout: React.FC<Props> = ({
             color: #f8f8f8;
           }
 
+          p {
+            mix-blend-mode: exclusion;
+            color: #f8f8f8;
+          }
+
           h1 {
             mix-blend-mode: exclusion;
             color: #f8f8f8;
