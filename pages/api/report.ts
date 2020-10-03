@@ -1,19 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import got from 'got';
 import { sendAbuseReport } from '../../lib/slack-notifier';
-/*
- *
- * curl -v -X POST https://api.airtable.com/v0/applm5lHINZUrlsjZ/Reported \
-  -H "Authorization: Bearer key5eKUYTgmWYoLVt" \
-  -H "Content-Type: application/json" \
-  --data '{
-  "records": [
-    {
-      "fields": {"playbackId": "1234", "reportedReason": "bad"}
-    }
-  ]
-}'
- */
 
 const notify = async ({playbackId, reason }: { playbackId: string, reason: string }) => {
   if (process.env.AIRTABLE_KEY && process.env.AIRTABLE_BASE_ID) {
