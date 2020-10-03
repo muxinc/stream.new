@@ -37,7 +37,7 @@ type Props = {
 const META_TITLE = "View this video created on stream.new";
 const REPORT_REASONS = [
   'Promotes violence',
-  'Pornographic or violent',
+  'Pornographic or graphic',
   'Copyright infringement',
   'Other',
 ];
