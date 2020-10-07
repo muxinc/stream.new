@@ -64,7 +64,7 @@ const baseBlocks = ({ playbackId, assetId, duration }: {playbackId: string, asse
     type: 'section',
     text: {
       type: 'mrkdwn',
-      text: `*Duration:*\n ${duration} seconds`,
+      text: `*Duration:*\n ${Math.floor(duration)} seconds`,
     },
   },
   {
