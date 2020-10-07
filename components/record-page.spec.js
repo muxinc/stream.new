@@ -1,8 +1,8 @@
 import { shallow } from 'enzyme';
 import RecordPage from './record-page';
-import Button from './button';
+import VideoSourceToggle from './video-source-toggle';
 
-test('should render with a button to allow access', () => {
+test('should render with a video source toggle component', () => {
   const wrapper = shallow(<RecordPage />);
-  expect(wrapper.find(Button).length).toEqual(1);
+  expect(wrapper.find(VideoSourceToggle).length).toEqual(1);
 });
