@@ -11,7 +11,8 @@ module.exports = {
     window: true,
     fetch: true,
     module: true,
-    console: true
+    console: true,
+    process: true
   },
   env: {
     jest: true,

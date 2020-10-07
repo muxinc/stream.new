@@ -17,7 +17,7 @@ Mux:
 - [HLS.js](https://github.com/video-dev/hls.js/) - for doing HLS video playback of videos
 - [Mux Data](https://docs.mux.com/docs/data) - for tracking video quality metrics.
 
-**Slackbot moderator**. This examples allows you to configure a `SLACK_WEBHOOK_ASSET_READY`. When a new Mux asset is `ready`, an Incoming Webhook for slack will be sent. This is an example of how you might integrate a Slack channel that can be used to moderate content. The Slack message contains the asset ID, playback ID and a thumbnail from the video.
+**Slackbot moderator**. This examples allows you to configure a `SLACK_WEBHOOK_ASSET_READY`. When a new Mux asset is `ready`, an Incoming Webhook for slack will be sent. This is an example of how you might integrate a Slack channel that can be used to moderate content. The Slack message contains the asset ID, playback ID and a storyboard of thumbnails from the video.
 
 ![Slackbot message](screenshots/slackbot-moderator.png)
 

@@ -51,7 +51,6 @@ const RecordPage: React.FC<NoProps> = () => {
   const mediaChunks = useRef<Blob[]>([]);
   const finalBlob = useRef<Blob | null>(null);
   const [deviceList, setDevices] = useState({ video: [], audio: [] } as DeviceList);
-  // const hasMediaRecorder = (typeof window !== 'undefined' && typeof window.MediaRecorder !== 'undefined');
 
   useEffect(() => {
     if (router.query && router.query.source) {
@@ -270,6 +269,14 @@ const RecordPage: React.FC<NoProps> = () => {
   }, [videoDeviceId, audioDeviceId, isMicDeviceEnabled]);
 
   const startRecording = async () => {
+    if (isRecording) {
+      logger.warn('we are already recording');
+      return;
+    }
+    if (isReviewing) {
+      logger.warn('cannot start recording when you are reviewing your last recording');
+      return;
+    }
     logger('start recording');
     if (typeof MediaRecorder === 'undefined') {
       setErrorMessage('MediaRecorder not available in your browser. You may be able to enable this in Experimental Features');
@@ -329,19 +336,6 @@ const RecordPage: React.FC<NoProps> = () => {
         videoRef.current.muted = false;
         setIsReviewing(true);
       }
-      /*
-      setIsLoadingPreview(true);
-
-      videoRef.current.addEventListener('canplaythrough', () => {
-        videoRef.current.addEventListener('durationchange', () => {
-          logger('got video durationchange', isLoadingPreview);
-          if (isLoadingPreview) {
-            setIsLoadingPreview(false);
-            setIsReviewing(true);
-          }
-        });
-      });
-      */
       cleanup();
     };
     recorderRef.current.stop();
