@@ -1,5 +1,4 @@
-/* globals process */
-import got from 'got';
+import got from './got-client';
 import { HOST_URL } from '../constants';
 
 const slackWebhook = process.env.SLACK_WEBHOOK_ASSET_READY;
@@ -39,7 +38,7 @@ type BlockItem = {
   }]
 };
 
-const baseBlocks = ({ playbackId, assetId }: {playbackId: string, assetId: string}): BlockItem[] => ([
+const baseBlocks = ({ playbackId, assetId, duration }: {playbackId: string, assetId: string, duration: number}): BlockItem[] => ([
   {
     type: 'section',
     text: {
@@ -59,6 +58,13 @@ const baseBlocks = ({ playbackId, assetId }: {playbackId: string, assetId: strin
     text: {
       type: 'mrkdwn',
       text: `*Playback ID:*\n ${playbackId}`,
+    },
+  },
+  {
+    type: 'section',
+    text: {
+      type: 'mrkdwn',
+      text: `*Duration:*\n ${duration} seconds`,
     },
   },
   {
@@ -87,13 +93,13 @@ const baseBlocks = ({ playbackId, assetId }: {playbackId: string, assetId: strin
     ],
   }]);
 
-export const sendSlackWebhook = async ({ playbackId, assetId }: {playbackId: string, assetId: string}): Promise<null> => {
+export const sendSlackAssetReady = async ({ playbackId, assetId, duration }: {playbackId: string, assetId: string, duration: number}): Promise<null> => {
   if (!slackWebhook) {
     console.log('No slack webhook configured'); // eslint-disable-line no-console
     return null;
   }
 
-  const blocks = baseBlocks({ playbackId, assetId });
+  const blocks = baseBlocks({ playbackId, assetId, duration });
 
   if (moderatorPassword) {
     blocks.push({
