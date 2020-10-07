@@ -27,7 +27,9 @@
   },
   "devDependencies": {
     "@types/dom-mediacapture-record": "^1.0.7",
+    "@types/got": "^9.6.11",
     "@types/hls.js": "^0.13.1",
+    "@types/jest": "^26.0.14",
     "@types/react": "^16.9.49",
     "@types/webrtc": "^0.0.26",
     "@typescript-eslint/eslint-plugin": "^4.1.1",

@@ -1,6 +1,6 @@
-import got from 'got';
+import got, { Options } from 'got';
 
-const options = {};
+const options = {} as Options;
 
 if (process.env.NODE_ENV === 'test') {
   options.retry = 0;

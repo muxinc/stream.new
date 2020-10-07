@@ -53,7 +53,7 @@ export default async function muxWebhookHandler (req: NextApiRequest, res: NextA
         await sendSlackAssetReady({
           assetId: data.id,
           playbackId: data.playback_ids && data.playback_ids[0] && data.playback_ids[0].id,
-          assetDuration: data.duration,
+          duration: data.duration,
         });
         res.json({ message: 'thanks Mux, I notified myself about this' });
       } catch (e) {
