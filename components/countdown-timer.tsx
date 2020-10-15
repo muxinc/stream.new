@@ -10,7 +10,7 @@ interface Props {
   onElapsed?: () => void;
 }
 
-const CountdownTimer = React.forwardRef<CountdownTimerHandles, Props>(({ seconds = 3, onElapsed = () => {} }, ref) => {
+const CountdownTimer = ({ seconds = 3, onElapsed }:Props, ref:React.Ref<CountdownTimerHandles>) => {
   const [isCountdownActive, setIsCountdownActive] = React.useState<boolean>(false);
   const [recCountdown, setRecCountdown] = React.useState<number>(seconds);
 
@@ -23,7 +23,7 @@ const CountdownTimer = React.forwardRef<CountdownTimerHandles, Props>(({ seconds
         clearInterval(countdownIntervalRef.current);
       }
       setIsCountdownActive(false);
-    }
+    };
   }, []);
 
   React.useImperativeHandle(ref, () => ({
@@ -40,7 +40,7 @@ const CountdownTimer = React.forwardRef<CountdownTimerHandles, Props>(({ seconds
   const tick = () => {
     if(recCountdownRef.current <= 1) {
       resetTimeout();
-      onElapsed();
+      onElapsed && onElapsed();
 
       return;
     }
@@ -51,8 +51,8 @@ const CountdownTimer = React.forwardRef<CountdownTimerHandles, Props>(({ seconds
   };
 
   const startTimeout = function() {
-    countdownIntervalRef.current = setTimeout(tick, 1000)
-  }
+    countdownIntervalRef.current = setTimeout(tick, 1000);
+  };
 
   const resetTimeout = function() {
     if(countdownIntervalRef.current) {
@@ -62,7 +62,7 @@ const CountdownTimer = React.forwardRef<CountdownTimerHandles, Props>(({ seconds
     setIsCountdownActive(false);
     recCountdownRef.current = seconds;
     setRecCountdown(seconds);
-  }
+  };
 
   if(!isCountdownActive) return null;
 
@@ -93,6 +93,6 @@ const CountdownTimer = React.forwardRef<CountdownTimerHandles, Props>(({ seconds
       }
     `}</style>
   </>);
-});
+};
 
-export default (CountdownTimer);
+export default React.forwardRef<CountdownTimerHandles, Props>(CountdownTimer);
