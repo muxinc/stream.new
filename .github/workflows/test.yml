@@ -1,0 +1,15 @@
+name: CI
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install modules
+      run: yarn
+    - name: Lint
+      run: yarn lint
+    - name: Typescript
+      run: yarn tsc
+    - name: Run tests
+      run: yarn test
