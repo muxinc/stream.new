@@ -11,6 +11,8 @@ import ScreenOptions from './screen-options';
 import AccessSkeletonFrame from './access-skeleton-frame';
 import UploadProgressFullpage from './upload-progress-fullpage';
 import logger from '../lib/logger';
+import CountdownTimer, {CountdownTimerHandles} from './countdown-timer';
+import { RecordState } from '../types';
 
 const MEDIA_RECORDER_TIMESLICE_MS = 2000;
 
@@ -35,7 +37,7 @@ const RecordPage: React.FC<NoProps> = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [startRecordTime, setStartRecordTime] = useState<number | null>(null);
-  const [isRecording, setIsRecording] = useState(false);
+  const [recordState, setRecordState] = useState(RecordState.IDLE);
   const [isRequestingMedia, setIsRequestingMedia] = useState(false);
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
   const [isReviewing, setIsReviewing] = useState(false);
@@ -50,6 +52,7 @@ const RecordPage: React.FC<NoProps> = () => {
   const audioInterval = useRef<number | null>(null);
   const mediaChunks = useRef<Blob[]>([]);
   const finalBlob = useRef<Blob | null>(null);
+  const countdownTimerRef = useRef<CountdownTimerHandles | null>(null);
   const [deviceList, setDevices] = useState({ video: [], audio: [] } as DeviceList);
 
   useEffect(() => {
@@ -117,7 +120,7 @@ const RecordPage: React.FC<NoProps> = () => {
     if (audioInterval.current) {
       clearInterval(audioInterval.current);
     }
-    setIsRecording(false);
+    setRecordState(RecordState.IDLE);
     setErrorMessage('');
   };
 
@@ -260,13 +263,23 @@ const RecordPage: React.FC<NoProps> = () => {
     // plugging in or unplugging a mic or camera
     //
     navigator.mediaDevices.ondevicechange = getDevices;
-  });
+  }, []);
 
   useEffect(() => {
     if (isMicDeviceEnabled || videoDeviceId || audioDeviceId) {
       startAv();
     }
   }, [videoDeviceId, audioDeviceId, isMicDeviceEnabled]);
+
+  const prepRecording = () => {
+    logger('prep recording');
+    if (typeof MediaRecorder === 'undefined') {
+      setErrorMessage('MediaRecorder not available in your browser. You may be able to enable this in Experimental Features');
+      return;
+    }
+    countdownTimerRef.current?.start();
+    setRecordState(RecordState.PREPARING);
+  };
 
   const startRecording = async () => {
     if (isRecording) {
@@ -278,10 +291,6 @@ const RecordPage: React.FC<NoProps> = () => {
       return;
     }
     logger('start recording');
-    if (typeof MediaRecorder === 'undefined') {
-      setErrorMessage('MediaRecorder not available in your browser. You may be able to enable this in Experimental Features');
-      return;
-    }
     try {
       setStartRecordTime((new Date()).valueOf());
       const preferredOptions = { mimeType: 'video/webm;codecs=vp9' };
@@ -305,22 +314,17 @@ const RecordPage: React.FC<NoProps> = () => {
         mediaChunks.current.push(evt.data);
         logger('added media recorder chunk', mediaChunks.current.length);
       };
-      setIsRecording(true);
+      setRecordState(RecordState.RECORDING);
     } catch (err) {
       logger.error(err); // eslint-disable-line no-console
       setErrorMessage('Error attempting to start recording, check console for details');
     }
   };
 
-  const submitRecording = () => {
-    if (!finalBlob.current) {
-      logger.error('Cannot submit recording without a blob');
-      return;
-    }
-    const createdFile = new File([finalBlob.current], 'video-from-camera');
-    setFile(createdFile);
+  const cancelRecording = () => {
+    countdownTimerRef.current?.reset();
+    cleanup();
   };
-
   const stopRecording = () => {
     if (!recorderRef.current) {
       logger.warn('cannot stopRecording() without a recorderRef');
@@ -339,6 +343,15 @@ const RecordPage: React.FC<NoProps> = () => {
       cleanup();
     };
     recorderRef.current.stop();
+  };
+
+  const submitRecording = () => {
+    if (!finalBlob.current) {
+      logger.error('Cannot submit recording without a blob');
+      return;
+    }
+    const createdFile = new File([finalBlob.current], 'video-from-camera');
+    setFile(createdFile);
   };
 
   const muteAudioTrack = (shouldMute: boolean) => {
@@ -389,6 +402,8 @@ const RecordPage: React.FC<NoProps> = () => {
     return false;
   };
 
+  const isRecording = recordState === RecordState.RECORDING;
+
   return (
     <Layout
       title="stream.new"
@@ -407,7 +422,10 @@ const RecordPage: React.FC<NoProps> = () => {
         }
       </div>
       { videoSource === '' && <div>Select camera or screenshare to get started</div>}
-      {<video className={showMirrorImage() ? 'mirror-image' : ''} ref={videoRef} width="400" autoPlay />}
+      <div className='video-container'>
+        {<video className={showMirrorImage() ? 'mirror-image' : ''} ref={videoRef} width="400" autoPlay />}
+        <CountdownTimer ref={countdownTimerRef} onElapsed={startRecording} />
+      </div>
       <div>
         { isLoadingPreview && 'Loading preview...' }
       </div>
@@ -439,10 +457,11 @@ const RecordPage: React.FC<NoProps> = () => {
       }
       { haveDeviceAccess && (
       <RecordingControls
-        isRecording={isRecording}
+        recordState={recordState}
         isLoadingPreview={isLoadingPreview}
         isReviewing={isReviewing}
-        startRecording={startRecording}
+        startRecording={prepRecording}
+        cancelRecording={cancelRecording}
         stopRecording={stopRecording}
         submitRecording={submitRecording}
         reset={reset}
@@ -460,6 +479,9 @@ const RecordPage: React.FC<NoProps> = () => {
           width: 100%;
           display: flex;
           justify-content: center;
+        }
+        .video-container {
+          position: relative;
         }
         video {
           display: ${haveDeviceAccess ? 'block' : 'none'};
