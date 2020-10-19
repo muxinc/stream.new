@@ -343,6 +343,7 @@ const RecordPage: React.FC<NoProps> = () => {
       cleanup();
     };
     recorderRef.current.stop();
+    stopUserMedia()
   };
 
   const submitRecording = () => {
