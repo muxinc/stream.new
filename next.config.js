@@ -1,4 +1,4 @@
-import createSecureHeaders from "next-secure-headers";
+import createSecureHeaders from 'next-secure-headers';
 
 module.exports = {
   async headers() {
