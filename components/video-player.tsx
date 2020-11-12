@@ -1,5 +1,7 @@
 /* globals Image */
 import { useState, useEffect, useRef } from 'react';
+import Plyr from 'plyr';
+import 'plyr/dist/plyr.css';
 import Hls from 'hls.js';
 import mux from 'mux-embed';
 import logger from '../lib/logger';
@@ -41,6 +43,7 @@ type SizedEvent = {
 
 const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const playerRef = useRef<Plyr | null>(null);
   const [isVertical, setIsVertical] = useState<boolean | null>();
   const [playerInitTime] = useState(Date.now());
 
@@ -74,6 +77,9 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
     hls = null;
     if (video) {
       video.addEventListener('error', videoError);
+      playerRef.current = new Plyr(video, {
+        previewThumbnails: { enabled: true, src: `https://image.mux.com/${playbackId}/storyboard.vtt` },
+      });
 
       if (video.canPlayType('application/vnd.apple.mpegurl')) {
         // This will run in safari, where HLS is supported natively
@@ -123,8 +129,21 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
 
   return (
     <>
-      <video ref={videoRef} poster={poster} controls />
+      <div className='video-container'>
+        <video ref={videoRef} poster={poster} controls />
+      </div>
       <style jsx>{`
+        :global(:root) {
+          --plyr-color-main: #1b1b1b;
+        }
+        :global(.plyr__controls button),
+        :global(.plyr__controls input) {
+          cursor: pointer;
+        }
+        .video-container {
+          margin-bottom: 40px;
+          border-radius: 30px;
+        }
         video {
           display: block;
           width: ${isVertical ? 'auto' : '1000px'};
@@ -133,8 +152,6 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
           max-height: 50vh;
           cursor: pointer;
           margin-top: 40px;
-          margin-bottom: 40px;
-          border-radius: 30px;
         }
         @media only screen and (min-width: ${breakpoints.md}px) {
           video {
