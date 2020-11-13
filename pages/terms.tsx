@@ -1,5 +1,5 @@
 import Layout from '../components/layout';
-import { MUX_HOME_PAGE_URL } from '../constants';
+import { MUX_HOME_PAGE_URL, MUX_TERMS_URL } from '../constants';
 
 const Terms: React.FC<NoProps> = () => {
   return (
@@ -17,6 +17,9 @@ const Terms: React.FC<NoProps> = () => {
           anyone with a link. So...that&apos;s what we built this for, but other stuff is ok too as long as
           it is nice and clean. We reserve the right to take down <strong>any</strong> piece of content, but anything
           hateful, pornographic, gore-y, or illegal is going to get insta-deleted.
+        </p>
+        <p>
+          This project is powered by Mux and covered by the <a href={MUX_TERMS_URL}>Mux Terms of Service</a>.
         </p>
       </div>
       <style jsx>{`
