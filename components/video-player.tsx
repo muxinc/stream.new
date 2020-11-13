@@ -79,6 +79,7 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
       video.addEventListener('error', videoError);
       playerRef.current = new Plyr(video, {
         previewThumbnails: { enabled: true, src: `https://image.mux.com/${playbackId}/storyboard.vtt` },
+        storage: { enabled: false }
       });
 
       if (video.canPlayType('application/vnd.apple.mpegurl')) {
