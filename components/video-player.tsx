@@ -136,6 +136,7 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
       <style jsx>{`
         :global(:root) {
           --plyr-color-main: #1b1b1b;
+          --plyr-range-fill-background: #ccc;
         }
         :global(.plyr__controls button),
         :global(.plyr__controls input) {
