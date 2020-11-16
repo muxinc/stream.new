@@ -9,8 +9,6 @@ class MyDocument extends Document {
           <style>
             @import url(https://static.mux.com/fonts/fonts.css);
           </style>
-          <link rel="preload" href="https://static.mux.com/fonts/fonts.css" as="font" />
-          <script src="https://src.litix.io/core/3/mux.js" />
         </Head>
         <body>
           <Main />
