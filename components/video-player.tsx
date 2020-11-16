@@ -146,6 +146,12 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
           margin-bottom: 40px;
           border-radius: 30px;
         }
+        :global(.plyr:fullscreen video) {
+          max-width: initial;
+          max-height: initial;
+          width: 100%;
+          height: 100%;
+        }
         video {
           display: block;
           width: ${isVertical ? 'auto' : '1000px'};
