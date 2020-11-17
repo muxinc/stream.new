@@ -144,6 +144,7 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
         }
         .video-container {
           margin-bottom: 40px;
+          margin-top: 40px;
           border-radius: 30px;
         }
         :global(.plyr:fullscreen video) {
@@ -159,7 +160,6 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
           max-width: 100%;
           max-height: 50vh;
           cursor: pointer;
-          margin-top: 40px;
         }
         @media only screen and (min-width: ${breakpoints.md}px) {
           video {
