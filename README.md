@@ -43,7 +43,7 @@ Copy the `.env.local.example` file in this directory to `.env.local` (which will
 cp .env.local.example .env.local
 ```
 
-Then, go to the [settings page](https://dashboard.mux.com/settings/access-tokens) in your Mux dashboard set each variable on `.env.local`, get a new **API Access Token** and set each variable in `.env.local`:
+Then, go to the [settings page](https://dashboard.mux.com/settings/access-tokens) in your Mux dashboard, get a new **API Access Token** and set each variable in `.env.local`:
 
 - `MUX_TOKEN_ID` should be the `TOKEN ID` of your new token
 - `MUX_TOKEN_SECRET` should be `TOKEN SECRET`

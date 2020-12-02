@@ -48,22 +48,27 @@ const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
     }
 
     setIsUploading(true);
-    const upChunk = UpChunk.createUpload({
-      endpoint: createUpload,
-      file: _file,
-    });
+    try {
+      const upChunk = UpChunk.createUpload({
+        endpoint: createUpload,
+        maxFileSize: 2**20,
+        file: _file,
+      });
 
-    upChunk.on('error', (err) => {
-      setErrorMessage(err.detail);
-    });
+      upChunk.on('error', (err) => {
+        setErrorMessage(err.detail);
+      });
 
-    upChunk.on('progress', (progressEvt) => {
-      setProgress(Math.floor(progressEvt.detail));
-    });
+      upChunk.on('progress', (progressEvt) => {
+        setProgress(Math.floor(progressEvt.detail));
+      });
 
-    upChunk.on('success', () => {
-      setIsPreparing(true);
-    });
+      upChunk.on('success', () => {
+        setIsPreparing(true);
+      });
+    } catch (err) {
+      setErrorMessage(err.toString());
+    }
   };
 
   useEffect(() => {
