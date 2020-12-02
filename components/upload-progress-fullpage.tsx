@@ -51,7 +51,7 @@ const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
     try {
       const upChunk = UpChunk.createUpload({
         endpoint: createUpload,
-        maxFileSize: 2**20,
+        maxFileSize: 2**20, // 1GB
         file: _file,
       });
 
