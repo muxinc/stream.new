@@ -90,7 +90,7 @@ const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
       video.preload = 'metadata';
       video.onloadedmetadata = function() {
         URL.revokeObjectURL(video.src);
-        if (video.duration < MAX_VIDEO_DURATION_SEC) {
+        if (video.duration > MAX_VIDEO_DURATION_SEC) {
           reject(`file duration (${video.duration.toString()}s) exceeds allowed maximum (${MAX_VIDEO_DURATION_SEC/60}min)!`);
         }
         resolve();
