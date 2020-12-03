@@ -18,7 +18,7 @@ const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
   const [isPreparing, setIsPreparing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [inputValidated, setInputValidated] = useState(false);
-  const [validationError, setValidationError] = useState(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const { data, error } = useSwr(
     () => (isPreparing ? `/api/uploads/${uploadId}` : null),
@@ -78,12 +78,12 @@ const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
   }, [upload]);
 
 
-  const startFileValidation = (file) => {
+  const startFileValidation = (_file: File) => {
     // Attempt to load the file as a video element and inspect its duration
     // metadata. This is not an authoritative check of video duration, but
     // rather intended to serve as just a simple and fast sanity check.
-    if (!file.type.includes("video")) {
-      console.warn(`file type (${file.type}) does not look like video!`);
+    if (!_file.type.includes("video")) {
+      console.warn(`file type (${_file.type}) does not look like video!`);
       setInputValidated(true);
       return;
     }
