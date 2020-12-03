@@ -5,7 +5,7 @@ import useSwr from 'swr';
 import Layout from './layout';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
-const MAX_VIDEO_DURATION_SEC = 3600
+const MAX_VIDEO_DURATION_SEC = 3600;
 
 type Props = {
   file: File
@@ -83,43 +83,43 @@ const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
     // metadata. This is not an authoritative check of video duration, but
     // rather intended to serve as just a simple and fast sanity check.
     if (!file.type.includes("video")) {
-      console.warn(`file type (${file.type}) does not look like video!`)
+      console.warn(`file type (${file.type}) does not look like video!`);
       setInputValidated(true);
-      return
+      return;
     }
 
-    var video = document.createElement('video');
+    const video = document.createElement('video');
     video.preload = 'metadata';
     video.onloadedmetadata = function() {
       URL.revokeObjectURL(video.src);
       if (video.duration > MAX_VIDEO_DURATION_SEC) {
         setValidationError(`file duration (${video.duration.toString()}s) exceeds allowed maximum (${MAX_VIDEO_DURATION_SEC}s)!`);
-        return
+        return;
       }
       setInputValidated(true);
-    }
-    video.onerror = function(e) {
+    };
+    video.onerror = function() {
       // The file has a video MIME type, but we were unable to load its
       // metadata for some reason.
       console.warn("failed to load video file metadata for validation!");
       URL.revokeObjectURL(video.src);
       setInputValidated(true);
-    }
+    };
     video.src = URL.createObjectURL(file);
-  }
+  };
 
   useEffect(() => {
     if (!file) {
-      return
+      return;
     }
 
     if (inputValidated || validationError) {
       if (validationError) {
-        setErrorMessage(validationError)
-        return
+        setErrorMessage(validationError);
+        return;
       }
       startUpload(file);
-      return
+      return;
     }
 
     startFileValidation(file);
