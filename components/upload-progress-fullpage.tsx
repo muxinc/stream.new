@@ -17,8 +17,6 @@ const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
   const [progress, setProgress] = useState(0);
   const [isPreparing, setIsPreparing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [inputValidated, setInputValidated] = useState(false);
-  const [validationError, setValidationError] = useState<string | null>(null);
 
   const { data, error } = useSwr(
     () => (isPreparing ? `/api/uploads/${uploadId}` : null),
@@ -78,34 +76,34 @@ const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
   }, [upload]);
 
 
-  const startFileValidation = (_file: File) => {
-    // Attempt to load the file as a video element and inspect its duration
-    // metadata. This is not an authoritative check of video duration, but
-    // rather intended to serve as just a simple and fast sanity check.
-    if (!_file.type.includes("video")) {
-      console.warn(`file type (${_file.type}) does not look like video!`);
-      setInputValidated(true);
-      return;
-    }
-
-    const video = document.createElement('video');
-    video.preload = 'metadata';
-    video.onloadedmetadata = function() {
-      URL.revokeObjectURL(video.src);
-      if (video.duration > MAX_VIDEO_DURATION_SEC) {
-        setValidationError(`file duration (${video.duration.toString()}s) exceeds allowed maximum (${MAX_VIDEO_DURATION_SEC}s)!`);
-        return;
+  const startFileValidation = (_file: File): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      // Attempt to load the file as a video element and inspect its duration
+      // metadata. This is not an authoritative check of video duration, but
+      // rather intended to serve as just a simple and fast sanity check.
+      if (!_file.type.includes("video")) {
+        console.warn(`file type (${_file.type}) does not look like video!`);
+        resolve();
       }
-      setInputValidated(true);
-    };
-    video.onerror = function() {
-      // The file has a video MIME type, but we were unable to load its
-      // metadata for some reason.
-      console.warn("failed to load video file metadata for validation!");
-      URL.revokeObjectURL(video.src);
-      setInputValidated(true);
-    };
-    video.src = URL.createObjectURL(file);
+
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      video.onloadedmetadata = function() {
+        URL.revokeObjectURL(video.src);
+        if (video.duration < MAX_VIDEO_DURATION_SEC) {
+          reject(`file duration (${video.duration.toString()}s) exceeds allowed maximum (${MAX_VIDEO_DURATION_SEC/60}min)!`);
+        }
+        resolve();
+      };
+      video.onerror = function() {
+        // The file has a video MIME type, but we were unable to load its
+        // metadata for some reason.
+        console.warn("failed to load video file metadata for validation!");
+        URL.revokeObjectURL(video.src);
+        resolve();
+      };
+      video.src = URL.createObjectURL(file);
+    })
   };
 
   useEffect(() => {
@@ -113,17 +111,13 @@ const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
       return;
     }
 
-    if (inputValidated || validationError) {
-      if (validationError) {
-        setErrorMessage(validationError);
-        return;
-      }
+    startFileValidation(file).then(() => {
       startUpload(file);
-      return;
-    }
-
-    startFileValidation(file);
-  }, [file, inputValidated, validationError]);
+    }).catch((error => {
+      console.log(error);
+      setErrorMessage(error);
+    }));
+  }, [file]);
 
   return (
     <Layout centered spinningLogo>
