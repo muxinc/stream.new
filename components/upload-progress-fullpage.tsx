@@ -92,7 +92,7 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
       video.preload = 'metadata';
       video.onloadedmetadata = function() {
         URL.revokeObjectURL(video.src);
-        if (video.duration > MAX_VIDEO_DURATION_MIN*60) {
+        if (video.duration !== Infinity && video.duration > MAX_VIDEO_DURATION_MIN*60) {
           const dur = Math.round(video.duration * 100) / 100;
           reject(`file duration (${dur.toString()}s) exceeds allowed maximum (${MAX_VIDEO_DURATION_MIN}min)!`);
         }
@@ -117,7 +117,6 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
     startFileValidation(file).then(() => {
       startUpload(file);
     }).catch((error => {
-      console.log(error);
       setErrorMessage(error);
     }));
   }, [file]);

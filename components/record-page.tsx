@@ -123,6 +123,7 @@ const RecordPage: React.FC<NoProps> = () => {
     }
     setRecordState(RecordState.IDLE);
     setErrorMessage('');
+    setShowUploadPage(false);
   };
 
   /*
@@ -352,8 +353,9 @@ const RecordPage: React.FC<NoProps> = () => {
       logger.error('Cannot submit recording without a blob');
       return;
     }
-    const createdFile = new File([finalBlob.current], 'video-from-camera');
+    const createdFile = new File([finalBlob.current], 'video-from-camera', {type: finalBlob.current.type});
     setFile(createdFile);
+    setShowUploadPage(true);
   };
 
   const muteAudioTrack = (shouldMute: boolean) => {
@@ -382,13 +384,8 @@ const RecordPage: React.FC<NoProps> = () => {
     await getDevices();
   };
 
-  const resetPage = () => {
-    setShowUploadPage(false);
-    hardCleanup();
-  };
-
   if (file && showUploadPage) {
-    return <UploadProgressFullpage file={file} resetPage={resetPage}/>;
+    return <UploadProgressFullpage file={file} resetPage={hardCleanup}/>;
   }
 
   /*
