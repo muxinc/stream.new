@@ -6,14 +6,14 @@ import Layout from './layout';
 import Button from './button';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
-const MAX_VIDEO_DURATION_MIN = 1;
+const MAX_VIDEO_DURATION_MIN = 60;
 
 type Props = {
   file: File;
-  setShowUploadPage: (b: boolean) => void;
+  resetPage: () => void;
 };
 
-const UploadProgressFullpage: React.FC<Props> = ({ file, setShowUploadPage }) => {
+const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadId, setUploadId] = useState('');
   const [progress, setProgress] = useState(0);
@@ -128,7 +128,7 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, setShowUploadPage }) =>
         (errorMessage || error)
           ? <div className="errorMsg"><h1>Oops there was a problem uploading your file!</h1>
             <p>{(error && 'Error fetching API') || errorMessage}</p>
-            <Button onClick={() => setShowUploadPage(false)}>Start over</Button>
+            <Button onClick={resetPage}>Start over</Button>
             </div>
           : <div className="percent"><h1>{progress ? `${progress}` : '0'}</h1></div>
       }

@@ -28,7 +28,7 @@ const Index: React.FC<Props> = () => {
   };
 
   if (file && showUploadPage) {
-    return <UploadProgressFullpage file={file} setShowUploadPage={setShowUploadPage}/>;
+    return <UploadProgressFullpage file={file} resetPage={() => setShowUploadPage(false)}/>;
   }
 
   return (
