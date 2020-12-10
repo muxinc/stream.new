@@ -4,22 +4,21 @@ import * as UpChunk from '@mux/upchunk';
 import useSwr from 'swr';
 import Layout from './layout';
 import Button from './button';
-import Index from '../pages/index';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
-const MAX_VIDEO_DURATION_MIN = 60;
+const MAX_VIDEO_DURATION_MIN = 1;
 
 type Props = {
-  file: File
+  file: File;
+  setShowUploadPage: (b: boolean) => void;
 };
 
-const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
+const UploadProgressFullpage: React.FC<Props> = ({ file, setShowUploadPage }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadId, setUploadId] = useState('');
   const [progress, setProgress] = useState(0);
   const [isPreparing, setIsPreparing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [resetIndexPage, setResetIndexPage] = useState(false);
 
   const { data, error } = useSwr(
     () => (isPreparing ? `/api/uploads/${uploadId}` : null),
@@ -107,7 +106,7 @@ const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
         resolve();
       };
       video.src = URL.createObjectURL(file);
-    })
+    });
   };
 
   useEffect(() => {
@@ -123,17 +122,13 @@ const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
     }));
   }, [file]);
 
-  if (resetIndexPage) {
-    return <Index />
-  }
-
   return (
     <Layout centered spinningLogo>
       {
         (errorMessage || error)
           ? <div className="errorMsg"><h1>Oops there was a problem uploading your file!</h1>
             <p>{(error && 'Error fetching API') || errorMessage}</p>
-            <Button onClick={() => setResetIndexPage(true)}>Start over</Button>
+            <Button onClick={() => setShowUploadPage(false)}>Start over</Button>
             </div>
           : <div className="percent"><h1>{progress ? `${progress}` : '0'}</h1></div>
       }
