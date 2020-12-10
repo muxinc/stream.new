@@ -24,6 +24,7 @@ const Index: React.FC<Props> = () => {
   const onInputChange = () => {
     if (inputRef.current && inputRef.current.files && inputRef.current.files[0]) {
       setFile(inputRef.current.files[0]);
+      setShowUploadPage(true);
     }
   };
 
