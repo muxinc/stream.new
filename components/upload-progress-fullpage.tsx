@@ -3,9 +3,11 @@ import Router from 'next/router';
 import * as UpChunk from '@mux/upchunk';
 import useSwr from 'swr';
 import Layout from './layout';
+import Button from './button';
+import Index from '../pages/index';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
-const MAX_VIDEO_DURATION_SEC = 3600;
+const MAX_VIDEO_DURATION_MIN = 60;
 
 type Props = {
   file: File
@@ -17,6 +19,7 @@ const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
   const [progress, setProgress] = useState(0);
   const [isPreparing, setIsPreparing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [resetIndexPage, setResetIndexPage] = useState(false);
 
   const { data, error } = useSwr(
     () => (isPreparing ? `/api/uploads/${uploadId}` : null),
@@ -90,8 +93,9 @@ const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
       video.preload = 'metadata';
       video.onloadedmetadata = function() {
         URL.revokeObjectURL(video.src);
-        if (video.duration > MAX_VIDEO_DURATION_SEC) {
-          reject(`file duration (${video.duration.toString()}s) exceeds allowed maximum (${MAX_VIDEO_DURATION_SEC/60}min)!`);
+        if (video.duration > MAX_VIDEO_DURATION_MIN*60) {
+          const dur = Math.round(video.duration * 100) / 100;
+          reject(`file duration (${dur.toString()}s) exceeds allowed maximum (${MAX_VIDEO_DURATION_MIN}min)!`);
         }
         resolve();
       };
@@ -119,11 +123,18 @@ const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
     }));
   }, [file]);
 
+  if (resetIndexPage) {
+    return <Index />
+  }
+
   return (
     <Layout centered spinningLogo>
       {
         (errorMessage || error)
-          ? <div><h1>{(error && 'Error fetching API') || errorMessage}</h1></div>
+          ? <div className="errorMsg"><h1>Oops there was a problem uploading your file!</h1>
+            <p>{(error && 'Error fetching API') || errorMessage}</p>
+            <Button onClick={() => setResetIndexPage(true)}>Start over</Button>
+            </div>
           : <div className="percent"><h1>{progress ? `${progress}` : '0'}</h1></div>
       }
       <style jsx>{`
