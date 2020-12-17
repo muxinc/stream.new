@@ -139,7 +139,7 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
           align-items: center;
         }
 
-        h1 {
+        .percent h1 {
           font-size: 8vw;
         }
       `}
