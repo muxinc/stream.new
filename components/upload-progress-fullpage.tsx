@@ -125,9 +125,10 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
     <Layout centered spinningLogo>
       {
         (errorMessage || error)
-          ? <div className="errorMsg"><h1>Oops there was a problem uploading your file!</h1>
-            <p>{(error && 'Error fetching API') || errorMessage}</p>
-            <Button onClick={resetPage}>Start over</Button>
+          ? <div>
+              <h1>Oops there was a problem uploading your file!</h1>
+              <p>{(error && 'Error fetching API') || errorMessage}</p>
+              <Button onClick={resetPage}>Start over</Button>
             </div>
           : <div className="percent"><h1>{progress ? `${progress}` : '0'}</h1></div>
       }
