@@ -3,14 +3,17 @@ import Router from 'next/router';
 import * as UpChunk from '@mux/upchunk';
 import useSwr from 'swr';
 import Layout from './layout';
+import Button from './button';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const MAX_VIDEO_DURATION_MIN = 60;
 
 type Props = {
-  file: File
+  file: File;
+  resetPage: () => void;
 };
 
-const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
+const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadId, setUploadId] = useState('');
   const [progress, setProgress] = useState(0);
@@ -79,17 +82,59 @@ const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
     }
   }, [upload]);
 
+
+  const startFileValidation = (_file: File): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      // Attempt to load the file as a video element and inspect its duration
+      // metadata. This is not an authoritative check of video duration, but
+      // rather intended to serve as just a simple and fast sanity check.
+      if (!_file.type.includes("video")) {
+        console.warn(`file type (${_file.type}) does not look like video!`);
+        resolve();
+      }
+
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      video.onloadedmetadata = function() {
+        URL.revokeObjectURL(video.src);
+        if (video.duration !== Infinity && video.duration > MAX_VIDEO_DURATION_MIN*60) {
+          const dur = Math.round(video.duration * 100) / 100;
+          reject(`file duration (${dur.toString()}s) exceeds allowed maximum (${MAX_VIDEO_DURATION_MIN}min)!`);
+        }
+        resolve();
+      };
+      video.onerror = function() {
+        // The file has a video MIME type, but we were unable to load its
+        // metadata for some reason.
+        console.warn("failed to load video file metadata for validation!");
+        URL.revokeObjectURL(video.src);
+        resolve();
+      };
+      video.src = URL.createObjectURL(file);
+    });
+  };
+
   useEffect(() => {
-    if (file) {
-      startUpload(file);
+    if (!file) {
+      return;
     }
+
+    startFileValidation(file).then(() => {
+      startUpload(file);
+    }).catch((error => {
+      setErrorMessage(error);
+    }));
   }, [file]);
 
   return (
     <Layout centered spinningLogo>
       {
         (errorMessage || error)
-          ? <div><h1>{(error && 'Error fetching API') || errorMessage}</h1></div>
+          ? <div>
+              <h1>Oops there was a problem uploading your file!</h1>
+              <p>{(error && 'Error fetching API') || errorMessage}</p>
+              <Button onClick={resetPage}>Start over</Button>
+            </div>
           : <div className="percent"><h1>{progress ? `${progress}` : '0'}</h1></div>
       }
       <style jsx>{`
@@ -99,7 +144,7 @@ const UploadProgressFullpage: React.FC<Props> = ({ file }) => {
           align-items: center;
         }
 
-        h1 {
+        .percent h1 {
           font-size: 8vw;
         }
       `}

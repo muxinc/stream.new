@@ -9,11 +9,13 @@ type Props = null;
 
 const Index: React.FC<Props> = () => {
   const [file, setFile] = useState<File | null>(null);
+  const [showUploadPage, setShowUploadPage] = useState(true);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const onDrop = useCallback((acceptedFiles) => {
     if (acceptedFiles && acceptedFiles[0]) {
       setFile(acceptedFiles[0]);
+      setShowUploadPage(true);
     } else {
       console.warn('got a drop event but no file'); // eslint-disable-line no-console
     }
@@ -22,11 +24,12 @@ const Index: React.FC<Props> = () => {
   const onInputChange = () => {
     if (inputRef.current && inputRef.current.files && inputRef.current.files[0]) {
       setFile(inputRef.current.files[0]);
+      setShowUploadPage(true);
     }
   };
 
-  if (file) {
-    return <UploadProgressFullpage file={file} />;
+  if (file && showUploadPage) {
+    return <UploadProgressFullpage file={file} resetPage={() => setShowUploadPage(false)}/>;
   }
 
   return (

@@ -54,6 +54,7 @@ const RecordPage: React.FC<NoProps> = () => {
   const finalBlob = useRef<Blob | null>(null);
   const countdownTimerRef = useRef<CountdownTimerHandles | null>(null);
   const [deviceList, setDevices] = useState({ video: [], audio: [] } as DeviceList);
+  const [showUploadPage, setShowUploadPage] = useState(true);
 
   useEffect(() => {
     if (router.query && router.query.source) {
@@ -122,6 +123,7 @@ const RecordPage: React.FC<NoProps> = () => {
     }
     setRecordState(RecordState.IDLE);
     setErrorMessage('');
+    setShowUploadPage(false);
   };
 
   /*
@@ -351,8 +353,9 @@ const RecordPage: React.FC<NoProps> = () => {
       logger.error('Cannot submit recording without a blob');
       return;
     }
-    const createdFile = new File([finalBlob.current], 'video-from-camera');
+    const createdFile = new File([finalBlob.current], 'video-from-camera', {type: finalBlob.current.type});
     setFile(createdFile);
+    setShowUploadPage(true);
   };
 
   const muteAudioTrack = (shouldMute: boolean) => {
@@ -381,8 +384,8 @@ const RecordPage: React.FC<NoProps> = () => {
     await getDevices();
   };
 
-  if (file) {
-    return <UploadProgressFullpage file={file} />;
+  if (file && showUploadPage) {
+    return <UploadProgressFullpage file={file} resetPage={hardCleanup}/>;
   }
 
   /*
