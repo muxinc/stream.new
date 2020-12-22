@@ -20,7 +20,7 @@
     "micro": "9.3.5-canary.3",
     "mux-embed": "^3.3.0",
     "next": "^10.0.1",
-    "plyr": "^3.6.2",
+    "plyr": "^3.6.3",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-dropzone": "^11.0.2",

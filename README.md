@@ -43,7 +43,7 @@ Copy the `.env.local.example` file in this directory to `.env.local` (which will
 cp .env.local.example .env.local
 ```
 
-Then, go to the [settings page](https://dashboard.mux.com/settings/access-tokens) in your Mux dashboard, get a new **API Access Token** and set each variable in `.env.local`:
+Then, go to the [settings page](https://dashboard.mux.com/settings/access-tokens) in your Mux dashboard, get a new **API Access Token** that allows for "Full Access" against Mux Video and set each variable in `.env.local`:
 
 - `MUX_TOKEN_ID` should be the `TOKEN ID` of your new token
 - `MUX_TOKEN_SECRET` should be `TOKEN SECRET`
@@ -87,10 +87,10 @@ When you're done with this, you should have a slack webhook URL that looks somet
 
 Set the optional environment variables either directly in the vercel UI or by updating `vercel.json` and setting them as secrets for your organization. The optional environment variables are:
 
-  * `MUX_WEBHOOK_SIGNATURE_SECRET` - This is a security mechanism that checks the webhook signature header when the request hits your server so that your server can verify that the webhook came from Mux. Read more about [webhook signature verification](https://docs.mux.com/docs/webhook-security). Note that in `./pages/api/webhooks/mux` the code will only verify the signature if you have set a signature secret variable, so this step is optional.
-  * `SLACK_WEBHOOK_ASSET_READY` - This is the `https://hooks.slack.com/services/....` URL when you created the Slack Incoming Webhook.
-  * `SLACK_MODERATOR_PASSWORD` - This is the password that will be used to authorize deleting assets from the slack moderator (The button with the red text "DELETE (cannot be undone)")
-  * `NEXT_PUBLIC_MUX_ENV_KEY` - This is the env key to use with [Mux Data](https://docs.mux.com/docs/data). Note this is different than your API key and this environment key can be found on your [environment page in the Mux dashboard](https://dashboard.mux.com/environments)
+- `MUX_WEBHOOK_SIGNATURE_SECRET` - This is a security mechanism that checks the webhook signature header when the request hits your server so that your server can verify that the webhook came from Mux. Read more about [webhook signature verification](https://docs.mux.com/docs/webhook-security). Note that in `./pages/api/webhooks/mux` the code will only verify the signature if you have set a signature secret variable, so this step is optional.
+- `SLACK_WEBHOOK_ASSET_READY` - This is the `https://hooks.slack.com/services/....` URL when you created the Slack Incoming Webhook.
+- `SLACK_MODERATOR_PASSWORD` - This is the password that will be used to authorize deleting assets from the slack moderator (The button with the red text "DELETE (cannot be undone)")
+- `NEXT_PUBLIC_MUX_ENV_KEY` - This is the env key to use with [Mux Data](https://docs.mux.com/docs/data). Note this is different than your API key and this environment key can be found on your [environment page in the Mux dashboard](https://dashboard.mux.com/environments)
 
 After all of this is set up the flow will be:
 
@@ -107,7 +107,6 @@ Horizontal
 
 - http://localhost:3000/v/Hi6we01h00uVvZc00GzvVXZW8C02Y8QC8OX7
 
-
 Vertical
 
 - http://localhost:3000/v/UNDUU7tU7vYt02CRMDTlZd1qKjvk41LN6yI5LbHgtxo8
@@ -117,6 +116,3 @@ Super vertical
 - http://localhost:3000/v/seK501Bf00kyqSnGdMwQFi3lgqgdoS00qm5PAiV7Yjf2ew
 
 Also be sure to check: Safari, Mobile Safari, Chrome, Firefox because they all behave a little differently.
-
-
-
