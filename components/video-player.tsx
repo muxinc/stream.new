@@ -79,7 +79,10 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
       video.addEventListener('error', videoError);
       playerRef.current = new Plyr(video, {
         previewThumbnails: { enabled: true, src: `https://image.mux.com/${playbackId}/storyboard.vtt` },
-        storage: { enabled: false }
+        storage: { enabled: false },
+        fullscreen: {
+          iosNative: true
+        }
       });
 
       if (video.canPlayType('application/vnd.apple.mpegurl')) {
@@ -131,7 +134,7 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
   return (
     <>
       <div className='video-container'>
-        <video ref={videoRef} poster={poster} controls />
+        <video ref={videoRef} poster={poster} controls playsInline />
       </div>
       <style jsx>{`
         :global(:root) {
@@ -155,15 +158,16 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
         }
         video {
           display: block;
-          width: ${isVertical ? 'auto' : '1000px'};
-          height: ${isVertical ? '600px' : 'auto'};
           max-width: 100%;
           max-height: 50vh;
           cursor: pointer;
         }
         @media only screen and (min-width: ${breakpoints.md}px) {
-          video {
+          video {           
+            width: ${isVertical ? 'auto' : '1000px'};
+            height: ${isVertical ? '600px' : 'auto'}; 
             max-height: 70vh;
+            min-width: 30rem;
           }
         }
         @media only screen and (max-width: ${breakpoints.md}px) {
@@ -174,6 +178,11 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
           :global(.plyr__volume, .plyr__menu, .plyr--pip-supported [data-plyr=pip]) {
             display: none;
           }
+          video: {
+            width: 100%;
+            height: 100%;
+          }
+        }
       `}
       </style>
     </>
