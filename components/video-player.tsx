@@ -171,10 +171,6 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
           }
         }
         @media only screen and (max-width: ${breakpoints.md}px) {
-          :global(:root) {
-            --plyr-control-icon-size: ${isVertical ? '10px' : '18px'};
-            --plyr-font-size-time: ${isVertical ? '10px' : '12px'};
-          }
           :global(.plyr__volume, .plyr__menu, .plyr--pip-supported [data-plyr=pip]) {
             display: none;
           }
