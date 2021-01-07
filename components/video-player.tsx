@@ -78,9 +78,19 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
     if (video) {
       video.addEventListener('error', videoError);
 
+      const initPlyr = () => {
+        playerRef.current = new Plyr(video, {
+          previewThumbnails: { enabled: true, src: `https://image.mux.com/${playbackId}/storyboard.vtt` },
+          storage: { enabled: false },
+          fullscreen: {
+            iosNative: true
+          }
+        });
+      }
 
       if (video.canPlayType('application/vnd.apple.mpegurl')) {
         // This will run in safari, where HLS is supported natively
+        initPlyr();
         video.src = src;
       } else if (Hls.isSupported()) {
         // This will run in all other modern browsers
@@ -102,13 +112,7 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
           })
         }
         attachPromise(hls, video).then(() => {
-          playerRef.current = new Plyr(video, {
-            previewThumbnails: { enabled: true, src: `https://image.mux.com/${playbackId}/storyboard.vtt` },
-            storage: { enabled: false },
-            fullscreen: {
-              iosNative: true
-            }
-          });
+          initPlyr();
         }).catch(() => {
           videoError(new ErrorEvent('HLS.js fatal error'));
         })
