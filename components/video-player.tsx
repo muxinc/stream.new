@@ -77,13 +77,7 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
     hls = null;
     if (video) {
       video.addEventListener('error', videoError);
-      playerRef.current = new Plyr(video, {
-        previewThumbnails: { enabled: true, src: `https://image.mux.com/${playbackId}/storyboard.vtt` },
-        storage: { enabled: false },
-        fullscreen: {
-          iosNative: true
-        }
-      });
+
 
       if (video.canPlayType('application/vnd.apple.mpegurl')) {
         // This will run in safari, where HLS is supported natively
@@ -92,13 +86,33 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
         // This will run in all other modern browsers
         hls = new Hls();
         hls.loadSource(src);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.ERROR, function (event, data) {
-          if (data.fatal) {
-            logger.error('hls.js fatal error');
-            videoError(new ErrorEvent('HLS.js fatal error'));
-          }
-        });
+
+        const attachPromise = (hls: Hls, video: HTMLVideoElement) => {
+          return new Promise((resolve, reject) => {
+            hls.on(Hls.Events.MANIFEST_LOADED, () => {
+              resolve(true)
+            })
+            hls.on(Hls.Events.ERROR, function (event, data) {
+              if (data.fatal) {
+                logger.error('hls.js fatal error');
+                reject()
+              }
+            });
+            hls.attachMedia(video);
+          })
+        }
+        attachPromise(hls, video).then(() => {
+          playerRef.current = new Plyr(video, {
+            previewThumbnails: { enabled: true, src: `https://image.mux.com/${playbackId}/storyboard.vtt` },
+            storage: { enabled: false },
+            fullscreen: {
+              iosNative: true
+            }
+          });
+        }).catch(() => {
+          videoError(new ErrorEvent('HLS.js fatal error'));
+        })
+
       } else {
         console.error( // eslint-disable-line no-console
           'This is an old browser that does not support MSE https://developer.mozilla.org/en-US/docs/Web/API/Media_Source_Extensions_API',
