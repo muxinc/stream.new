@@ -82,7 +82,8 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
         storage: { enabled: false },
         fullscreen: {
           iosNative: true
-        }
+        },
+        captions: { active: false, language: 'auto', update: true }
       });
 
       if (video.canPlayType('application/vnd.apple.mpegurl')) {
