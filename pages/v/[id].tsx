@@ -5,7 +5,6 @@ import copy from 'copy-to-clipboard';
 import FullpageLoader from '../../components/fullpage-loader';
 import VideoPlayer from '../../components/video-player';
 import Layout from '../../components/layout';
-import ReportForm from '../../components/report-form';
 import { HOST_URL } from '../../constants';
 
 type Params = {
@@ -106,9 +105,6 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
               className="report">{ openReport ? 'Back' : 'Report abuse' }
             </a>
           )}
-        </div>
-        <div className="report-form">
-          { openReport && <ReportForm playbackId={playbackId} close={() => setOpenReport(false)} /> }
         </div>
       </div>
       <style jsx>{`
