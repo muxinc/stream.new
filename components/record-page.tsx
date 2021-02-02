@@ -414,8 +414,8 @@ const RecordPage: React.FC<NoProps> = () => {
       description="Record a video"
       centered
     >
-      <h1>{(isRecording && startRecordTime && <StopWatch startTimeUnixMs={startRecordTime} />) || 'Video setup'}</h1>
-      <VideoSourceToggle activeSource={videoSource} onChange={changeVideoSource} />
+      <h1>{(isRecording && startRecordTime && <StopWatch startTimeUnixMs={startRecordTime} />) || 'Record your video message'}</h1>
+      {/* <VideoSourceToggle activeSource={videoSource} onChange={changeVideoSource} /> */}
       {errorMessage && <div className='error-message'>{errorMessage}</div>}
       <div className="skeleton-container">
         {!haveDeviceAccess && videoSource === 'camera' &&

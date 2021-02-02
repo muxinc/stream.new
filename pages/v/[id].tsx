@@ -33,7 +33,7 @@ type Props = {
   poster: string
 };
 
-const META_TITLE = "View this video created on stream.new";
+const META_TITLE = "View this video created on FamJam.Space";
 const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -51,7 +51,7 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
   if (router.isFallback) {
     return (
       <Layout
-        metaTitle="View this video created on stream.new"
+        metaTitle="View this video created on FamJam.Space"
         image={poster}
         centered
         darkMode
@@ -95,8 +95,8 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
       <div className="wrapper">
         {!openReport && <VideoPlayer playbackId={playbackId} poster={poster} onLoaded={() => setIsLoaded(true)} onError={onError} />}
         <div className="actions">
-          {!openReport && <a onClick={copyUrl} onKeyPress={copyUrl} role="button" tabIndex={0}>{ isCopied ? 'Copied to clipboard' :'Copy video URL' }</a>}
-          {!openReport && (
+          {/* {!openReport && <a onClick={copyUrl} onKeyPress={copyUrl} role="button" tabIndex={0}>{ isCopied ? 'Copied to clipboard' :'Copy video URL' }</a>} */}
+          {/* {!openReport && (
             <a
               onClick={() => setOpenReport(!openReport)}
               onKeyPress={() => setOpenReport(!openReport)}
@@ -104,7 +104,7 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
               tabIndex={0}
               className="report">{ openReport ? 'Back' : 'Report abuse' }
             </a>
-          )}
+          )} */}
         </div>
       </div>
       <style jsx>{`

@@ -69,7 +69,7 @@ const Layout: React.FC<Props> = ({
   return (
     <>
       <Head>
-        <title>stream.new</title>
+        <title>FamJam.Space</title>
         <link rel="icon" href="/stream-new-asterisk.svg" />
         {metaTitle && <meta property="og:title" content={metaTitle} />}
         {metaTitle && <meta property="twitter:title" content={metaTitle} />}
@@ -86,7 +86,7 @@ const Layout: React.FC<Props> = ({
         {image && <meta property="twitter:image" content={image} />}
       </Head>
       <div className="container" {...containerProps}>
-        <div className={`drag-overlay ${isDragActive ? 'active' : ''}`}><h1>Upload to stream.new</h1></div>
+        <div className={`drag-overlay ${isDragActive ? 'active' : ''}`}><h1>Upload to FamJam.Space</h1></div>
 
         <div className="modal-wrapper"><InfoModal close={() => setModalOpen(false)} /></div>
         <main>
@@ -94,7 +94,7 @@ const Layout: React.FC<Props> = ({
         </main>
         <div className="footer-wrapper">
           <footer>
-            <div className="nav">
+            {/* <div className="nav">
              {
                backNav ?
                <div className="footer-link back"><a onClick={() => router.back()} role="presentation">Back</a></div> :
@@ -106,7 +106,7 @@ const Layout: React.FC<Props> = ({
                </>
 
              }
-            </div>
+            </div> */}
             <div className="footer-link"><AsteriskLink spinning={spinningLogo} /></div>
           </footer>
         </div>

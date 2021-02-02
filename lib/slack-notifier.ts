@@ -122,7 +122,7 @@ export const sendSlackAssetReady = async ({ playbackId, assetId, duration }: {pl
 
   await got.post(slackWebhook, {
     json: {
-      text: `New video created on stream.new. <${HOST_URL}/v/${playbackId}|View on stream.new>`,
+      text: `New video created on FamJam.Space. <${HOST_URL}/v/${playbackId}|View on FamJam.Space>`,
       icon_emoji: 'see_no_evil',
       blocks,
     },
