@@ -47,7 +47,6 @@ const Index: React.FC<Props> = () => {
           </div>
           <label htmlFor="file-input">
             <Button type="button" onClick={() => inputRef.current && inputRef.current.click()}>
-              <span className="cta-text-mobile">Add a video</span>
               <span className="cta-text-desktop">Upload a video</span>
             </Button>
             <input id="file-input" type="file" onChange={onInputChange} ref={inputRef} />
@@ -92,10 +91,11 @@ const Index: React.FC<Props> = () => {
           display: inline-block;
         }
         .cta-text-desktop {
-          display: none;
+          display: inline-block;
         }
         .cta-record {
-          display: none;
+          display: block;
+          margin-top: 30px;
         }
 
         @media only screen and (min-width: ${breakpoints.md}px) {
