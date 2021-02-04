@@ -88,7 +88,6 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
       metaTitle={META_TITLE}
       image={poster}
       centered={showLoading}
-      darkMode
     >
       {errorMessage && <h1 className="error-message">{errorMessage}</h1>}
       {showLoading && <FullpageLoader text="Loading player" />}
