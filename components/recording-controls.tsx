@@ -37,13 +37,19 @@ const RecordingControls: React.FC<Props> = ({
   }, [recordState, isReviewing]);
 
   return (
-    <div className="container">
+    <div className="container-inline">
       <div className="button">
         {renderRecordingControl()}
       </div>
       <div className="button"><Button type="button" onClick={submitRecording} disabled={!isReviewing || isLoadingPreview}>{ isLoadingPreview ? 'Loading preview...' : 'Submit' }</Button></div>
       <div className="button"><Button type="button" onClick={reset}>Reset</Button></div>
       <style jsx>{`
+        .container-inline {
+          display: flex;
+        }
+        .container-inline .button {
+          margin: 0 8px;
+        }
         .container {
           display: flex;
           flex-direction: column;

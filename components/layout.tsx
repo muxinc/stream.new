@@ -132,6 +132,8 @@ const Layout: React.FC<Props> = ({
           .container {
             transition: background ${transitionDuration} ease;
             outline: none;
+            background: rgb(2,0,36);
+            background: linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 24%, rgba(0,110,255,1) 100%);
           }
           .drag-overlay {
             height: 100%;
