@@ -39,6 +39,7 @@ const Index: React.FC<Props> = () => {
       <div>
         <div className="hero-title">
           <h1>Send a video birthday message to Jessica <span role="img" aria-label="balloon">🎈</span></h1>
+          <h2>Record your video any time. Videos will be packaged and shared with Jess on Feb 14th</h2>
         </div>
         <div className="cta">
           <div className="cta-record">
@@ -63,7 +64,7 @@ const Index: React.FC<Props> = () => {
           display: none;
         }
 
-        .hero-title h1{
+        .hero-title{
           color: #FFFFE0;
         }
 
