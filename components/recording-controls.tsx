@@ -28,22 +28,29 @@ const RecordingControls: React.FC<Props> = ({
     if(isReviewing) {
       return null;
     } else if(recordState === RecordState.IDLE) {
-      return <Button type="button" onClick={startRecording}>Start recording</Button>;
+      return <Button type="button" fullW onClick={startRecording}>Start recording</Button>;
     } else if(recordState === RecordState.PREPARING) {
-      return <Button type="button" onClick={cancelRecording}>Cancel recording</Button>;
+      return <Button type="button" fullW onClick={cancelRecording}>Cancel recording</Button>;
     } else if(RecordState.RECORDING) {
-      return <Button type="button" onClick={stopRecording}>Stop recording</Button>;
+      return <Button type="button" fullW onClick={stopRecording}>Stop recording</Button>;
     }
   }, [recordState, isReviewing]);
 
   return (
-    <div className="container-inline">
-      <div className="button">
-        {renderRecordingControl()}
+    <div className="">
+      <div className="start-recording">
+        <div className="button">
+          {renderRecordingControl()}
+        </div>
       </div>
-      <div className="button"><Button type="button" onClick={submitRecording} disabled={!isReviewing || isLoadingPreview}>{ isLoadingPreview ? 'Loading preview...' : 'Submit' }</Button></div>
-      <div className="button"><Button type="button" onClick={reset}>Reset</Button></div>
+      <div className="container-inline">
+        <div className="button"><Button type="button" onClick={submitRecording} disabled={!isReviewing || isLoadingPreview}>{ isLoadingPreview ? 'Loading preview...' : 'Submit' }</Button></div>
+        <div className="button"><Button type="button" onClick={reset}>Reset</Button></div>
+      </div>
       <style jsx>{`
+        .start-recording {
+          margin: 10px 0;
+        }
         .container-inline {
           display: flex;
           margin: 20px 0;

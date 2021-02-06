@@ -86,30 +86,9 @@ const Layout: React.FC<Props> = ({
         {image && <meta property="twitter:image" content={image} />}
       </Head>
       <div className="container" {...containerProps}>
-        <div className={`drag-overlay ${isDragActive ? 'active' : ''}`}><h1>Upload to FamJam.Space</h1></div>
-
-        <div className="modal-wrapper"><InfoModal close={() => setModalOpen(false)} /></div>
         <main>
           <div className={`${centered ? "content-wrapper-centered" : ""}`}>{children}</div>
         </main>
-        <div className="footer-wrapper">
-          <footer>
-            {/* <div className="nav">
-             {
-               backNav ?
-               <div className="footer-link back"><a onClick={() => router.back()} role="presentation">Back</a></div> :
-               <>
-                <div className="footer-link info"><a role="presentation" onClick={() => setModalOpen(true)}>Info</a></div>
-                <div className="footer-link mux">An <a href={OPEN_SOURCE_URL}>open source</a> project by <a href={MUX_HOME_PAGE_URL}>Mux</a></div>
-                <div className="divider" />
-                <div className="footer-link terms"><Link href="/terms"><a>Terms</a></Link></div>
-               </>
-
-             }
-            </div> */}
-            {/* <div className="footer-link"><AsteriskLink spinning={spinningLogo} /></div> */}
-          </footer>
-        </div>
 
         <style jsx>{`
           .modal-wrapper {
