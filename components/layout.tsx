@@ -107,7 +107,7 @@ const Layout: React.FC<Props> = ({
 
              }
             </div> */}
-            <div className="footer-link"><AsteriskLink spinning={spinningLogo} /></div>
+            {/* <div className="footer-link"><AsteriskLink spinning={spinningLogo} /></div> */}
           </footer>
         </div>
 
