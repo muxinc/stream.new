@@ -37,13 +37,12 @@ const Index: React.FC<Props> = () => {
       onFileDrop={onDrop}
     >
       <div>
-        <div>
-          <h1>Add a video.</h1>
-          <h1>Get a shareable link to stream it.</h1>
+        <div className="hero-title">
+          <h1>Send a video birthday message to Jessica <span role="img" aria-label="balloon">🎈</span></h1>
         </div>
         <div className="cta">
-          <div className="drop-notice">
-            <h2>↓ Drag & drop a video file anywhere</h2>
+          <div className="cta-record">
+            <Link href="/record?source=camera"><Button>Record from camera</Button></Link>
           </div>
           <label htmlFor="file-input">
             <Button type="button" onClick={() => inputRef.current && inputRef.current.click()}>
@@ -51,9 +50,6 @@ const Index: React.FC<Props> = () => {
             </Button>
             <input id="file-input" type="file" onChange={onInputChange} ref={inputRef} />
           </label>
-          <div className="cta-record">
-            <Link href="/record?source=camera"><Button>Record from camera</Button></Link>
-          </div>
           {/* <div className="cta-record">
             <Link href="/record?source=screen"><Button>Record my screen</Button></Link>
           </div> */}
@@ -67,62 +63,20 @@ const Index: React.FC<Props> = () => {
           display: none;
         }
 
-        .cta {
-          display: flex;
-          flex-direction: column;
-          position: absolute;
-          right: 0;
-          bottom: 0;
-          align-items: flex-end;
-          justify-content: flex-end;
-          margin-bottom: 100px;
-          margin-right: 30px;
-        }
-        .cta .button {
-          margin: 8px 0;
+        .hero-title h1{
+          color: #FFFFE0;
         }
 
         .cta {
-          margin-top: 30px;
           display: flex;
           flex-direction: column;
+          margin-top: 50px;
         }
-        .cta-text-mobile {
-          display: inline-block;
-        }
-        .cta-text-desktop {
-          display: inline-block;
-        }
+
         .cta-record {
-          display: block;
-          margin-top: 30px;
+          margin: 30px 0;
         }
 
-        @media only screen and (min-width: ${breakpoints.md}px) {
-          .drop-notice {
-            display: block;
-            text-align: right;
-            float: right;
-            color: #fff;
-            margin-bottom: 5px;
-            opacity: 0.5;
-            mix-blend-mode: exclusion;
-          }
-          .drop-notice h2 {
-            margin-top: 0;
-          }
-
-          .cta-text-mobile {
-            display: none;
-          }
-          .cta-text-desktop {
-            display: inline-block;
-          }
-          .cta-record {
-            display: block;
-            margin-top: 30px;
-          }
-        }
       `}
       </style>
     </Layout>

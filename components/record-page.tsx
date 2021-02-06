@@ -414,7 +414,7 @@ const RecordPage: React.FC<NoProps> = () => {
       description="Record a video"
       centered
     >
-      <h1>{(isRecording && startRecordTime && <StopWatch startTimeUnixMs={startRecordTime} />) || 'Record your video message'}</h1>
+      <h1>{(isRecording && startRecordTime && <StopWatch startTimeUnixMs={startRecordTime} />) || 'Record video message 🎉'}</h1>
       {/* <VideoSourceToggle activeSource={videoSource} onChange={changeVideoSource} /> */}
       {errorMessage && <div className='error-message'>{errorMessage}</div>}
       <div className="skeleton-container">
@@ -433,7 +433,7 @@ const RecordPage: React.FC<NoProps> = () => {
       <div>
         { isLoadingPreview && 'Loading preview...' }
       </div>
-      {haveDeviceAccess && videoSource === 'camera' &&
+      {/* {haveDeviceAccess && videoSource === 'camera' &&
         <CameraOptions
           isLoadingPreview={isLoadingPreview}
           isRecording={isRecording}
@@ -444,8 +444,8 @@ const RecordPage: React.FC<NoProps> = () => {
           selectVideo={selectVideo}
           selectAudio={selectAudio}
         />
-      }
-      {haveDeviceAccess && videoSource === 'screen' &&
+      } */}
+      {/* {haveDeviceAccess && videoSource === 'screen' &&
         <ScreenOptions
           isMicDeviceEnabled={isMicDeviceEnabled}
           enableMicForScreenshare={enableMicForScreenshare}
@@ -458,7 +458,7 @@ const RecordPage: React.FC<NoProps> = () => {
           selectVideo={selectVideo}
           selectAudio={selectAudio}
         />
-      }
+      } */}
       { haveDeviceAccess && (
       <RecordingControls
         recordState={recordState}

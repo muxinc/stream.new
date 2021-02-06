@@ -34,7 +34,7 @@ const Button = forwardRef<ButtonOrAnchor, Props>(
             font-size: 26px;
             font-family: Akkurat;
             line-height: 33px;
-            background: #fff;
+            background: #ffffE0;
             border: 2px solid ${disabled ? '#b0b0b0' : '#222222'};
             color: ${disabled ? '#b0b0b0' : '#222222'};
             padding: 10px 20px;

@@ -46,6 +46,7 @@ const RecordingControls: React.FC<Props> = ({
       <style jsx>{`
         .container-inline {
           display: flex;
+          margin: 20px 0;
         }
         .container-inline .button {
           margin: 0 8px;
