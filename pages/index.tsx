@@ -47,6 +47,7 @@ const Index: React.FC<Props> = () => {
           </div>
           <label htmlFor="file-input">
             <Button type="button" onClick={() => inputRef.current && inputRef.current.click()}>
+              <span className="cta-text-mobile">Add a video</span>
               <span className="cta-text-desktop">Upload a video</span>
             </Button>
             <input id="file-input" type="file" onChange={onInputChange} ref={inputRef} />
@@ -55,11 +56,11 @@ const Index: React.FC<Props> = () => {
             <Link href="/record?source=screen"><Button>Record my screen</Button></Link>
           </div> */}
         </div>
-      </div>
-      <style jsx>{`
+        <style jsx>{`
         input {
           display: none;
         }
+
         .drop-notice {
           display: none;
         }
@@ -73,13 +74,34 @@ const Index: React.FC<Props> = () => {
           flex-direction: column;
           margin-top: 50px;
         }
-
+        .cta-text-mobile {
+          display: inline-block;
+        }
+        .cta-text-desktop {
+          display: none;
+        }
         .cta-record {
-          margin: 30px 0;
+          display: none;
+          margin: 20px 0;
+        }
+
+        @media only screen and (min-width: ${breakpoints.md}px) {
+          .cta-record {
+            display: inline-block;
+          }
+
+          .cta-text-mobile {
+            display: none;
+          }
+
+          .cta-text-desktop {
+            display: inline-block;
+          }
         }
 
       `}
       </style>
+      </div>
     </Layout>
   );
 };
