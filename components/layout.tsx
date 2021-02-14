@@ -45,6 +45,7 @@ type Props = {
   centered?: boolean;
   spinningLogo?: boolean;
   backNav?: boolean;
+  long?: boolean;
 };
 
 const Layout: React.FC<Props> = ({
@@ -55,6 +56,7 @@ const Layout: React.FC<Props> = ({
   image = "/stream-new-og-image.png",
   onFileDrop,
   darkMode,
+  long,
   centered,
   spinningLogo,
   backNav,
@@ -70,7 +72,7 @@ const Layout: React.FC<Props> = ({
     <>
       <Head>
         <title>FamJam.Space</title>
-        <link rel="icon" href="/stream-new-asterisk.svg" />
+        <link rel="icon" href="/favicon.ico" />
         {metaTitle && <meta property="og:title" content={metaTitle} />}
         {metaTitle && <meta property="twitter:title" content={metaTitle} />}
         {metaDescription && (
@@ -253,7 +255,7 @@ const Layout: React.FC<Props> = ({
         <style jsx global>{`
           html, body, #__next, .container {
             background: ${darkMode ? '#111' : '#f8f8f8'};
-            height: 100%;
+            height: ${long ? 'auto' : '100%'};;
             -webkit-font-smoothing: antialiased;
           }
           p {
