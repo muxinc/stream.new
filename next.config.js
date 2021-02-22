@@ -3,7 +3,7 @@ const { createSecureHeaders } = require("next-secure-headers");
 const secureHeaderOptions = {
   contentSecurityPolicy: {
     directives: {
-      frameSrc: ["frame-ancestors", "'self'", "*.mux.com"],
+      frameSrc: ["; frame-ancestors", "'self'", "*.mux.com"],
     },
   }
 };
