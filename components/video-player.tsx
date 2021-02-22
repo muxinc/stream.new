@@ -41,8 +41,12 @@ type SizedEvent = {
   }
 };
 
+interface HTMLVideoElementWithPlyr extends HTMLVideoElement {
+  plyr: any
+}
+
 const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError }) => {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const videoRef = useRef<HTMLVideoElementWithPlyr | null>(null);
   const playerRef = useRef<Plyr | null>(null);
   const [isVertical, setIsVertical] = useState<boolean | null>();
   const [playerInitTime] = useState(Date.now());
