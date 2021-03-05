@@ -90,7 +90,7 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
       centered={showLoading}
     >
       {errorMessage && <h1 className="error-message">{errorMessage}</h1>}
-      {showLoading && <FullpageLoader text="Loading player" />}
+      {showLoading && <FullpageLoader text="Success 🙌" />}
       <div className="wrapper">
         {!openReport && <VideoPlayer playbackId={playbackId} poster={poster} onLoaded={() => setIsLoaded(true)} onError={onError} />}
         <div className="actions">
