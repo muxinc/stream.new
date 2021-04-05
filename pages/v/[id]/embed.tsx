@@ -3,10 +3,11 @@ import { GetStaticProps, GetStaticPaths } from 'next';
 import { useRouter } from 'next/router';
 
 import FullpageLoader from '../../../components/fullpage-loader';
-import VideoPlayer, { HTMLVideoElementWithPlyr } from '../../../components/video-player';
+import VideoPlayer from '../../../components/video-player';
 import Layout from '../../../components/layout';
 import Asterisk from '../../../components/asterisk';
 import { OPEN_SOURCE_URL, MUX_HOME_PAGE_URL, HOST_URL } from '../../../constants';
+import { HTMLVideoElementWithPlyr } from '../../../types';
 
 type Params = {
   id: string;

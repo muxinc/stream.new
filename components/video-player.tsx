@@ -4,8 +4,11 @@ import Plyr from 'plyr';
 import 'plyr/dist/plyr.css';
 import Hls from 'hls.js';
 import mux from 'mux-embed';
+
 import logger from '../lib/logger';
 import { breakpoints } from '../style-vars';
+import { HTMLVideoElementWithPlyr } from '../types';
+import { useCombinedRefs } from '../util/use-combined-refs';
 
 /*
  * We need to set the width/height of the player depending on what the dimensions of
@@ -39,28 +42,6 @@ type SizedEvent = {
     width: number
     height: number
   }
-};
-
-export interface HTMLVideoElementWithPlyr extends HTMLVideoElement {
-  plyr: Plyr
-}
-
-const useCombinedRefs = function (...refs: (((instance: HTMLVideoElementWithPlyr | null) => void) | MutableRefObject<HTMLVideoElementWithPlyr | null> | null)[]) {
-  const targetRef = useRef(null);
-
-  useEffect(() => {
-    refs.forEach(ref => {
-      if (!ref) return;
-
-      if (typeof ref === 'function') {
-        ref(targetRef.current);
-      } else {
-        ref.current = targetRef.current;
-      }
-    });
-  }, [refs]);
-
-  return targetRef;
 };
 
 const VideoPlayer = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, poster, onLoaded, onError }, ref) => {

@@ -3,3 +3,7 @@ export enum RecordState {
   PREPARING,
   RECORDING
 }
+
+export interface HTMLVideoElementWithPlyr extends HTMLVideoElement {
+  plyr: Plyr
+}
