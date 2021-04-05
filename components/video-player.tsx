@@ -1,5 +1,5 @@
 /* globals Image */
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, forwardRef, MutableRefObject } from 'react';
 import Plyr from 'plyr';
 import 'plyr/dist/plyr.css';
 import Hls from 'hls.js';
@@ -41,12 +41,31 @@ type SizedEvent = {
   }
 };
 
-interface HTMLVideoElementWithPlyr extends HTMLVideoElement {
-  plyr: any
+export interface HTMLVideoElementWithPlyr extends HTMLVideoElement {
+  plyr: Plyr
 }
 
-const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError }) => {
-  const videoRef = useRef<HTMLVideoElementWithPlyr | null>(null);
+const useCombinedRefs = function (...refs: (((instance: HTMLVideoElementWithPlyr | null) => void) | MutableRefObject<HTMLVideoElementWithPlyr | null> | null)[]) {
+  const targetRef = useRef(null);
+
+  useEffect(() => {
+    refs.forEach(ref => {
+      if (!ref) return;
+
+      if (typeof ref === 'function') {
+        ref(targetRef.current);
+      } else {
+        ref.current = targetRef.current;
+      }
+    });
+  }, [refs]);
+
+  return targetRef;
+};
+
+const VideoPlayer = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, poster, onLoaded, onError }, ref) => {
+  const videoRef = useRef<HTMLVideoElementWithPlyr>(null);
+  const metaRef = useCombinedRefs(ref, videoRef);
   const playerRef = useRef<Plyr | null>(null);
   const [isVertical, setIsVertical] = useState<boolean | null>();
   const [playerInitTime] = useState(Date.now());
@@ -139,7 +158,7 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
   return (
     <>
       <div className='video-container'>
-        <video ref={videoRef} poster={poster} controls playsInline />
+        <video ref={metaRef} poster={poster} controls playsInline />
       </div>
       <style jsx>{`
         :global(:root) {
@@ -188,6 +207,6 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
       </style>
     </>
   );
-};
+});
 
 export default VideoPlayer;

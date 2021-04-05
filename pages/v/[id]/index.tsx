@@ -6,7 +6,6 @@ import FullpageLoader from '../../../components/fullpage-loader';
 import VideoPlayer from '../../../components/video-player';
 import Layout from '../../../components/layout';
 import ReportForm from '../../../components/report-form';
-import { breakpoints } from '../../../style-vars';
 import { Props } from './common';
 export { getStaticProps, getStaticPaths } from './common';
 
