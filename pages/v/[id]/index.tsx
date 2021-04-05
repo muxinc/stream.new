@@ -2,15 +2,23 @@ import { useState, useRef, useEffect } from 'react';
 import { GetStaticProps, GetStaticPaths } from 'next';
 import { useRouter } from 'next/router';
 import copy from 'copy-to-clipboard';
-import FullpageLoader from '../../components/fullpage-loader';
-import VideoPlayer from '../../components/video-player';
-import Layout from '../../components/layout';
-import ReportForm from '../../components/report-form';
-import { HOST_URL } from '../../constants';
+
+import FullpageLoader from '../../../components/fullpage-loader';
+import VideoPlayer from '../../../components/video-player';
+import Layout from '../../../components/layout';
+import ReportForm from '../../../components/report-form';
+import { HOST_URL } from '../../../constants';
+import logger from '../../../lib/logger';
 
 type Params = {
   id: string;
 }
+
+export type Props = {
+  playbackId: string,
+  shareUrl: string,
+  poster: string
+};
 
 export const getStaticProps: GetStaticProps = async (context)  => {
   const { params } = context;
@@ -26,12 +34,6 @@ export const getStaticPaths: GetStaticPaths = async () => {
     paths: [],
     fallback: true,
   };
-};
-
-type Props = {
-  playbackId: string,
-  shareUrl: string,
-  poster: string
 };
 
 const META_TITLE = "View this video created on stream.new";
@@ -65,7 +67,7 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
   const onError = (evt: ErrorEvent) => {
     setErrorMessage('This video does not exist');
     setIsLoaded(false);
-    console.error('Error', evt); // eslint-disable-line no-console
+    logger.error('Error', evt);
   };
 
   const showLoading = (!isLoaded && !errorMessage);

@@ -1,11 +1,14 @@
 /* globals Image */
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, forwardRef } from 'react';
 import Plyr from 'plyr';
 import 'plyr/dist/plyr.css';
 import Hls from 'hls.js';
 import mux from 'mux-embed';
+
 import logger from '../lib/logger';
 import { breakpoints } from '../style-vars';
+import { HTMLVideoElementWithPlyr } from '../types';
+import { useCombinedRefs } from '../util/use-combined-refs';
 
 /*
  * We need to set the width/height of the player depending on what the dimensions of
@@ -41,8 +44,9 @@ type SizedEvent = {
   }
 };
 
-const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError }) => {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+const VideoPlayer = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, poster, onLoaded, onError }, ref) => {
+  const videoRef = useRef<HTMLVideoElementWithPlyr>(null);
+  const metaRef = useCombinedRefs(ref, videoRef);
   const playerRef = useRef<Plyr | null>(null);
   const [isVertical, setIsVertical] = useState<boolean | null>();
   const [playerInitTime] = useState(Date.now());
@@ -135,7 +139,7 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
   return (
     <>
       <div className='video-container'>
-        <video ref={videoRef} poster={poster} controls playsInline />
+        <video ref={metaRef} poster={poster} controls playsInline />
       </div>
       <style jsx>{`
         :global(:root) {
@@ -184,6 +188,6 @@ const VideoPlayer: React.FC<Props> = ({ playbackId, poster, onLoaded, onError })
       </style>
     </>
   );
-};
+});
 
 export default VideoPlayer;
