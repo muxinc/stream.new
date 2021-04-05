@@ -135,6 +135,10 @@ const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster }) => {
         )}
       </div>
       <style jsx>{`
+        :global(html),
+        :global(body) {
+          font-family: Akkurat;
+        }
         .error-message {
           color: #ccc;
         }
