@@ -8,6 +8,7 @@ import Layout from '../../../components/layout';
 import Asterisk from '../../../components/asterisk';
 import { OPEN_SOURCE_URL, MUX_HOME_PAGE_URL, HOST_URL } from '../../../constants';
 import { HTMLVideoElementWithPlyr } from '../../../types';
+import logger from '../../../lib/logger';
 
 type Params = {
   id: string;
@@ -105,7 +106,7 @@ const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster }) => {
   const onError = (evt: ErrorEvent) => {
     setErrorMessage('This video does not exist');
     setIsLoaded(false);
-    console.error('Error', evt); // eslint-disable-line no-console
+    logger.error('Error', evt);
   };
 
   const showLoading = (!isLoaded && !errorMessage);
