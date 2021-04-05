@@ -1,13 +1,39 @@
 import { useState, useRef } from 'react';
+import { GetStaticProps, GetStaticPaths } from 'next';
 import { useRouter } from 'next/router';
 
 import FullpageLoader from '../../../components/fullpage-loader';
 import VideoPlayer, { HTMLVideoElementWithPlyr } from '../../../components/video-player';
 import Layout from '../../../components/layout';
-import { Props } from './common';
 import Asterisk from '../../../components/asterisk';
-export { getStaticProps, getStaticPaths } from './common';
-import { OPEN_SOURCE_URL, MUX_HOME_PAGE_URL } from '../../../constants';
+import { OPEN_SOURCE_URL, MUX_HOME_PAGE_URL, HOST_URL } from '../../../constants';
+
+type Params = {
+  id: string;
+}
+
+export type Props = {
+  playbackId: string,
+  shareUrl: string,
+  poster: string
+};
+
+export const getStaticProps: GetStaticProps = async (context)  => {
+  const { params } = context;
+  const { id: playbackId } = (params as Params);
+  const poster = `https://image.mux.com/${playbackId}/thumbnail.png`;
+  const shareUrl = `${HOST_URL}/v/${playbackId}`;
+
+  return { props: { playbackId, shareUrl, poster } };
+};
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: [],
+    fallback: true,
+  };
+};
+
 
 interface AsteriskButtonProps {
   onOpenOverlay?: () => void;
@@ -98,7 +124,7 @@ const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster }) => {
             <div>
               <p>View this video on <a href={nonEmbedUrl} target='_blank' rel="noreferrer">stream.new</a>
               </p>
-              <p>This is an <a href={OPEN_SOURCE_URL}>open source</a> project from <a href={MUX_HOME_PAGE_URL}>Mux</a>, the video streaming API.</p>
+              <p>This is an <a href={OPEN_SOURCE_URL}  target='_blank' rel="noreferrer">open source</a> project from <a href={MUX_HOME_PAGE_URL} target='_blank' rel="noreferrer">Mux</a>, the video streaming API.</p>
             </div>
             <p>
               <a onClick={onCloseOverlay} onKeyPress={onCloseOverlay} role='link' tabIndex={0}>
