@@ -87,8 +87,7 @@ const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster }) => {
     setShowOverlay(true);
   };
 
-  const url = (typeof window !== 'undefined' && window.location.href) || '';
-  const nonEmbedUrl = url.substring(0, url.lastIndexOf('/'));
+  const nonEmbedUrl = `/v/${playbackId}`;
 
   if (router.isFallback) {
     return (
