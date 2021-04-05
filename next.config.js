@@ -10,6 +10,10 @@ const secureHeaderOptions = {
 
 module.exports = {
   async headers() {
-    return [{ source: "/(.*)", headers: createSecureHeaders(secureHeaderOptions) }];
+    return [{
+      source: "/(.*)", headers: createSecureHeaders()
+    }, {
+      source: "/(.*)/embed", headers: createSecureHeaders(secureHeaderOptions)
+    }];
   },
 };
