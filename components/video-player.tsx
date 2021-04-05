@@ -1,5 +1,5 @@
 /* globals Image */
-import { useState, useEffect, useRef, forwardRef, MutableRefObject } from 'react';
+import { useState, useEffect, useRef, forwardRef } from 'react';
 import Plyr from 'plyr';
 import 'plyr/dist/plyr.css';
 import Hls from 'hls.js';
