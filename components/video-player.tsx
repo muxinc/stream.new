@@ -33,6 +33,7 @@ import { useCombinedRefs } from '../util/use-combined-refs';
 type Props = {
   playbackId: string
   poster: string
+  currentTime?: number
   onLoaded: () => void
   onError: (error: ErrorEvent) => void
 };
@@ -44,7 +45,7 @@ type SizedEvent = {
   }
 };
 
-const VideoPlayer = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, poster, onLoaded, onError }, ref) => {
+const VideoPlayer = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, poster, currentTime, onLoaded, onError }, ref) => {
   const videoRef = useRef<HTMLVideoElementWithPlyr>(null);
   const metaRef = useCombinedRefs(ref, videoRef);
   const playerRef = useRef<Plyr | null>(null);
@@ -109,6 +110,11 @@ const VideoPlayer = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, p
           'This is an old browser that does not support MSE https://developer.mozilla.org/en-US/docs/Web/API/Media_Source_Extensions_API',
         );
       }
+
+      if (currentTime) {
+        video.currentTime = currentTime;
+      }
+
       if (typeof mux !== 'undefined' && process.env.NEXT_PUBLIC_MUX_ENV_KEY) {
         mux.monitor(video, {
           hlsjs: hls,
@@ -168,9 +174,9 @@ const VideoPlayer = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, p
           cursor: pointer;
         }
         @media only screen and (min-width: ${breakpoints.md}px) {
-          video {           
+          video {
             width: ${isVertical ? 'auto' : '1000px'};
-            height: ${isVertical ? '600px' : 'auto'}; 
+            height: ${isVertical ? '600px' : 'auto'};
             max-height: 70vh;
             min-width: 30rem;
           }

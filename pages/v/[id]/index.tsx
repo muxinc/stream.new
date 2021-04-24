@@ -86,6 +86,8 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
     }, 5000);
   };
 
+  const startTime = router.query?.time && parseFloat(router.query.time as string) || 0;
+
   return (
     <Layout
       metaTitle={META_TITLE}
@@ -96,7 +98,7 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
       {errorMessage && <h1 className="error-message">{errorMessage}</h1>}
       {showLoading && <FullpageLoader text="Loading player" />}
       <div className="wrapper">
-        {!openReport && <VideoPlayer playbackId={playbackId} poster={poster} onLoaded={() => setIsLoaded(true)} onError={onError} />}
+        {!openReport && <VideoPlayer playbackId={playbackId} poster={poster} currentTime={startTime} onLoaded={() => setIsLoaded(true)} onError={onError} />}
         <div className="actions">
           {!openReport && <a onClick={copyUrl} onKeyPress={copyUrl} role="button" tabIndex={0}>{ isCopied ? 'Copied to clipboard' :'Copy video URL' }</a>}
           {!openReport && (
