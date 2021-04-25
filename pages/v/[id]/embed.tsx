@@ -111,12 +111,14 @@ const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster }) => {
 
   const showLoading = (!isLoaded && !errorMessage);
 
+  const startTime = router.query?.time && parseFloat(router.query.time as string) || 0;
+
   return (
     <>
       {errorMessage && <h1 className="error-message">{errorMessage}</h1>}
       {showLoading && <FullpageLoader text="Loading player" />}
       <div className="wrapper">
-        <VideoPlayer ref={videoRef} playbackId={playbackId} poster={poster} onLoaded={() => setIsLoaded(true)} onError={onError} />
+        <VideoPlayer ref={videoRef} playbackId={playbackId} poster={poster} currentTime={startTime} onLoaded={() => setIsLoaded(true)} onError={onError} />
         <div className='asterisk-container'>
           <AsteriskButton onOpenOverlay={onOpenOverlay} />
         </div>
