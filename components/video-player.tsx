@@ -111,10 +111,6 @@ const VideoPlayer = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, p
         );
       }
 
-      if (currentTime) {
-        video.currentTime = currentTime;
-      }
-
       if (typeof mux !== 'undefined' && process.env.NEXT_PUBLIC_MUX_ENV_KEY) {
         mux.monitor(video, {
           hlsjs: hls,
@@ -141,6 +137,13 @@ const VideoPlayer = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, p
       }
     };
   }, [playbackId, videoRef]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (currentTime && video) {
+      video.currentTime = currentTime;
+    }
+  }, [currentTime])
 
   return (
     <>
