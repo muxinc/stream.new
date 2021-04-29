@@ -88,7 +88,7 @@ const VideoPlayer = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, p
         fullscreen: {
           iosNative: true
         },
-        captions: { active: false, language: 'auto', update: true }
+        captions: { active: true, language: 'auto', update: true }
       });
 
       if (video.canPlayType('application/vnd.apple.mpegurl')) {
