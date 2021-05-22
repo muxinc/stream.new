@@ -1,5 +1,15 @@
-process.env.GOOGLE_APPLICATION_CREDENTIALS = process.env.GOOGLE_APPLICATION_CREDENTIALS || 'three-monkeys-hackweek-844be021a66d.json';
 import vision from '@google-cloud/vision';
 
-const client = new vision.ImageAnnotatorClient();
+let credentials;
+
+if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  credentials = JSON.parse(
+    Buffer.from(process.env.GOOGLE_APPLICATION_CREDENTIALS, 'base64').toString()
+  );
+}
+
+const client = new vision.ImageAnnotatorClient({
+  credentials,
+});
+
 export default client;

@@ -56,7 +56,6 @@ export default async function muxWebhookHandler (req: NextApiRequest, res: NextA
         const duration = data.duration;
 
         const moderationScores = await getScores({ playbackId, duration });
-        console.log('debug detected moderationScores', moderationScores);
         await sendSlackAssetReady({
           assetId: data.id,
           playbackId,
@@ -67,7 +66,7 @@ export default async function muxWebhookHandler (req: NextApiRequest, res: NextA
       } catch (e) {
         res.statusCode = 500;
         console.error('Request error', e); // eslint-disable-line no-console
-        res.json({ error: 'Error creating upload' });
+        res.json({ error: 'Error handling webhook' });
       }
       break;
     } default:

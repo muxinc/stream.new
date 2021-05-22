@@ -40,7 +40,15 @@ const ENUM_TO_VAL = {
 };
 
 async function fetchAnnotationsForUrl (url: string): Promise<SafeSearchAnnotation|null> {
-  const [result] = await client.safeSearchDetection(url);
+  let result;
+
+  try {
+    result = (await client.safeSearchDetection(url))[0];
+  } catch (e) {
+    console.error('Error with client.safeSearchDetection', e);
+    return null;
+  }
+
   if (result.error) {
     console.error('Error detecting scores', url);
     return null;
@@ -51,7 +59,6 @@ async function fetchAnnotationsForUrl (url: string): Promise<SafeSearchAnnotatio
     return null;
   }
 
-  console.log('debug detections for url', detections, url);
   return detections as SafeSearchAnnotation;
 }
 
