@@ -143,7 +143,7 @@ const VideoPlayer = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, p
     if (currentTime && video) {
       video.currentTime = currentTime;
     }
-  }, [currentTime])
+  }, [currentTime]);
 
   return (
     <>
