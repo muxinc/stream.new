@@ -134,7 +134,6 @@ Get the base64 encoded string of this JSON file like so:
 
 ```
 cat service-account.json | base64
-
 ```
 
 ^ This command will output one long string. This string is what you will use for the ENV var `GOOGLE_APPLICATION_CREDENTIALS`.
