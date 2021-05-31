@@ -10,7 +10,7 @@ export interface HTMLVideoElementWithPlyr extends HTMLVideoElement {
 
 export type ModerationScores = {
   adult?: number;
-  violence?: number;
-  racy?: number;
+  violent?: number;
+  suggestive?: number;
 }
 
