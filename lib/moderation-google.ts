@@ -1,5 +1,6 @@
-import client from './google-vision-client';
+import client, { isEnabled } from './google-vision-client';
 import { ModerationScores } from '../types';
+import { getThumbnailUrls } from './moderation-utils';
 
 /*
  * https://cloud.google.com/vision/docs/reference/rpc/google.cloud.vision.v1#google.cloud.vision.v1.Likelihood
@@ -81,20 +82,19 @@ export function mergeAnnotations (annotations: SafeSearchAnnotation[]): Moderati
 
   const combined: ModerationScores = {
     adult: adultScores.length ? Math.max(...adultScores) : undefined,
-    violence: violenceScores.length ? Math.max(...violenceScores) : undefined,
-    racy: racyScores.length ? Math.max(...racyScores) : undefined,
+    violent: violenceScores.length ? Math.max(...violenceScores) : undefined,
+    suggestive: racyScores.length ? Math.max(...racyScores) : undefined,
   };
 
   return combined;
 }
 
-export async function getScores ({ playbackId, duration }: { playbackId: string, duration: number }): Promise<ModerationScores> {
-  /*
-   * Get 3 thumbnails based on the duration
-   */
-  const timestamps = [(duration * 0.25),  (duration * 0.5), (duration * 0.75)];
-  // const timestamps = [duration * 0.5];
-  const files = timestamps.map((time) => `https://image.mux.com/${playbackId}/thumbnail.png?time=${time}`);
+export async function getScores ({ playbackId, duration }: { playbackId: string, duration: number }): Promise<ModerationScores|undefined> {
+  if (!isEnabled()) {
+    console.log('Skipping moderation-google, no key enabled');
+    return;
+  }
+  const files = getThumbnailUrls({ playbackId, duration });
   const annotations = await Promise.all(files.map((file) => fetchAnnotationsForUrl(file)));
   /*
    * Filter out nulls to make typescript happy

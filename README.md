@@ -99,7 +99,7 @@ After all of this is set up the flow will be:
 1. (optional) Your server verifies the webhook signature
 1. If the webhook matches `video.asset.ready` then your server will post a message to your slack channel that has the Mux Asset ID, the Mux Playback ID, and a thumbnail of the video.
 
-# Step 5 (optional) Add automatic content analysis to Slackbot Moderator
+# Step 5 (optional) Add automatic content analysis to Slackbot Moderator (Google Vision API)
 
 stream.new can automatically moderate content with the help of Google's [Cloud vision API](https://cloud.google.com/vision).
 
@@ -138,13 +138,14 @@ cat service-account.json | base64
 
 ^ This command will output one long string. This string is what you will use for the ENV var `GOOGLE_APPLICATION_CREDENTIALS`.
 
-When the Slackbot Moderator message gets posted to slack, it will now include a "Moderation Score" with 3 dimensions:
+When the Slackbot Moderator message gets posted to slack, it will now include a "Moderation score (Google)" with 2 dimensions:
 
 * `"adult"`
-* `"racy"`
-* `"violence"`
+* `"suggestive"`
+* `"violent"`
 
-Each dimension will have a score from 1-5. You should interpret these scores in terms of likelihood that the video contains this type of content.
+Each dimension will have a score from 1-5. You should interpret these scores in terms of likelihood that the video contains this type of content. This
+is based on Google Vision's [Likelihood score](https://cloud.google.com/vision/docs/reference/rpc/google.cloud.vision.v1#google.cloud.vision.v1.Likelihood)
 
 * `1`: very unlikely
 * `2`: unlikely
@@ -152,6 +153,28 @@ Each dimension will have a score from 1-5. You should interpret these scores in 
 * `4`: likely
 * `5`: very likely
 
+
+![Slackbot message](screenshots/moderation-score-slack.png)
+
+
+# Step 6 (optional) Add automatic content analysis to Slackbot Moderator ([Hive AI](https://thehive.ai/))
+
+stream.new can automatically moderate content with the help of [Hive AI](https://thehive.ai/).
+
+Follow these steps to help moderate uploaded content:
+
+- `HIVE_AI_KEY` - This is a base64 encoded JSON representation of your Google service account credentials. Follow instructions below.
+
+1. First, you will need to set up an account at [thehive.ai](https://thehive.ai/).
+1. Create a project
+1. Get the API key for your prject
+
+When the Slackbot Moderator message gets posted to slack, it will now include a section titled "Moderation score (hive)" with 2 dimensions:
+
+* `"adult"`
+* `"suggestive"`
+
+Each dimension will have a score from 0-1 with a precision of 6 decimal places. These numbers come from the "Classification API" that Hive AI provides. [Details here](https://docs.thehive.ai/reference#classification).
 
 ![Slackbot message](screenshots/moderation-score-slack.png)
 

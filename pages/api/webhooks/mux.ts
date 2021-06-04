@@ -2,7 +2,8 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import Mux from '@mux/mux-node';
 import { buffer } from 'micro';
 import { sendSlackAssetReady } from '../../../lib/slack-notifier';
-import { getScores } from '../../../lib/moderation';
+import { getScores as moderationGoogle } from '../../../lib/moderation-google';
+import { getScores as moderationHive } from '../../../lib/moderation-hive';
 
 const webhookSignatureSecret = process.env.MUX_WEBHOOK_SIGNATURE_SECRET;
 
@@ -41,6 +42,7 @@ export default async function muxWebhookHandler (req: NextApiRequest, res: NextA
       try {
         verifyWebhookSignature(rawBody, req);
       } catch (e) {
+        console.error('Error verifyWebhookSignature - is the correct signature secret set?', e);
         res.status(400).json({ message: e.message });
         return;
       }
@@ -55,12 +57,15 @@ export default async function muxWebhookHandler (req: NextApiRequest, res: NextA
         const playbackId = data.playback_ids && data.playback_ids[0] && data.playback_ids[0].id;
         const duration = data.duration;
 
-        const moderationScores = await getScores({ playbackId, duration });
+        const googleScores = await moderationGoogle ({ playbackId, duration });
+        const hiveScores = await moderationHive ({ playbackId, duration });
+
         await sendSlackAssetReady({
           assetId: data.id,
           playbackId,
           duration,
-          moderationScores,
+          googleScores,
+          hiveScores,
         });
         res.json({ message: 'thanks Mux, I notified myself about this' });
       } catch (e) {
