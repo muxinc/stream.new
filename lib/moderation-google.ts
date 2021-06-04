@@ -1,4 +1,4 @@
-import client from './google-vision-client';
+import client, { isEnabled } from './google-vision-client';
 import { ModerationScores } from '../types';
 import { getThumbnailUrls } from './moderation-utils';
 
@@ -89,7 +89,11 @@ export function mergeAnnotations (annotations: SafeSearchAnnotation[]): Moderati
   return combined;
 }
 
-export async function getScores ({ playbackId, duration }: { playbackId: string, duration: number }): Promise<ModerationScores> {
+export async function getScores ({ playbackId, duration }: { playbackId: string, duration: number }): Promise<ModerationScores|undefined> {
+  if (!isEnabled()) {
+    console.log('Skipping moderation-google, no key enabled');
+    return;
+  }
   const files = getThumbnailUrls({ playbackId, duration });
   const annotations = await Promise.all(files.map((file) => fetchAnnotationsForUrl(file)));
   /*

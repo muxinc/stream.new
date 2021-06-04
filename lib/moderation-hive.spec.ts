@@ -2,6 +2,7 @@ import { getScores } from './moderation-hive';
 import nock from 'nock';
 
 beforeEach(() => {
+  process.env.HIVE_AI_KEY = process.env.HIVE_AI_KEY || 'test-api-key';
   nock.disableNetConnect();
 });
 
@@ -38,8 +39,8 @@ test('gets a combined score for 3 files', async () => {
   const scopeUrl3 = nockNsfwScore({ adult: 0.0389421, suggestive: 0.00482 });
   const scores = await getScores({ playbackId: '123', duration: 30 });
 
-  expect(scores.adult).toEqual(0.992512);
-  expect(scores.suggestive).toEqual(0.79251);
+  expect(scores?.adult).toEqual(0.992512);
+  expect(scores?.suggestive).toEqual(0.79251);
   expect(scopeUrl1.isDone()).toEqual(true);
   expect(scopeUrl2.isDone()).toEqual(true);
   expect(scopeUrl3.isDone()).toEqual(true);

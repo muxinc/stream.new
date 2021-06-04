@@ -10,6 +10,8 @@ const client = got.extend({
   },
 });
 
+const isEnabled = () => !!(process.env.HIVE_AI_KEY?.length);
+
 type HiveClass = {
   class: string;
   score: number;
@@ -80,7 +82,11 @@ export function mergeAnnotations (outputs: HiveOutput[]): ModerationScores {
   return combined;
 }
 
-export async function getScores ({ playbackId, duration }: { playbackId: string, duration: number }): Promise<ModerationScores> {
+export async function getScores ({ playbackId, duration }: { playbackId: string, duration: number }): Promise<ModerationScores|undefined> {
+  if (!isEnabled()) {
+    console.log('Skipping moderation-hive, no key enabled');
+    return undefined;
+  }
   const files = getThumbnailUrls({ playbackId, duration });
   const outputs = await Promise.all(files.map((file) => fetchOutputForUrl(file)));
   /*

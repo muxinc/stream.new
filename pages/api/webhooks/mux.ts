@@ -42,6 +42,7 @@ export default async function muxWebhookHandler (req: NextApiRequest, res: NextA
       try {
         verifyWebhookSignature(rawBody, req);
       } catch (e) {
+        console.error('Error verifyWebhookSignature - is the correct signature secret set?', e);
         res.status(400).json({ message: e.message });
         return;
       }
