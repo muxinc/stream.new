@@ -20,11 +20,22 @@ type HiveOutput = {
   classes: HiveClass[],
 }
 
+type HiveResponse = {
+  response: {
+    output: HiveOutput[];
+  };
+}
+
+type HiveResult = {
+  code: number;
+  status: HiveResponse[];
+}
+
 async function fetchOutputForUrl (url: string): Promise<HiveOutput|null> {
-  let result;
+  let result: HiveResult;
 
   try {
-    result = (await client.post('task/sync', { json: { url }, responseType: 'json' })).body;
+    result = (await client.post('task/sync', { json: { url }, responseType: 'json' })).body as HiveResult;
   } catch (e) {
     console.error('Error with client.post in hive-moderation', e);
     return null;
@@ -52,12 +63,12 @@ export function mergeAnnotations (outputs: HiveOutput[]): ModerationScores {
   const suggestiveScores: number[] = [];
 
   outputs.forEach((output) => {
-    const nsfwScore = output.classes.find((cls => cls.class === "general_nsfw")).score;
+    const nsfwScore = (output.classes.find((cls => cls.class === "general_nsfw")) as HiveClass).score;
     adultScores.push(roundedScore(nsfwScore));
   });
 
   outputs.forEach((output) => {
-    const suggestiveScore = output.classes.find((cls => cls.class === "general_suggestive")).score;
+    const suggestiveScore = (output.classes.find((cls => cls.class === "general_suggestive")) as HiveClass).score;
     suggestiveScores.push(roundedScore(suggestiveScore));
   });
 
