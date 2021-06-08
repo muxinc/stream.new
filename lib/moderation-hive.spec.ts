@@ -6,7 +6,7 @@ beforeEach(() => {
   nock.disableNetConnect();
 });
 
-function nockNsfwScore ({ adult, suggestive } : { adult: number, suggestive: number }) {
+function nockNsfwScore ({ adult, suggestive, veryBloody } : { adult: number, suggestive: number, veryBloody: number }) {
   return nock('https://api.thehive.ai/api/v2').post('/task/sync').reply(200, {
     code: 200,
     status: [
@@ -24,6 +24,10 @@ function nockNsfwScore ({ adult, suggestive } : { adult: number, suggestive: num
                   class: "general_suggestive",
                   score: suggestive
                 },
+                {
+                  class: "very_bloody",
+                  score: veryBloody
+                },
               ]
             }
           ]
@@ -34,13 +38,14 @@ function nockNsfwScore ({ adult, suggestive } : { adult: number, suggestive: num
 }
 
 test('gets a combined score for 3 files', async () => {
-  const scopeUrl1 = nockNsfwScore({ adult: 0.9925124, suggestive: 0.1123 });
-  const scopeUrl2 = nockNsfwScore({ adult: 0.881235, suggestive: 0.79251 });
-  const scopeUrl3 = nockNsfwScore({ adult: 0.0389421, suggestive: 0.00482 });
+  const scopeUrl1 = nockNsfwScore({ adult: 0.9925124, suggestive: 0.1123, veryBloody: 0.123 });
+  const scopeUrl2 = nockNsfwScore({ adult: 0.881235, suggestive: 0.79251, veryBloody: 0.134 });
+  const scopeUrl3 = nockNsfwScore({ adult: 0.0389421, suggestive: 0.00482, veryBloody: 0.456 });
   const scores = await getScores({ playbackId: '123', duration: 30 });
 
   expect(scores?.adult).toEqual(0.992512);
   expect(scores?.suggestive).toEqual(0.79251);
+  expect(scores?.violent).toEqual(0.456);
   expect(scopeUrl1.isDone()).toEqual(true);
   expect(scopeUrl2.isDone()).toEqual(true);
   expect(scopeUrl3.isDone()).toEqual(true);
