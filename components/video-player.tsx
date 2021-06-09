@@ -6,6 +6,7 @@ import Hls from 'hls.js';
 import mux from 'mux-embed';
 
 import logger from '../lib/logger';
+import { getStreamBaseUrl, getImageBaseUrl } from '../lib/urlutils'
 import { breakpoints } from '../style-vars';
 import { HTMLVideoElementWithPlyr } from '../types';
 import { useCombinedRefs } from '../util/use-combined-refs';
@@ -77,13 +78,13 @@ const VideoPlayer = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, p
 
   useEffect(() => {
     const video = videoRef.current;
-    const src = `https://stream.mux.com/${playbackId}.m3u8`;
+    const src = `${getStreamBaseUrl()}/${playbackId}.m3u8`;
     let hls: Hls | null;
     hls = null;
     if (video) {
       video.addEventListener('error', videoError);
       playerRef.current = new Plyr(video, {
-        previewThumbnails: { enabled: true, src: `https://image.mux.com/${playbackId}/storyboard.vtt` },
+        previewThumbnails: { enabled: true, src: `${getImageBaseUrl()}/${playbackId}/storyboard.vtt` },
         storage: { enabled: false },
         fullscreen: {
           iosNative: true
