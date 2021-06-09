@@ -1,6 +1,7 @@
 import got from './got-client';
 import { HOST_URL } from '../constants';
 import { ModerationScores } from '../types';
+import urlutils from './urlutils'
 
 const slackWebhook = process.env.SLACK_WEBHOOK_ASSET_READY;
 const moderatorPassword = process.env.SLACK_MODERATOR_PASSWORD;
@@ -75,7 +76,7 @@ const baseBlocks = ({ playbackId, assetId, duration }: {playbackId: string, asse
       text: 'Thumbnail',
       emoji: true,
     },
-    image_url: `https://image.media.stream.new/${playbackId}/storyboard.png`,
+    image_url: `${urlutils.getImageBaseUrl()}/${playbackId}/storyboard.png`,
     alt_text: 'storyboard',
   },
   {
