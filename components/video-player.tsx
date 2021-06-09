@@ -77,13 +77,13 @@ const VideoPlayer = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, p
 
   useEffect(() => {
     const video = videoRef.current;
-    const src = `https://stream.mux.com/${playbackId}.m3u8`;
+    const src = `https://stream.media.stream.new/${playbackId}.m3u8`;
     let hls: Hls | null;
     hls = null;
     if (video) {
       video.addEventListener('error', videoError);
       playerRef.current = new Plyr(video, {
-        previewThumbnails: { enabled: true, src: `https://image.mux.com/${playbackId}/storyboard.vtt` },
+        previewThumbnails: { enabled: true, src: `https://image.media.stream.new/${playbackId}/storyboard.vtt` },
         storage: { enabled: false },
         fullscreen: {
           iosNative: true
