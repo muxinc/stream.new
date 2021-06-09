@@ -9,7 +9,7 @@ import Layout from '../../../components/layout';
 import ReportForm from '../../../components/report-form';
 import { HOST_URL } from '../../../constants';
 import logger from '../../../lib/logger';
-import urlutils from '../../../lib/urlutils'
+import { getImageBaseUrl } from '../../../lib/urlutils'
 
 type Params = {
   id: string;
@@ -24,7 +24,7 @@ export type Props = {
 export const getStaticProps: GetStaticProps = async (context)  => {
   const { params } = context;
   const { id: playbackId } = (params as Params);
-  const poster = `${urlutils.getImageBaseUrl()}/${playbackId}/thumbnail.png`;
+  const poster = `${getImageBaseUrl()}/${playbackId}/thumbnail.png`;
   const shareUrl = `${HOST_URL}/v/${playbackId}`;
 
   return { props: { playbackId, shareUrl, poster } };
