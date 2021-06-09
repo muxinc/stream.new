@@ -75,7 +75,7 @@ const baseBlocks = ({ playbackId, assetId, duration }: {playbackId: string, asse
       text: 'Thumbnail',
       emoji: true,
     },
-    image_url: `https://image.mux.com/${playbackId}/storyboard.png`,
+    image_url: `https://image.media.stream.new/${playbackId}/storyboard.png`,
     alt_text: 'storyboard',
   },
   {
