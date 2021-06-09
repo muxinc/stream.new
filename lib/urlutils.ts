@@ -1,7 +1,9 @@
+const deliveryDomain = (process.env.NEXT_PUBLIC_MUX_BYO_DOMAIN) ? process.env.NEXT_PUBLIC_MUX_BYO_DOMAIN : "mux.com"
+
 export function getStreamBaseUrl() {
-  return (process.env.NEXT_PUBLIC_STREAM_PLAYBACK_BASEURL) ? process.env.NEXT_PUBLIC_STREAM_PLAYBACK_BASEURL : 'https://stream.mux.com';
+  return `https://stream.${deliveryDomain}`;
 }
 
 export function getImageBaseUrl() {
-  return (process.env.NEXT_PUBLIC_IMAGE_PLAYBACK_BASEURL) ? process.env.NEXT_PUBLIC_IMAGE_PLAYBACK_BASEURL : 'https://image.mux.com';
+  return `https://image.${deliveryDomain}`;
 }
