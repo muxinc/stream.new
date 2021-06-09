@@ -16,7 +16,7 @@ const notify = async ({playbackId, reason, comment }: { playbackId: string, reas
         }
       });
     } catch (e) {
-      console.error('Error reporting to airtable', e); // eslint-disable-line no-console
+      console.error('Error reporting to airtable', e.response.body); // eslint-disable-line no-console
     }
   }
   try {

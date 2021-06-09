@@ -151,6 +151,22 @@ export const sendSlackAssetReady = async ({ playbackId, assetId, duration, googl
   return null;
 };
 
+export const sendSlackAutoDeleteMessage = async ({ assetId, duration, hiveScores }: { assetId: string, duration: number, hiveScores?: ModerationScores }): Promise<null> => {
+  if (!slackWebhook) {
+    console.log('No slack webhook configured'); // eslint-disable-line no-console
+    return null;
+  }
+
+  await got.post(slackWebhook, {
+    json: {
+      text: `Auto-deleted by moderator: ${assetId} duration: ${duration}. ${JSON.stringify(hiveScores)}`,
+      icon_emoji: 'female-police-officer',
+    },
+  });
+
+  return null;
+};
+
 export const sendAbuseReport = async ({ playbackId, reason, comment }: {playbackId: string, reason: string, comment?: string}): Promise<null> => {
   if (!slackWebhook) {
     console.log('No slack webhook configured'); // eslint-disable-line no-console

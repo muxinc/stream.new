@@ -51,7 +51,7 @@ async function fetchAnnotationsForUrl (url: string): Promise<SafeSearchAnnotatio
   }
 
   if (result.error) {
-    console.error('Error detecting scores', url);
+    console.error('Error detecting scores for google', url);
     return null;
   }
   const detections = result.safeSearchAnnotation;

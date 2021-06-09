@@ -44,7 +44,7 @@ async function fetchOutputForUrl (url: string): Promise<HiveOutput|null> {
   }
 
   if (result.code !== 200) {
-    console.error('Error detecting scores', result.code, url);
+    console.error('Error detecting scores for hive', result.code, url);
     return null;
   }
 
@@ -63,20 +63,29 @@ function roundedScore (score: number) {
 export function mergeAnnotations (outputs: HiveOutput[]): ModerationScores {
   const adultScores: number[] = [];
   const suggestiveScores: number[] = [];
+  const violentScores: number[] = [];
 
   outputs.forEach((output) => {
     const nsfwScore = (output.classes.find((cls => cls.class === "general_nsfw")) as HiveClass).score;
-    adultScores.push(roundedScore(nsfwScore));
-  });
+    if (nsfwScore) {
+      adultScores.push(roundedScore(nsfwScore));
+    }
 
-  outputs.forEach((output) => {
     const suggestiveScore = (output.classes.find((cls => cls.class === "general_suggestive")) as HiveClass).score;
-    suggestiveScores.push(roundedScore(suggestiveScore));
+    if (suggestiveScore) {
+      suggestiveScores.push(roundedScore(suggestiveScore));
+    }
+
+    const bloodyScore = (output.classes.find((cls => cls.class === "very_bloody")) as HiveClass).score;
+    if (bloodyScore) {
+      violentScores.push(roundedScore(bloodyScore));
+    }
   });
 
   const combined: ModerationScores = {
     adult: adultScores.length ? Math.max(...adultScores) : undefined,
     suggestive: suggestiveScores.length ? Math.max(...suggestiveScores) : undefined,
+    violent: violentScores.length ? Math.max(...violentScores) : undefined,
   };
 
   return combined;
