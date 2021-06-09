@@ -588,10 +588,10 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@mux/mux-node@^3.0":
-  version "3.1.4"
-  resolved "https://registry.yarnpkg.com/@mux/mux-node/-/mux-node-3.1.4.tgz#0360076bbb7b33ab7f5476951f356430d2e19b64"
-  integrity sha512-VCpckpYa+bgYDU+YjGE9YjySJl2zCmxgY4IjsHSKYnyInKRrcFA0VIQ6RKMyarJzCxvy4sjC64uBhhlqDLIpMw==
+"@mux/mux-node@^3.2":
+  version "3.2.3"
+  resolved "https://registry.yarnpkg.com/@mux/mux-node/-/mux-node-3.2.3.tgz#2ca6b54d6d48972a6fce9b301674a876430a3c54"
+  integrity sha512-incFthoAPP2RJrptWnSF0/1OX5ws0X1hnkUscA7PP57Ka1y6597/vhxpbdKb4K7GkKBJ0DEyDpfFBMdC0II1sA==
   dependencies:
     axios "^0.21.1"
     esdoc-ecmascript-proposal-plugin "^1.0.0"

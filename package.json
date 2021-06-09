@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@google-cloud/vision": "^2.3.2",
-    "@mux/mux-node": "^3.0",
+    "@mux/mux-node": "^3.2",
     "@mux/upchunk": "^2.2",
     "copy-to-clipboard": "^3.3.1",
     "got": "^11.5.1",

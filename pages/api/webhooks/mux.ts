@@ -1,9 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Mux from '@mux/mux-node';
 import { buffer } from 'micro';
-import { sendSlackAssetReady } from '../../../lib/slack-notifier';
+import { sendSlackAssetReady, sendSlackAutoDeleteMessage } from '../../../lib/slack-notifier';
 import { getScores as moderationGoogle } from '../../../lib/moderation-google';
 import { getScores as moderationHive } from '../../../lib/moderation-hive';
+import { autoDelete } from '../../../lib/moderation-action';
 
 const webhookSignatureSecret = process.env.MUX_WEBHOOK_SIGNATURE_SECRET;
 
@@ -54,20 +55,28 @@ export default async function muxWebhookHandler (req: NextApiRequest, res: NextA
         return;
       }
       try {
+        const assetId = data.id;
         const playbackId = data.playback_ids && data.playback_ids[0] && data.playback_ids[0].id;
         const duration = data.duration;
 
         const googleScores = await moderationGoogle ({ playbackId, duration });
         const hiveScores = await moderationHive ({ playbackId, duration });
 
-        await sendSlackAssetReady({
-          assetId: data.id,
-          playbackId,
-          duration,
-          googleScores,
-          hiveScores,
-        });
-        res.json({ message: 'thanks Mux, I notified myself about this' });
+        const didAutoDelete = hiveScores ? (await autoDelete({ assetId, playbackId, hiveScores })) : false;
+
+        if (didAutoDelete) {
+          await sendSlackAutoDeleteMessage({ assetId, duration, hiveScores });
+          res.json({ message: 'thanks Mux, I autodeleted this asset because it was bad' });
+        } else {
+          await sendSlackAssetReady({
+            assetId,
+            playbackId,
+            duration,
+            googleScores,
+            hiveScores,
+          });
+          res.json({ message: 'thanks Mux, I notified myself about this' });
+        }
       } catch (e) {
         res.statusCode = 500;
         console.error('Request error', e); // eslint-disable-line no-console

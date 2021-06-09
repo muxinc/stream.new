@@ -44,7 +44,7 @@ async function fetchOutputForUrl (url: string): Promise<HiveOutput|null> {
   }
 
   if (result.code !== 200) {
-    console.error('Error detecting scores', result.code, url);
+    console.error('Error detecting scores for hive', result.code, url);
     return null;
   }
 

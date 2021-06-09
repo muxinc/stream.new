@@ -1,8 +1,11 @@
+/**
+ * @jest-environment node
+ */
+
 import { getScores } from './moderation-hive';
 import nock from 'nock';
 
 beforeEach(() => {
-  process.env.HIVE_AI_KEY = process.env.HIVE_AI_KEY || 'test-api-key';
   nock.disableNetConnect();
 });
 
