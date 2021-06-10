@@ -1,16 +1,66 @@
-# stream.new
+<p align="center">
+<a  href="https://github.com/muxinc/stream.new">
+    <img src="images/mux_logo_color.png" alt="Mux Logo" height="150">
+</a>
+</p>
+  <h1 align="center">Stream.new</h1>
+<div align="center">
+    <a href="https://github.com/muxinc/stream.new/stargazers"><img src="https://img.shields.io/github/stars/muxinc/stream.new" alt="Stars Badge"/></a>
+    <a href="https://github.com/muxinc/stream.new/network/members"><img src="https://img.shields.io/github/forks/muxinc/stream.new" alt="Forks Badge"/></a>
+    <a href="https://github.com/muxinc/stream.new/pulls"><img src="https://img.shields.io/github/issues-pr/muxinc/stream.new" alt="Pull Requests Badge"/></a>
+    <a href="https://github.com/muxinc/stream.new/issues"><img src="https://img.shields.io/github/issues/muxinc/stream.new" alt="Issues Badge"/></a>
+    <a href="https://github.com/muxinc/stream.new/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/muxinc/stream.new?color=2b9348"></a>
+</div>
+<br />
+<p align="center">
+    An open-source example application that allows users to record and upload videos using Mux
+    <br />
+    <br />
+    <a href="https://stream.new/">View Demo</a>
+    ·
+    <a href="https://github.com/muxinc/stream.new/issues">Report a Bug</a>
+    ·
+    <a href="https://github.com/muxinc/stream.new/issues">Request Features</a>
+</p>
 
-This example uses Mux Video Direct Uploads and NextJS. This is a functioning application at https://stream.new. Feel free to use it!
+<!-- TABLE OF CONTENTS -->
+<details open="open">
+  <summary><h2 style="display: inline-block">Table of Contents</h2></summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li>
+          <a href="#components">Components</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#step-1-create-an-account-in-mux">Step 1. Create an Account in Mux</a></li>
+        <li><a href="#step-2-set-up-environment-variables">Step 2. Set Up Environment Variables</a></li>
+        <li><a href="#step-3-deploy-on-vercel">Step 3. Deploy on Vercel</a></li>
+        <li><a href="#step-4-optional-slackbot-moderator">Step 4. (Optional) Slackbot Moderator</a></li>
+        <li><a 
+        href="#step-5-optional-add-automatic-content-analysis-to-slackbot-moderator-google-vision-api"
+        >Step 5. (Optional) Add automatic content analysis to Slackbot Moderator (Google Vision API)</a></li>
+        <li><a 
+        href="#step-6-optional-add-automatic-content-analysis-to-slackbot-moderator-hive-ai"
+        >Step 6. (Optional) Add automatic content analysis to Slackbot Moderator Hive AI</a></li>
+      </ul>
+    </li>
+    <li><a href="#videos-to-test-in-development">Videos to Test in Development</a></li>
+  </ol>
+</details>
 
-## Demo
+<!-- ABOUT THE PROJECT -->
 
-### [https://stream.new/](https://stream.new/)
+# About The Project
 
-## Note
+## Components:
 
-This example uses:
-
-Mux:
+### Mux:
 
 - [Direct uploads](https://docs.mux.com/docs/direct-upload) - this is an API for uploading video files from a client to create Mux Assets
 - [Webhook signature verification](https://docs.mux.com/docs/webhook-security) - webhook signature verification to make sure Mux webhooks are coming from a trusted source
@@ -19,9 +69,11 @@ Mux:
 
 **Slackbot moderator**. This examples allows you to configure a `SLACK_WEBHOOK_ASSET_READY`. When a new Mux asset is `ready`, an Incoming Webhook for slack will be sent. This is an example of how you might integrate a Slack channel that can be used to moderate content. The Slack message contains the asset ID, playback ID and a storyboard of thumbnails from the video.
 
-![Slackbot message](screenshots/slackbot-moderator.png)
+<div align="center">
+  <img src="images/slackbot-moderator.png" width="80%" alt="Slackbot message"></img>
+</div>
 
-NextJS:
+### NextJS:
 
 - [SWR](https://swr.now.sh/) — dynamically changing the `refreshInterval` depending on if the client should be polling for updates or not
 - [`/pages/api`](pages/api) routes — a couple endpoints for making authenticated requests to the Mux API.
@@ -29,13 +81,16 @@ NextJS:
 
 This app was created with the [NextJS `with-mux-video` example](https://github.com/vercel/next.js/tree/canary/examples/with-mux-video) as a starting point.
 
-# Step 1. Create an account in Mux
+<!-- GETTING STARTED -->
+
+# Getting Started
+## Step 1. Create an account in Mux
 
 All you need to set this up is a [Mux account](https://mux.com). You can sign up for free and pricing is pay-as-you-go. There are no upfront charges, you get billed monthly only for what you use.
 
 Without entering a credit card on your Mux account all videos are in “test mode” which means they are watermarked and clipped to 10 seconds. If you enter a credit card all limitations are lifted and you get \$20 of free credit. The free credit should be plenty for you to test out and play around with everything before you are charged.
 
-# Step 2. Set up environment variables
+## Step 2. Set up environment variables
 
 Copy the `.env.local.example` file in this directory to `.env.local` (which will be ignored by Git):
 
@@ -52,7 +107,7 @@ Then, go to the [settings page](https://dashboard.mux.com/settings/access-tokens
 - `SLACK_MODERATOR_PASSWORD` (optional) - this is the password when you want to take actions from the **Slackbot moderator** feature (see below)
 - `NEXT_PUBLIC_MUX_ENV_KEY` (optional) - this is the mux environment key for Mux Data integration
 
-# Step 3. Deploy on Vercel
+## Step 3. Deploy on Vercel
 
 You can deploy this app to the cloud with [Vercel](https://vercel.com/import?filter=next.js&utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
 
@@ -67,21 +122,27 @@ vercel secrets add stream_new_token_secret <MUX_TOKEN_SECRET>
 
 Then push the project to GitHub/GitLab/Bitbucket and [import to Vercel](https://vercel.com/import?filter=next.js&utm_source=github&utm_medium=readme&utm_campaign=next-example) to deploy.
 
-# Step 4 (optional) Slackbot Moderator
+## Step 4 (optional) Slackbot Moderator
 
-![Slackbot message](screenshots/slackbot-moderator.png)
+<div align="center">
+  <img src="images/slackbot-moderator.png" width="80%" alt="Slackbot message"></img>
+</div>
 
 This application uses a slackbot to send message to a slack channel every time a new asset is ready for playback. This requires a few steps for setup.
 
 First, login to your Mux dashboard and in the left sidebar navigation find Settings > Webhooks. Create a new webhook and makes sure you are creating a webhook for the environment that matches the access token that you are using.
 
-![Mux Webhook Create](screenshots/mux-webhook-create.png)
+<div align="center">
+  <img src="images/mux-webhook-create.png" width="80%" alt="Mux Webhook Create"></img>
+</div>
 
 For local development you may want to use a tool [like ngrok](https://ngrok.com/) to receive webhooks on localhost. The route for the webhook handler is `/api/webhooks/mux` (defined in this NextJS app under `./pages/api/webhooks/mux`).
 
 Create a Slack 'Incoming Webhook'. Configure the channel you want to post to, the icon, etc.
 
-![Slack Incoming Webhook](screenshots/incoming-webhook.png)
+<div align="center">
+  <img src="images/incoming-webhook.png" width="80%" alt="Slack Incoming Webhook"></img>
+</div>
 
 When you're done with this, you should have a slack webhook URL that looks something like `https://hooks.slack.com/services/...`.
 
@@ -99,7 +160,7 @@ After all of this is set up the flow will be:
 1. (optional) Your server verifies the webhook signature
 1. If the webhook matches `video.asset.ready` then your server will post a message to your slack channel that has the Mux Asset ID, the Mux Playback ID, and a thumbnail of the video.
 
-# Step 5 (optional) Add automatic content analysis to Slackbot Moderator (Google Vision API)
+## Step 5 (optional) Add automatic content analysis to Slackbot Moderator (Google Vision API)
 
 stream.new can automatically moderate content with the help of Google's [Cloud vision API](https://cloud.google.com/vision).
 
@@ -154,10 +215,14 @@ is based on Google Vision's [Likelihood score](https://cloud.google.com/vision/d
 * `5`: very likely
 
 
-![Slackbot message](screenshots/moderation-score-slack.png)
+
+<div align="center">
+  <img src="images/moderation-score-slack.png" width="80%" alt="Slackbot Moderation Message"></img>
+</div>
 
 
-# Step 6 (optional) Add automatic content analysis to Slackbot Moderator ([Hive AI](https://thehive.ai/))
+
+## Step 6 (optional) Add automatic content analysis to Slackbot Moderator ([Hive AI](https://thehive.ai/))
 
 stream.new can automatically moderate content with the help of [Hive AI](https://thehive.ai/).
 
@@ -176,10 +241,11 @@ When the Slackbot Moderator message gets posted to slack, it will now include a 
 
 Each dimension will have a score from 0-1 with a precision of 6 decimal places. These numbers come from the "Classification API" that Hive AI provides. [Details here](https://docs.thehive.ai/reference#classification).
 
-![Slackbot message](screenshots/moderation-score-slack.png)
+<div align="center">
+  <img src="images/moderation-score-slack.png" width="80%" alt="Slackbot Moderation Message"></img>
+</div>
 
-
-### Videos to test in development:
+# Videos to test in development:
 
 When developing, if you make any changes to the video player, make sure it works and looks good with videos of various dimensions:
 
@@ -196,3 +262,4 @@ Super vertical
 - http://localhost:3000/v/seK501Bf00kyqSnGdMwQFi3lgqgdoS00qm5PAiV7Yjf2ew
 
 Also be sure to check: Safari, Mobile Safari, Chrome, Firefox because they all behave a little differently.
+
