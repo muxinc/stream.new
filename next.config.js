@@ -1,10 +1,10 @@
 const { createSecureHeaders } = require('next-secure-headers');
 
 const secureHeaderOptions = {
+  frameGuard: false,
   contentSecurityPolicy: {
     directives: {
       frameSrc: ['; frame-ancestors', "'self'", '*'],
-      frameGuard: false,
     },
   },
 };
