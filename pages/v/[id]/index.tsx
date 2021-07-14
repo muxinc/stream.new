@@ -97,7 +97,7 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
         <link
           rel="alternate"
           type="application/json+oembed"
-          href={encodeURI(`${HOST_URL}/api/oembed?url=${HOST_URL}/v/${playbackId}`)}
+          href={`${HOST_URL}/api/oembed?url=${encodeURIComponent(`${HOST_URL}/v/${playbackId}`)}`}
           title="video hosted by stream.new"
         />
       </Head>
