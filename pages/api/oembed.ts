@@ -24,6 +24,6 @@ export default async (
     thumbnail_height: imageSize.height,
     thumbnail_width: imageSize.width,
     thumbnail_url: imageUrl,
-    html: `<iframe width="${imageSize.width}" height="${imageSize.height}" src="${HOST_URL}/v/${playbackId}/embed" frameborder="0" allow="autoplay; allowfullscreen></iframe>`,
+    html: `<iframe width="${imageSize.width}" height="${imageSize.height}" src="${HOST_URL}/v/${playbackId}/embed" frameborder="0" allow="autoplay; allowfullscreen"></iframe>`,
   });
 };
