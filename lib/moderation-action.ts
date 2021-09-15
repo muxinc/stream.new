@@ -4,6 +4,9 @@ import got from 'got';
 
 const { Video } = new Mux();
 
+const ADULT_SCORE_THRESHHOLD = 0.95;
+const VIOLENCE_SCORE_THRESHHOLD = 0.85;
+
 async function saveDeletionRecordInAirtable ({ assetId, notes }: { assetId: string, notes: string }) {
   if (process.env.AIRTABLE_KEY && process.env.AIRTABLE_BASE_ID) {
     try {
@@ -23,8 +26,14 @@ async function saveDeletionRecordInAirtable ({ assetId, notes }: { assetId: stri
   }
 }
 
+function shouldAutoDeleteContent(hiveScores?: ModerationScores): boolean {
+  const isAdult = (hiveScores && hiveScores.adult && hiveScores.adult >= ADULT_SCORE_THRESHHOLD || false);
+  const isViolent = (hiveScores && hiveScores.violent && hiveScores.violent >= VIOLENCE_SCORE_THRESHHOLD || false);
+  return isAdult || isViolent;
+}
+
 export async function autoDelete({ assetId, playbackId, hiveScores }: { assetId: string, playbackId: string, hiveScores: ModerationScores }): Promise<boolean> {
-  if (hiveScores && hiveScores.adult && hiveScores.adult >= 0.95) {
+  if (shouldAutoDeleteContent(hiveScores)) {
     await Video.Assets.deletePlaybackId(assetId, playbackId);
     await saveDeletionRecordInAirtable({ assetId, notes: JSON.stringify(hiveScores) });
 
