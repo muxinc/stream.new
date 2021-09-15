@@ -100,6 +100,7 @@ const Playback: React.FC<Props> = ({ playbackId, shareUrl, poster }) => {
           href={`${HOST_URL}/api/oembed?url=${encodeURIComponent(`${HOST_URL}/v/${playbackId}`)}`}
           title="video hosted by stream.new"
         />
+        <meta name="twitter:player" content={`${HOST_URL}/v/${playbackId}/embed`} />
       </Head>
       <Layout
         metaTitle={META_TITLE}
