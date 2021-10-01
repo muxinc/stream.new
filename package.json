@@ -16,6 +16,7 @@
     "@mux/mux-node": "^3.2",
     "@mux/upchunk": "^2.2",
     "copy-to-clipboard": "^3.3.1",
+    "fathom-client": "^3.2.0",
     "got": "^11.5.1",
     "hls.js": "^1.0.0",
     "micro": "9.3.5-canary.3",
