@@ -13,7 +13,7 @@ export default async (
   const imageUrl = `https://image.mux.com/${playbackId}/thumbnail.jpeg?width=480`;
   const imageSize = await probe(imageUrl);
 
-  const escapedSrc = escape(`${HOST_URL}/v/${playbackId}/embed`);
+  const escapedSrc = encodeURIComponent(`${HOST_URL}/v/${playbackId}/embed`);
 
   res.json({
     type: 'video',
