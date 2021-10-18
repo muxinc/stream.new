@@ -13,9 +13,11 @@ export default async (
   const imageUrl = `https://image.mux.com/${playbackId}/thumbnail.jpeg?width=480`;
   const imageSize = await probe(imageUrl);
 
+  const escapedSrc = escape(`${HOST_URL}/v/${playbackId}/embed`);
+
   res.json({
-    title: 'Video uploaded to stream.new',
     type: 'video',
+    title: 'Video uploaded to stream.new',
     height: imageSize.height,
     width: imageSize.width,
     version: '1.0',
@@ -24,6 +26,6 @@ export default async (
     thumbnail_height: imageSize.height,
     thumbnail_width: imageSize.width,
     thumbnail_url: imageUrl,
-    html: `<iframe width="${imageSize.width}" height="${imageSize.height}" src="${HOST_URL}/v/${playbackId}/embed" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`,
+    html: `<iframe width="${imageSize.width}" height="${imageSize.height}" src="${escapedSrc}" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`,
   });
 };
