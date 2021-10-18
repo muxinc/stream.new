@@ -4,7 +4,7 @@ const secureHeaderOptions = {
   frameGuard: false,
   contentSecurityPolicy: {
     directives: {
-      frameSrc: ['; frame-ancestors', "'self'", '*'],
+      frameAncestors: ["'self'", '*']
     },
   },
 };
