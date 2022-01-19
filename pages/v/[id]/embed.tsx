@@ -7,7 +7,6 @@ import VideoPlayer from '../../../components/video-player';
 import Layout from '../../../components/layout';
 import Asterisk from '../../../components/asterisk';
 import { OPEN_SOURCE_URL, MUX_HOME_PAGE_URL, HOST_URL } from '../../../constants';
-import { HTMLVideoElementWithPlyr } from '../../../types';
 import logger from '../../../lib/logger';
 import { getImageBaseUrl } from '../../../lib/urlutils';
 
@@ -66,7 +65,7 @@ const AsteriskButton: React.FC<AsteriskButtonProps> = ({ onOpenOverlay }) => {
 };
 
 const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster }) => {
-  const videoRef = useRef<HTMLVideoElementWithPlyr>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showOverlay, setShowOverlay] = useState(false);
@@ -82,7 +81,7 @@ const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster }) => {
   };
 
   const onOpenOverlay = () => {
-    setWasPlaying(videoRef.current?.plyr.playing || false);
+    setWasPlaying(!videoRef.current?.paused || false);
 
     videoRef.current?.pause();
 
