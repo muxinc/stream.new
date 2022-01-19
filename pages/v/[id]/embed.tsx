@@ -9,7 +9,7 @@ import Asterisk from '../../../components/asterisk';
 import { OPEN_SOURCE_URL, MUX_HOME_PAGE_URL, HOST_URL } from '../../../constants';
 import { HTMLVideoElementWithPlyr } from '../../../types';
 import logger from '../../../lib/logger';
-import { getImageBaseUrl } from '../../../lib/urlutils'
+import { getImageBaseUrl } from '../../../lib/urlutils';
 
 type Params = {
   id: string;
@@ -21,7 +21,7 @@ export type Props = {
   poster: string
 };
 
-export const getStaticProps: GetStaticProps = async (context)  => {
+export const getStaticProps: GetStaticProps = async (context) => {
   const { params } = context;
   const { id: playbackId } = (params as Params);
   const poster = `${getImageBaseUrl()}/${playbackId}/thumbnail.png`;
@@ -119,7 +119,7 @@ const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster }) => {
       {errorMessage && <h1 className="error-message">{errorMessage}</h1>}
       {showLoading && <FullpageLoader text="Loading player" />}
       <div className="wrapper">
-        <VideoPlayer ref={videoRef} playbackId={playbackId} poster={poster} currentTime={startTime} onLoaded={() => setIsLoaded(true)} onError={onError} />
+        <VideoPlayer playbackId={playbackId} poster={poster} currentTime={startTime} onLoaded={() => setIsLoaded(true)} onError={onError} />
         <div className='asterisk-container'>
           <AsteriskButton onOpenOverlay={onOpenOverlay} />
         </div>
@@ -128,7 +128,7 @@ const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster }) => {
             <div>
               <p>View this video on <a href={nonEmbedUrl} target='_blank' rel="noreferrer">stream.new</a>
               </p>
-              <p>This is an <a href={OPEN_SOURCE_URL}  target='_blank' rel="noreferrer">open source</a> project from <a href={MUX_HOME_PAGE_URL} target='_blank' rel="noreferrer">Mux</a>, the video streaming API.</p>
+              <p>This is an <a href={OPEN_SOURCE_URL} target='_blank' rel="noreferrer">open source</a> project from <a href={MUX_HOME_PAGE_URL} target='_blank' rel="noreferrer">Mux</a>, the video streaming API.</p>
             </div>
             <p>
               <a onClick={onCloseOverlay} onKeyPress={onCloseOverlay} role='link' tabIndex={0}>
