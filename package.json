@@ -51,5 +51,8 @@
     "next-secure-headers": "^2.0.0",
     "nock": "^13.0.11",
     "typescript": "^4.0.2"
+  },
+  "resolutions": {
+    "node-fetch": "^2.6.7"
   }
 }
