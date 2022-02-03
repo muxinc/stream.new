@@ -296,7 +296,8 @@ const RecordPage: React.FC<NoProps> = () => {
     try {
       setStartRecordTime((new Date()).valueOf());
       const preferredOptions = { mimeType: 'video/webm;codecs=vp9' };
-      const backupOptions = { mimeType: 'video/mp4' };
+      const backupOptions = { mimeType: 'video/webm;codecs=vp8,opus' };
+      const lastResortOptions = { mimeType: 'video/mp4;codecs=avc1' };
       let options = preferredOptions;
       /*
        * MediaRecorder.isTypeSupported is not a thing in safari,
@@ -305,6 +306,9 @@ const RecordPage: React.FC<NoProps> = () => {
       if (typeof MediaRecorder.isTypeSupported === 'function') {
         if (!MediaRecorder.isTypeSupported(preferredOptions.mimeType)) {
           options = backupOptions;
+          if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+            options = lastResortOptions;
+          }
         }
       }
 
@@ -333,7 +337,7 @@ const RecordPage: React.FC<NoProps> = () => {
       return;
     }
     recorderRef.current.onstop = function onRecorderStop () {
-      finalBlob.current = new Blob(mediaChunks.current, { type: 'video/webm' });
+      finalBlob.current = new Blob(mediaChunks.current, { type: recorderRef.current?.mimeType });
       const objUrl = URL.createObjectURL(finalBlob.current);
       if (videoRef.current !== null) {
         videoRef.current.srcObject = null;
