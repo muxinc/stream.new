@@ -1,7 +1,7 @@
 import got from './got-client';
 import { HOST_URL } from '../constants';
 import { ModerationScores } from '../types';
-import { getImageBaseUrl } from './urlutils'
+import { getImageBaseUrl } from './urlutils';
 
 const slackWebhook = process.env.SLACK_WEBHOOK_ASSET_READY;
 const moderatorPassword = process.env.SLACK_MODERATOR_PASSWORD;

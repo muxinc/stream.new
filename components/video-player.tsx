@@ -6,7 +6,7 @@ import Hls from 'hls.js';
 import mux from 'mux-embed';
 
 import logger from '../lib/logger';
-import { getStreamBaseUrl, getImageBaseUrl } from '../lib/urlutils'
+import { getStreamBaseUrl, getImageBaseUrl } from '../lib/urlutils';
 import { breakpoints } from '../style-vars';
 import { HTMLVideoElementWithPlyr } from '../types';
 import { useCombinedRefs } from '../util/use-combined-refs';
