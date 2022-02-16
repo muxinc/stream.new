@@ -70,7 +70,7 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
         setIsPreparing(true);
       });
     } catch (err) {
-      setErrorMessage(err.toString());
+      setErrorMessage((err as Error).toString());
     }
   };
 

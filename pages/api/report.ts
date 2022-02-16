@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import got from 'got';
+import { RequestError } from 'got';
+import got from '../../lib/got-client';
 import { sendAbuseReport } from '../../lib/slack-notifier';
 
 const notify = async ({playbackId, reason, comment }: { playbackId: string, reason: string, comment?: string }) => {
@@ -16,7 +17,8 @@ const notify = async ({playbackId, reason, comment }: { playbackId: string, reas
         }
       });
     } catch (e) {
-      console.error('Error reporting to airtable', e.response.body); // eslint-disable-line no-console
+      const err = (e as RequestError);
+      console.error('Error reporting to airtable', err.response?.body, e); // eslint-disable-line no-console
     }
   }
   try {

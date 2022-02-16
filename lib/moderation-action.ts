@@ -1,6 +1,7 @@
 import { ModerationScores } from '../types';
 import Mux from '@mux/mux-node';
-import got from 'got';
+import { RequestError } from 'got';
+import got from './got-client';
 
 const { Video } = new Mux();
 
@@ -21,7 +22,8 @@ async function saveDeletionRecordInAirtable ({ assetId, notes }: { assetId: stri
         }
       });
     } catch (e) {
-      console.error('Error reporting to airtable', e.response && e.response.body, e); // eslint-disable-line no-console
+      const err = (e as RequestError);
+      console.error('Error reporting to airtable', err.response?.body, e); // eslint-disable-line no-console
     }
   }
 }
