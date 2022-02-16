@@ -26,7 +26,7 @@ const UploadPage: React.FC<Props> = ({ children }) => {
           </p>
           <p>
             Uploading a video uses the Mux{' '}
-            <a href="https://docs.mux.com/docs/direct-upload">
+            <a href="https://docs.mux.com/docs/direct-upload?utm_source=stream-new">
               direct upload API
             </a>
             . When the upload is complete your video will be processed by Mux
