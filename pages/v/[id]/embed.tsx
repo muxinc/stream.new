@@ -9,7 +9,7 @@ import Asterisk from '../../../components/asterisk';
 import { OPEN_SOURCE_URL, MUX_HOME_PAGE_URL, HOST_URL } from '../../../constants';
 import { HTMLVideoElementWithPlyr } from '../../../types';
 import logger from '../../../lib/logger';
-import { getImageBaseUrl } from '../../../lib/urlutils'
+import { getImageBaseUrl } from '../../../lib/urlutils';
 
 type Params = {
   id: string;
