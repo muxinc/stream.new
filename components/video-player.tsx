@@ -200,4 +200,6 @@ const VideoPlayer = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, p
   );
 });
 
+VideoPlayer.displayName = 'VideoPlayer';
+
 export default VideoPlayer;
