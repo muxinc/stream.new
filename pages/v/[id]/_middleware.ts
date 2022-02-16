@@ -11,9 +11,9 @@ export function middleware(request: NextRequest): NextResponse {
     const selectedForExperiment = Math.random() <= 0.1;
 
     if (selectedForExperiment) {
-      response.cookie('muxPlayer', 'mux-player');
+      response.cookie(COOKIE_KEY, 'mux-player');
     } else {
-      response.cookie('muxPlayer', 'plyr');
+      response.cookie(COOKIE_KEY, 'plyr');
     }
   }
 
