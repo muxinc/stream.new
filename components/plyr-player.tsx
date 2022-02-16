@@ -1,5 +1,4 @@
-/* globals Image */
-import { useState, useEffect, useRef, forwardRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Plyr from 'plyr';
 import 'plyr/dist/plyr.css';
 import Hls from 'hls.js';
@@ -11,70 +10,23 @@ import { breakpoints } from '../style-vars';
 import { HTMLVideoElementWithPlyr } from '../types';
 import { useCombinedRefs } from '../util/use-combined-refs';
 
-/*
- * We need to set the width/height of the player depending on what the dimensions of
- * the underlying video source is.
- *
- * On most platforms we know the dimensions on 'loadedmetadata'
- * On Desktop Safari we don't know the dimensions until 'canplay'
- *
- * At first, I tried to get the dimensions of the video from these callbacks, that worked
- * great except for on moble Safari. On Mobile Safari none of those callbacks fire until
- * there is some user interaction :(
- *
- * BUT! There is a brilliant hack here. We can create a `display: none` `img` element in the
- * DOM, load up the poster image.
- *
- * Since the poster image will have the same dimensions of the video, now we know if the video
- * is vertical and now we can style the proper width/height so the layout doesn't have a sudden
- * jump or resize.
- *
- */
-
 type Props = {
   playbackId: string
   poster: string
+  isVertical: boolean;
   currentTime?: number
   onLoaded: () => void
-  onError: (error: ErrorEvent) => void
+  onError: (error: ErrorEvent) => void;
+  forwardedRef: React.ForwardedRef<HTMLVideoElementWithPlyr>;
 };
 
-type SizedEvent = {
-  target: {
-    width: number
-    height: number
-  }
-};
-
-const VideoPlayer = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, poster, currentTime, onLoaded, onError }, ref) => {
+const PlyrPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, isVertical, onLoaded, onError, forwardedRef }) => {
   const videoRef = useRef<HTMLVideoElementWithPlyr>(null);
-  const metaRef = useCombinedRefs(ref, videoRef);
+  const metaRef = useCombinedRefs(forwardedRef, videoRef);
   const playerRef = useRef<Plyr | null>(null);
-  const [isVertical, setIsVertical] = useState<boolean | null>();
   const [playerInitTime] = useState(Date.now());
 
   const videoError = (event: ErrorEvent) => onError(event);
-
-  const onImageLoad = (event: SizedEvent) => {
-    const [w, h] = [event.target.width, event.target.height];
-    if (w && h) {
-      setIsVertical((w / h) < 1);
-      onLoaded();
-    } else {
-      onLoaded();
-      console.error('Error getting img dimensions', event); // eslint-disable-line no-console
-    }
-  };
-
-  /*
-   * See comment above -- we're loading the poster image just so we can grab the dimensions
-   * which determines styles for the player
-   */
-  useEffect(() => {
-    const img = new Image();
-    img.onload = (evt) => onImageLoad((evt as unknown) as SizedEvent);
-    img.src = poster;
-  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -91,6 +43,8 @@ const VideoPlayer = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, p
         },
         captions: { active: true, language: 'auto', update: true }
       });
+
+      playerRef.current.on('ready', () => onLoaded());
 
       if (video.canPlayType('application/vnd.apple.mpegurl')) {
         // This will run in safari, where HLS is supported natively
@@ -136,6 +90,9 @@ const VideoPlayer = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, p
       if (hls) {
         hls.destroy();
       }
+      if (playerRef.current) {
+        playerRef.current.destroy();
+      }
     };
   }, [playbackId, videoRef]);
 
@@ -148,9 +105,7 @@ const VideoPlayer = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, p
 
   return (
     <>
-      <div className='video-container'>
-        <video ref={metaRef} poster={poster} controls playsInline />
-      </div>
+      <video ref={metaRef} poster={poster} controls playsInline />
       <style jsx>{`
         :global(:root) {
           --plyr-color-main: #1b1b1b;
@@ -159,11 +114,6 @@ const VideoPlayer = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, p
         :global(.plyr__controls button),
         :global(.plyr__controls input) {
           cursor: pointer;
-        }
-        .video-container {
-          margin-bottom: 40px;
-          margin-top: 40px;
-          border-radius: 30px;
         }
         :global(.plyr:fullscreen video) {
           max-width: initial;
@@ -198,8 +148,8 @@ const VideoPlayer = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, p
       </style>
     </>
   );
-});
+};
 
-VideoPlayer.displayName = 'VideoPlayer';
+PlyrPlayer.displayName = 'PlyrPlayer';
 
-export default VideoPlayer;
+export default PlyrPlayer;
