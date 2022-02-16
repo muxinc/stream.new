@@ -1,4 +1,4 @@
-import got from 'got';
+import got from './got-client';
 import { ModerationScores } from '../types';
 import { getThumbnailUrls } from './moderation-utils';
 
