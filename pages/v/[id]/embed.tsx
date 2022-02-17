@@ -3,7 +3,7 @@ import { GetStaticProps, GetStaticPaths } from 'next';
 import { useRouter } from 'next/router';
 
 import FullpageLoader from '../../../components/fullpage-loader';
-import VideoPlayer from '../../../components/video-player';
+import PlayerLoader from '../../../components/player-loader';
 import Layout from '../../../components/layout';
 import Asterisk from '../../../components/asterisk';
 import { OPEN_SOURCE_URL, MUX_HOME_PAGE_URL, HOST_URL } from '../../../constants';
@@ -133,7 +133,7 @@ const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster, width, height, 
       {errorMessage && <h1 className="error-message">{errorMessage}</h1>}
       {showLoading && <FullpageLoader text="Loading player" />}
       <div className="wrapper">
-        <VideoPlayer playerType="plyr" ref={videoRef} playbackId={playbackId} poster={poster} currentTime={startTime} width={width} height={height} aspectRatio={aspectRatio} onLoaded={() => setIsLoaded(true)} onError={onError} />
+        <PlayerLoader playerType="plyr" ref={videoRef} playbackId={playbackId} poster={poster} currentTime={startTime} aspectRatio={aspectRatio} onLoaded={() => setIsLoaded(true)} onError={onError} />
         <div className='asterisk-container'>
           <AsteriskButton onOpenOverlay={onOpenOverlay} />
         </div>
