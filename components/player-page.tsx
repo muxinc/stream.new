@@ -161,18 +161,21 @@ const Playback: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, post
         </div>
         <style jsx>
           {`
-            .actions a:first-child {
-              padding-right: 30px;
+            .actions {
+              display: flex;
+              justify-content: center;
+            }
+            .actions a {
+              padding-left: 15px;
+              padding-right: 15px;
             }
             .report-form {
               margin-top: 20px;
             }
             .wrapper {
-              display: ${isLoaded ? 'flex' : 'none'};
+              display: flex;
               flex-direction: column;
-              flex-grow: 1;
-              align-items: center;
-              justify-content: center;
+              max-height: 100%;
             }
           `}
         </style>
@@ -181,4 +184,12 @@ const Playback: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, post
   );
 };
 
+    /*
+     * .wrapper {
+      display: ${isLoaded ? 'flex' : 'none'};
+      flex-direction: column;
+      flex-grow: 1;
+      align-items: center;
+      justify-content: center;
+      */
 export default Playback;

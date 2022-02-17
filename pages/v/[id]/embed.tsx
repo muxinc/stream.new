@@ -75,7 +75,7 @@ const AsteriskButton: React.FC<AsteriskButtonProps> = ({ onOpenOverlay }) => {
   );
 };
 
-const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster, width, height, aspectRatio }) => {
+const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster, aspectRatio }) => {
   const videoRef = useRef<HTMLVideoElementWithPlyr>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
