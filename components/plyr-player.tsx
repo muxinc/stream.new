@@ -134,7 +134,8 @@ const PlyrPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoaded
           max-width: 100%;
         }
         @media only screen and (min-width: ${breakpoints.md}px) {
-          video {
+          :global(.plyr.plyr--full-ui) {
+            min-width: 480px;
           }
         }
         @media only screen and (max-width: ${breakpoints.md}px) {
