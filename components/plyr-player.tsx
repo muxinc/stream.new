@@ -13,14 +13,15 @@ import { useCombinedRefs } from '../util/use-combined-refs';
 type Props = {
   playbackId: string
   poster: string
-  isVertical: boolean;
+  aspectRatio?: number;
+  // isVertical: boolean;
   currentTime?: number
   onLoaded: () => void
   onError: (error: ErrorEvent) => void;
   forwardedRef: React.ForwardedRef<HTMLVideoElementWithPlyr>;
 };
 
-const PlyrPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, isVertical, onLoaded, onError, forwardedRef }) => {
+const PlyrPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoaded, onError, forwardedRef, aspectRatio }) => {
   const videoRef = useRef<HTMLVideoElementWithPlyr>(null);
   const metaRef = useCombinedRefs(forwardedRef, videoRef);
   const playerRef = useRef<Plyr | null>(null);
@@ -111,6 +112,11 @@ const PlyrPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, isVertic
           --plyr-color-main: #1b1b1b;
           --plyr-range-fill-background: #ccc;
         }
+        :global(.plyr) {
+          max-height: 100%;
+          margin: 0 auto;
+          aspect-ratio: ${aspectRatio}
+        }
         :global(.plyr__controls button),
         :global(.plyr__controls input) {
           cursor: pointer;
@@ -123,16 +129,12 @@ const PlyrPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, isVertic
         }
         video {
           display: block;
-          max-width: 100%;
-          max-height: 50vh;
           cursor: pointer;
+          max-height: 100%;
+          max-width: 100%;
         }
         @media only screen and (min-width: ${breakpoints.md}px) {
           video {
-            width: ${isVertical ? 'auto' : '1000px'};
-            height: ${isVertical ? '600px' : 'auto'};
-            max-height: 70vh;
-            min-width: 30rem;
           }
         }
         @media only screen and (max-width: ${breakpoints.md}px) {
@@ -140,8 +142,6 @@ const PlyrPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, isVertic
             display: none;
           }
           video: {
-            width: 100%;
-            height: 100%;
           }
         }
       `}
