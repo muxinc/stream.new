@@ -18,6 +18,7 @@ type PageProps = Props & {
 const META_TITLE = 'View this video created on stream.new';
 
 const Playback: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, poster, playerType, aspectRatio }) => {
+  const isVertical = !!aspectRatio && aspectRatio < 1;
   const [isLoaded, setIsLoaded] = useState(false);
   const [tryToLoadPlayer, setTryToLoadPlayer] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -175,7 +176,9 @@ const Playback: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, post
             .wrapper {
               display: flex;
               flex-direction: column;
-              max-height: 100%;
+              align-items: ${isVertical ? 'center' : 'stretch'};
+              height: 100%;
+              justify-content: center;
             }
           `}
         </style>
