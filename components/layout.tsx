@@ -85,7 +85,7 @@ const Layout: React.FC<Props> = ({
         )}
         {image && <meta property="twitter:image" content={image} />}
       </Head>
-      <div className="container" {...containerProps}>
+      <div className="app-container" {...containerProps}>
         <div className={`drag-overlay ${isDragActive ? 'active' : ''}`}><h1>Upload to stream.new</h1></div>
 
         <div className="modal-wrapper"><InfoModal close={() => setModalOpen(false)} /></div>
@@ -123,7 +123,7 @@ const Layout: React.FC<Props> = ({
           .spinning {
             animation: rotation 2s infinite linear;
           }
-          .container {
+          .app-container {
             display: flex;
             flex-direction: column;
             transition: background ${transitionDuration} ease;
@@ -271,11 +271,11 @@ const Layout: React.FC<Props> = ({
         </style>
 
         <style jsx global>{`
-          html, body, #__next, .container {
+          html, body, #__next, .app-container {
             background: ${darkMode ? '#111' : '#f8f8f8'};
             -webkit-font-smoothing: antialiased;
           }
-          #__next, .container {
+          #__next, .app-container {
             width: 100%;
             height: 100%;
           }
