@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { GetStaticProps, GetStaticPaths } from 'next';
 import { useRouter } from 'next/router';
 
@@ -82,10 +82,6 @@ const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster, aspectRatio }) 
   const [showOverlay, setShowOverlay] = useState(false);
   const [wasPlaying, setWasPlaying] = useState(false);
   const router = useRouter();
-
-  useEffect(() => {
-    console.log('debug videoRef', videoRef);
-  }, [videoRef]);
 
   const onCloseOverlay = () => {
     setShowOverlay(false);
