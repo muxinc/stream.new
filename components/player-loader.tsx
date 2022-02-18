@@ -1,4 +1,4 @@
-import { useEffect, forwardRef } from 'react';
+import { forwardRef } from 'react';
 import { HTMLVideoElementWithPlyr } from '../types';
 import dynamic from 'next/dynamic';
 
@@ -15,10 +15,6 @@ type Props = {
 };
 
 const PlayerLoader = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, poster, currentTime, aspectRatio, playerType, onLoaded, onError }, ref) => {
-
-  useEffect(() => {
-    onLoaded();
-  }, []);
 
   return (
     <>

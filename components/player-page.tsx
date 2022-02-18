@@ -114,7 +114,7 @@ const Playback: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, post
         centered={showLoading}
         darkMode
       >
-        {showLoading && <FullpageLoader text="Loading player" />}
+        {showLoading && !tryToLoadPlayer && <FullpageLoader text="Loading player" />}
         <div className="wrapper">
           {(tryToLoadPlayer && aspectRatio && !openReport) && (
             <PlayerLoader
