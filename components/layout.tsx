@@ -48,7 +48,7 @@ type Props = {
 };
 
 const Layout: React.FC<Props> = ({
-  title,
+  title = "stream.new",
   description,
   metaTitle,
   metaDescription,
@@ -69,7 +69,7 @@ const Layout: React.FC<Props> = ({
   return (
     <>
       <Head>
-        <title>stream.new</title>
+        <title>{title}</title>
         <link rel="icon" href="/stream-new-asterisk.svg" />
         {metaTitle && <meta property="og:title" content={metaTitle} />}
         {metaTitle && <meta property="twitter:title" content={metaTitle} />}
