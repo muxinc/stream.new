@@ -1,5 +1,4 @@
 import { useEffect, forwardRef } from 'react';
-import { breakpoints } from '../style-vars';
 import { HTMLVideoElementWithPlyr } from '../types';
 import dynamic from 'next/dynamic';
 
