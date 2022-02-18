@@ -6,8 +6,6 @@ export type Props = {
   playbackId: string;
   shareUrl: string;
   poster: string;
-  width?: number;
-  height?: number;
   aspectRatio?: number;
   videoExists: boolean;
 };
@@ -19,7 +17,7 @@ export async function getPropsFromPlaybackId (playbackId: string):Promise<Props>
   const props = { playbackId, shareUrl, poster };
 
   if (dimensions) {
-    return { ...props, ...dimensions, videoExists: true };
+    return { ...props, aspectRatio: dimensions.aspectRatio, videoExists: true };
   } else {
     return { ...props, videoExists: false };
   }
