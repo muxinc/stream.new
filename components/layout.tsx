@@ -48,7 +48,7 @@ type Props = {
 };
 
 const Layout: React.FC<Props> = ({
-  title,
+  title = "stream.new",
   description,
   metaTitle,
   metaDescription,
@@ -69,7 +69,7 @@ const Layout: React.FC<Props> = ({
   return (
     <>
       <Head>
-        <title>stream.new</title>
+        <title>{title}</title>
         <link rel="icon" href="/stream-new-asterisk.svg" />
         {metaTitle && <meta property="og:title" content={metaTitle} />}
         {metaTitle && <meta property="twitter:title" content={metaTitle} />}
@@ -85,12 +85,12 @@ const Layout: React.FC<Props> = ({
         )}
         {image && <meta property="twitter:image" content={image} />}
       </Head>
-      <div className="container" {...containerProps}>
+      <div className="app-container" {...containerProps}>
         <div className={`drag-overlay ${isDragActive ? 'active' : ''}`}><h1>Upload to stream.new</h1></div>
 
         <div className="modal-wrapper"><InfoModal close={() => setModalOpen(false)} /></div>
-        <main>
-          <div className={`${centered ? "content-wrapper-centered" : ""}`}>{children}</div>
+        <main className={`${centered ? "content-wrapper-centered" : ""}`}>
+          {children}
         </main>
         <div className="footer-wrapper">
           <footer>
@@ -123,15 +123,12 @@ const Layout: React.FC<Props> = ({
           .spinning {
             animation: rotation 2s infinite linear;
           }
-          .content-wrapper-centered {
+          .app-container {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            height: 100%;
-          }
-          .container {
             transition: background ${transitionDuration} ease;
             outline: none;
+            max-height: 100%;
           }
           .drag-overlay {
             height: 100%;
@@ -158,14 +155,18 @@ const Layout: React.FC<Props> = ({
 
           main {
             padding: 20px;
-            margin-bottom: -${FOOTER_HEIGHT};
+            flex-grow: 1;
+            max-height: calc(100% - ${FOOTER_HEIGHT});
+          }
+          main.content-wrapper-centered {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             height: 100%;
           }
 
           .footer-wrapper {
-            position: absolute;
             width: 100%;
-            bottom: 0;
           }
 
           footer {
@@ -270,10 +271,17 @@ const Layout: React.FC<Props> = ({
         </style>
 
         <style jsx global>{`
-          html, body, #__next, .container {
+          html, body, #__next, .app-container {
             background: ${darkMode ? '#111' : '#f8f8f8'};
-            height: 100%;
             -webkit-font-smoothing: antialiased;
+          }
+          #__next, .app-container {
+            width: 100%;
+            height: 100%;
+          }
+          body {
+            height: 100vh;
+            width: 100vw;
           }
           p {
             font-size: 18px;

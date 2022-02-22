@@ -3,12 +3,13 @@ import { GetStaticProps, GetStaticPaths } from 'next';
 import { useRouter } from 'next/router';
 
 import FullpageLoader from '../../../components/fullpage-loader';
-import VideoPlayer from '../../../components/video-player';
+import PlayerLoader from '../../../components/player-loader';
 import Layout from '../../../components/layout';
 import Asterisk from '../../../components/asterisk';
 import { OPEN_SOURCE_URL, MUX_HOME_PAGE_URL, HOST_URL } from '../../../constants';
 import { HTMLVideoElementWithPlyr } from '../../../types';
 import logger from '../../../lib/logger';
+import { getImageDimensions } from '../../../lib/image-dimensions';
 import { getImageBaseUrl } from '../../../lib/urlutils';
 
 type Params = {
@@ -18,7 +19,11 @@ type Params = {
 export type Props = {
   playbackId: string,
   shareUrl: string,
-  poster: string
+  poster: string,
+  width: number,
+  height: number,
+  aspectRatio: number,
+  videoExists: boolean,
 };
 
 export const getStaticProps: GetStaticProps = async (context)  => {
@@ -26,8 +31,13 @@ export const getStaticProps: GetStaticProps = async (context)  => {
   const { id: playbackId } = (params as Params);
   const poster = `${getImageBaseUrl()}/${playbackId}/thumbnail.png`;
   const shareUrl = `${HOST_URL}/v/${playbackId}`;
+  const dimensions = await getImageDimensions(playbackId);
 
-  return { props: { playbackId, shareUrl, poster } };
+  if (dimensions) {
+    return { props: { playbackId, videoExists: true, shareUrl, poster, ...dimensions } };
+  } else {
+    return { props: { playbackId, videoExists: false } };
+  }
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -65,7 +75,7 @@ const AsteriskButton: React.FC<AsteriskButtonProps> = ({ onOpenOverlay }) => {
   );
 };
 
-const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster }) => {
+const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster, aspectRatio }) => {
   const videoRef = useRef<HTMLVideoElementWithPlyr>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -119,7 +129,7 @@ const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster }) => {
       {errorMessage && <h1 className="error-message">{errorMessage}</h1>}
       {showLoading && <FullpageLoader text="Loading player" />}
       <div className="wrapper">
-        <VideoPlayer ref={videoRef} playbackId={playbackId} poster={poster} currentTime={startTime} onLoaded={() => setIsLoaded(true)} onError={onError} />
+        <PlayerLoader playerType="plyr" ref={videoRef} playbackId={playbackId} poster={poster} currentTime={startTime} aspectRatio={aspectRatio} onLoaded={() => setIsLoaded(true)} onError={onError} />
         <div className='asterisk-container'>
           <AsteriskButton onOpenOverlay={onOpenOverlay} />
         </div>

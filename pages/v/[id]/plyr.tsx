@@ -22,7 +22,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-const Playback: React.FC<Props> = ({ playbackId, videoExists, shareUrl, poster, aspectRatio }) => {
+const PlyrPage: React.FC<Props> = ({ playbackId, videoExists, shareUrl, poster, aspectRatio }) => {
   return (
     <PlayerPage
       playbackId={playbackId}
@@ -35,4 +35,4 @@ const Playback: React.FC<Props> = ({ playbackId, videoExists, shareUrl, poster, 
   );
 };
 
-export default Playback;
+export default PlyrPage;
