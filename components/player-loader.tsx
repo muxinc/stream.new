@@ -26,11 +26,9 @@ const PlayerLoader = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, 
           margin-bottom: 40px;
           margin-top: 40px;
           border-radius: 30px;
-          height: 0px;
-          aspect-ratio: ${aspectRatio};
+          height: 0;
           flex-shrink: 1;
           flex-grow: 1;
-          object-fit: contain;
         }
       `}
       </style>
