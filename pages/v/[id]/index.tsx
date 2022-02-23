@@ -1,14 +1,13 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
 import Cookies from 'js-cookie';
 
+import { PLYR_TYPE } from '../../../constants';
 import PlayerPage from '../../../components/player-page';
 import { getPropsFromPlaybackId, Props } from '../../../lib/player-page-utils';
 
 type Params = {
   id: string;
 };
-
-const FALLBACK_PLAYER ='plyr';
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const { params } = context;
@@ -18,7 +17,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   return {
     props: {
       ...props,
-      playerType: Cookies.get('streamPlayerType') || FALLBACK_PLAYER
+      playerType: Cookies.get('streamPlayerType') || PLYR_TYPE
     }
   };
 };
@@ -30,7 +29,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-const Playback: React.FC<Props> = ({ playbackId, videoExists, shareUrl, poster, aspectRatio, playerType = FALLBACK_PLAYER }) => {
+const Playback: React.FC<Props> = ({ playbackId, videoExists, shareUrl, poster, aspectRatio, playerType = PLYR_TYPE }) => {
   return (
     <PlayerPage
       playbackId={playbackId}
