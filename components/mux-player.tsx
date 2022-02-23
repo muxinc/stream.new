@@ -9,15 +9,13 @@ type Props = {
   onError: (error: ErrorEvent) => void;
 };
 
-const MuxPlayerInternal: React.FC<Props> = ({ playbackId, poster, currentTime, onLoaded, onError }) => {
+const MuxPlayerInternal: React.FC<Props> = ({ playbackId, poster, currentTime, onLoaded}) => {
   useEffect(() => {
     onLoaded();
   }, []);
 
   return (
-    <>
-      <MuxPlayer playbackId={playbackId} poster={poster} startTime={currentTime} onError={(err) => onError(err as ErrorEvent)} envKey={process.env.NEXT_PUBLIC_MUX_ENV_KEY} streamType="on-demand" />
-    </>
+    <MuxPlayer playbackId={playbackId} poster={poster} startTime={currentTime} envKey={process.env.NEXT_PUBLIC_MUX_ENV_KEY} streamType="on-demand" />
   );
 };
 
