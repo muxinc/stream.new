@@ -7,17 +7,18 @@ import FullpageLoader from './fullpage-loader';
 import PlayerLoader from './player-loader';
 import Layout from './layout';
 import ReportForm from './report-form';
-import { HOST_URL } from '../constants';
+import { HOST_URL, VALID_PLAYER_TYPES } from '../constants';
+import type { PlayerTypes } from '../constants';
 import logger from '../lib/logger';
 import { Props } from '../lib/player-page-utils';
 
 type PageProps = Props & {
-  playerType: string;
+  playerType: PlayerTypes;
 };
 
 const META_TITLE = 'View this video created on stream.new';
 
-const Playback: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, poster, playerType, aspectRatio }) => {
+const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, poster, playerType, aspectRatio }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [tryToLoadPlayer, setTryToLoadPlayer] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -43,6 +44,12 @@ const Playback: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, post
       //
     }
   }, [videoExists]);
+
+  useEffect(() => {
+    if (playerType && !VALID_PLAYER_TYPES.includes(playerType)) {
+      setErrorMessage(`Don't know how to load the player called: ${playerType}`);
+    }
+  }, [playerType]);
 
   if (router.isFallback) {
     return (
@@ -185,12 +192,4 @@ const Playback: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, post
   );
 };
 
-    /*
-     * .wrapper {
-      display: ${isLoaded ? 'flex' : 'none'};
-      flex-direction: column;
-      flex-grow: 1;
-      align-items: center;
-      justify-content: center;
-      */
-export default Playback;
+export default PlayerPage;

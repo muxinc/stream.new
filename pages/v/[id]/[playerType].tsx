@@ -5,14 +5,17 @@ import { getPropsFromPlaybackId, Props } from '../../../lib/player-page-utils';
 
 type Params = {
   id: string;
+  playerType: string;
 };
+
+type PlayerTypePageProps = Props & { playerType: string };
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const { params } = context;
-  const { id: playbackId } = params as Params;
+  const { id: playbackId, playerType } = params as Params;
   const props = await getPropsFromPlaybackId(playbackId);
 
-  return { props };
+  return { props: { ...props, playerType } };
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -22,7 +25,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-const PlyrPage: React.FC<Props> = ({ playbackId, videoExists, shareUrl, poster, aspectRatio }) => {
+const PlayerTypePage: React.FC<PlayerTypePageProps> = ({ playbackId, playerType, videoExists, shareUrl, poster, aspectRatio }) => {
   return (
     <PlayerPage
       playbackId={playbackId}
@@ -30,9 +33,9 @@ const PlyrPage: React.FC<Props> = ({ playbackId, videoExists, shareUrl, poster, 
       shareUrl={shareUrl}
       poster={poster}
       aspectRatio={aspectRatio}
-      playerType="plyr"
+      playerType={playerType}
     />
   );
 };
 
-export default PlyrPage;
+export default PlayerTypePage;

@@ -1,8 +1,17 @@
 import { forwardRef } from 'react';
 import { HTMLVideoElementWithPlyr } from '../types';
+import { PLYR_TYPE, MUX_PLAYER_TYPE } from '../constants';
 import dynamic from 'next/dynamic';
 
+/*
+ * It is important for these to be loaded with next/dynamic so that we don't load all
+ * the javascript for every single possible player.
+ *
+ * Lucky for us, next/dynamic will handle the code splitting and not load code for components
+ * that we don't end up using.
+ */
 const PlyrPlayer = dynamic(() => import('./plyr-player'));
+const MuxPlayer = dynamic(() => import('./mux-player'));
 
 type Props = {
   playbackId: string
@@ -15,11 +24,11 @@ type Props = {
 };
 
 const PlayerLoader = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, poster, currentTime, aspectRatio, playerType, onLoaded, onError }, ref) => {
-
   return (
     <>
       <div className='video-container'>
-        {playerType === "plyr" && <PlyrPlayer forwardedRef={ref} aspectRatio={aspectRatio} playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
+        {playerType === PLYR_TYPE && <PlyrPlayer forwardedRef={ref} aspectRatio={aspectRatio} playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
+        {playerType === MUX_PLAYER_TYPE && <MuxPlayer playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
       </div>
       <style jsx>{`
         .video-container {

@@ -1,6 +1,7 @@
 import { getImageDimensions } from './image-dimensions';
 import { getImageBaseUrl } from './urlutils';
 import { HOST_URL } from '../constants';
+import type { PlayerTypes } from '../constants';
 
 export type Props = {
   playbackId: string;
@@ -8,6 +9,7 @@ export type Props = {
   poster: string;
   aspectRatio?: number;
   videoExists: boolean;
+  playerType?: PlayerTypes;
 };
 
 export async function getPropsFromPlaybackId (playbackId: string):Promise<Props> {
