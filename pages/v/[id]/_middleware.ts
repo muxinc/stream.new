@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import { PLYR_TYPE, MUX_PLAYER_TYPE } from '../../../constants';
 
 const COOKIE_KEY = 'streamPlayerType';
-const SPLIT_PERCENTAGE = 0.1;
+const SPLIT_PERCENTAGE = process.env.PLAYER_SPLIT_TESTING_PERCENTAGE || 0.2;
 
 export function middleware(request: NextRequest): NextResponse {
   const response = NextResponse.next();
