@@ -8,11 +8,12 @@ import PlayerLoader from './player-loader';
 import Layout from './layout';
 import ReportForm from './report-form';
 import { HOST_URL, VALID_PLAYER_TYPES } from '../constants';
+import type { PlayerTypes } from '../constants';
 import logger from '../lib/logger';
 import { Props } from '../lib/player-page-utils';
 
 type PageProps = Props & {
-  playerType: string;
+  playerType: PlayerTypes;
 };
 
 const META_TITLE = 'View this video created on stream.new';

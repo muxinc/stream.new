@@ -5,3 +5,4 @@ export const HOST_URL = 'https://stream.new';
 export const PLYR_TYPE = "plyr";
 export const MUX_PLAYER_TYPE = "mux-player";
 export const VALID_PLAYER_TYPES = [PLYR_TYPE, MUX_PLAYER_TYPE];
+export type PlayerTypes = typeof PLYR_TYPE | typeof MUX_PLAYER_TYPE;

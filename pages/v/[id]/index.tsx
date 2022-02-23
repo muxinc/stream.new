@@ -2,6 +2,7 @@ import { GetStaticProps, GetStaticPaths } from 'next';
 import Cookies from 'js-cookie';
 
 import { PLYR_TYPE } from '../../../constants';
+import type { PlayerTypes } from '../../../constants';
 import PlayerPage from '../../../components/player-page';
 import { getPropsFromPlaybackId, Props } from '../../../lib/player-page-utils';
 
@@ -14,12 +15,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const { id: playbackId } = params as Params;
   const props = await getPropsFromPlaybackId(playbackId);
 
-  return {
-    props: {
-      ...props,
-      playerType: Cookies.get('streamPlayerType') || PLYR_TYPE
-    }
-  };
+  return { props };
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -29,7 +25,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-const Playback: React.FC<Props> = ({ playbackId, videoExists, shareUrl, poster, aspectRatio, playerType = PLYR_TYPE }) => {
+const Playback: React.FC<Props> = ({ playbackId, videoExists, shareUrl, poster, aspectRatio }) => {
+  const playerType: PlayerTypes = (Cookies.get('streamPlayerType') as PlayerTypes) || PLYR_TYPE;
+
   return (
     <PlayerPage
       playbackId={playbackId}
