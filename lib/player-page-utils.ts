@@ -8,6 +8,7 @@ export type Props = {
   poster: string;
   aspectRatio?: number;
   videoExists: boolean;
+  playerType?: | 'plyr' | 'mux-player';
 };
 
 export async function getPropsFromPlaybackId (playbackId: string):Promise<Props> {
