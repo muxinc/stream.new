@@ -15,7 +15,18 @@ const MuxPlayerInternal: React.FC<Props> = ({ playbackId, poster, currentTime, o
   }, []);
 
   return (
-    <MuxPlayer playbackId={playbackId} poster={poster} startTime={currentTime} envKey={process.env.NEXT_PUBLIC_MUX_ENV_KEY} streamType="on-demand" />
+    <MuxPlayer
+      playbackId={playbackId}
+      poster={poster}
+      startTime={currentTime}
+      envKey={process.env.NEXT_PUBLIC_MUX_ENV_KEY}
+      streamType="on-demand"
+      metadata={{
+        video_id: playbackId,
+        video_title: playbackId,
+        video_stream_type: 'on-demand',
+      }}
+    />
   );
 };
 
