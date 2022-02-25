@@ -29,7 +29,7 @@ const PlayerLoader = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, 
     <>
       <div className='video-container'>
         {playerType === PLYR_TYPE && <PlyrPlayer forwardedRef={ref} aspectRatio={aspectRatio} playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
-        {playerType === MUX_PLAYER_TYPE && <MuxPlayer playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
+        {playerType === MUX_PLAYER_TYPE && <MuxPlayer playbackId={playbackId} aspectRatio={aspectRatio} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
         {playerType === MUX_VIDEO_TYPE && <MuxVideo playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
       </div>
       <style jsx>{`
