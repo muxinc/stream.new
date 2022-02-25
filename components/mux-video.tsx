@@ -21,6 +21,7 @@ const MuxPlayerInternal: React.FC<Props> = ({ playbackId, poster, currentTime, o
       startTime={currentTime}
       envKey={process.env.NEXT_PUBLIC_MUX_ENV_KEY}
       streamType="on-demand"
+      style={{ maxWidth: '100%', maxHeight: '100%', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
       metadata={{
         video_id: playbackId,
         video_title: playbackId,
