@@ -605,6 +605,14 @@
     "@mux-elements/mux-video" "^0.2.5"
     media-chrome "0.5.1"
 
+"@mux-elements/mux-video-react@^0.2.4":
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/@mux-elements/mux-video-react/-/mux-video-react-0.2.4.tgz#688351d74e454cac390ab7a49ac949e0637f2aaa"
+  integrity sha512-kMvv1ijN4Jbwj4qoB/5UdK0ZvGqc+NG9gxXtsKpC6KauN8w7B9Te05+PZQnvsA015XEoNQ6jvD33TFxopZdfCg==
+  dependencies:
+    "@mux-elements/playback-core" "^0.1.4"
+    prop-types "^15.7.2"
+
 "@mux-elements/mux-video@^0.2.5":
   version "0.2.5"
   resolved "https://registry.yarnpkg.com/@mux-elements/mux-video/-/mux-video-0.2.5.tgz#aae3d25291b3b17b0d1051e42110e318e545e053"
