@@ -25,7 +25,7 @@ const MuxPlayerInternal: React.FC<Props> = ({ playbackId, poster, currentTime, o
       metadata={{
         video_id: playbackId,
         video_title: playbackId,
-        video_stream_type: 'on-demand',
+        player_name: 'Mux Video React',
       }}
       controls
     />

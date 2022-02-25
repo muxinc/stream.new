@@ -73,10 +73,9 @@ const PlyrPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoaded
           Hls,
           data: {
             env_key: process.env.NEXT_PUBLIC_MUX_ENV_KEY,
-            player_name: 'hls.js player v1',
+            player_name: 'Plyr',
             video_id: playbackId,
             video_title: playbackId,
-            video_stream_type: 'on-demand',
             player_init_time: playerInitTime,
           },
         });
