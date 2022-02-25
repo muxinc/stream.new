@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import { HTMLVideoElementWithPlyr } from '../types';
-import { PLYR_TYPE, MUX_PLAYER_TYPE } from '../constants';
+import { PLYR_TYPE, MUX_PLAYER_TYPE, MUX_VIDEO_TYPE } from '../constants';
 import dynamic from 'next/dynamic';
 
 /*
@@ -12,6 +12,7 @@ import dynamic from 'next/dynamic';
  */
 const PlyrPlayer = dynamic(() => import('./plyr-player'));
 const MuxPlayer = dynamic(() => import('./mux-player'));
+const MuxVideo = dynamic(() => import('./mux-video'));
 
 type Props = {
   playbackId: string
@@ -29,6 +30,7 @@ const PlayerLoader = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, 
       <div className='video-container'>
         {playerType === PLYR_TYPE && <PlyrPlayer forwardedRef={ref} aspectRatio={aspectRatio} playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
         {playerType === MUX_PLAYER_TYPE && <MuxPlayer playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
+        {playerType === MUX_VIDEO_TYPE && <MuxVideo playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
       </div>
       <style jsx>{`
         .video-container {
