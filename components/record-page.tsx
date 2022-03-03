@@ -295,20 +295,18 @@ const RecordPage: React.FC<NoProps> = () => {
     logger('start recording');
     try {
       setStartRecordTime((new Date()).valueOf());
-      const preferredOptions = { mimeType: 'video/webm;codecs=vp9' };
-      const backupOptions = { mimeType: 'video/webm;codecs=vp8,opus' };
-      const lastResortOptions = { mimeType: 'video/mp4;codecs=avc1' };
+      const videoBitsPerSecond = 5000000; // Double the default quality from 2.5Mbps to 5Mbps
+      const audioBitsPerSecond = 128000; // 128kbps
+      const mimeTypeStack = ['video/mp4;codecs=avc1', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8,opus'];
+      const preferredOptions = { videoBitsPerSecond, audioBitsPerSecond, mimeType: mimeTypeStack[0] };
+      const backupOptions = { ...preferredOptions, mimeType: mimeTypeStack[1] };
+      const lastResortOptions = { ...preferredOptions, mimeType: mimeTypeStack[2] };
       let options = preferredOptions;
-      /*
-       * MediaRecorder.isTypeSupported is not a thing in safari,
-       * good thing safari supports the preferredOptions
-       */
-      if (typeof MediaRecorder.isTypeSupported === 'function') {
-        if (!MediaRecorder.isTypeSupported(preferredOptions.mimeType)) {
-          options = backupOptions;
-          if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-            options = lastResortOptions;
-          }
+
+      if (!MediaRecorder.isTypeSupported(preferredOptions.mimeType)) {
+        options = backupOptions;
+        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+          options = lastResortOptions;
         }
       }
 
