@@ -16,7 +16,7 @@
     "@mux-elements/mux-player-react": "^0.1.0-alpha.5",
     "@mux-elements/mux-video-react": "^0.2.5",
     "@mux/mux-node": "^3.2",
-    "@mux/upchunk": "^2.2",
+    "@mux/upchunk": "^2.3",
     "@types/probe-image-size": "^7.0.0",
     "copy-to-clipboard": "^3.3.1",
     "got": "^11.8.3",

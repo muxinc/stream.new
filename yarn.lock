@@ -637,10 +637,10 @@
     esdoc-ecmascript-proposal-plugin "^1.0.0"
     jsonwebtoken "^8.4.0"
 
-"@mux/upchunk@^2.2":
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/@mux/upchunk/-/upchunk-2.2.2.tgz#52d629d435b50c32b2fed39566501a2210446805"
-  integrity sha512-uaiQYdROFHM9LMasSJ0vDuwSv0nR/BxjkLOm11N2CIsynzz+Axfvy49Kg8r6Mq/DrRKsyrQP9z/Tl0LfAvX/aQ==
+"@mux/upchunk@^2.3":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@mux/upchunk/-/upchunk-2.3.0.tgz#8d48a1fb1c8734bd71958c6eb56ad9e32c0bb8c5"
+  integrity sha512-i0EIjMZs3fEOk73E7PW/i5QoiLLkdMxBjiYBoOySnw65wFvC9ttjrcWX/hsPqniJ+tEFeAJsbB8A16Y+8vDrJw==
   dependencies:
     event-target-shim "^4.0.3"
     xhr "^2.6.0"
