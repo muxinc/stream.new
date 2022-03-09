@@ -1,7 +1,7 @@
-import { getImageDimensions } from './image-dimensions';
-import { getImageBaseUrl } from './urlutils';
-import { HOST_URL } from '../constants';
-import type { PlayerTypes } from '../constants';
+import { getImageDimensions } from "./image-dimensions";
+import { getImageBaseUrl, getStreamBaseUrl } from "./urlutils";
+import { HOST_URL } from "../constants";
+import type { PlayerTypes } from "../constants";
 
 export type Props = {
   playbackId: string;
@@ -12,15 +12,28 @@ export type Props = {
   playerType?: PlayerTypes;
 };
 
-export async function getPropsFromPlaybackId (playbackId: string):Promise<Props> {
+const getVideoExistsAsync = async (playbackId: string) => {
+  // NOTE: Would prefer to use a HEAD method request, but these appear to be not allowed (status 405) from Mux Video (CJP)
+  return fetch(`${getStreamBaseUrl()}/${playbackId}.m3u8`).then((resp) => {
+    return resp.status >= 200 && resp.status <= 399;
+  });
+};
+
+export async function getPropsFromPlaybackId(
+  playbackId: string
+): Promise<Props> {
   const poster = `${getImageBaseUrl()}/${playbackId}/thumbnail.jpg`;
   const shareUrl = `${HOST_URL}/v/${playbackId}`;
   const dimensions = await getImageDimensions(playbackId);
-  const props = { playbackId, shareUrl, poster };
-
-  if (dimensions) {
-    return { ...props, aspectRatio: dimensions.aspectRatio, videoExists: true };
-  } else {
-    return { ...props, videoExists: false };
+  const videoExists = await getVideoExistsAsync(playbackId);
+  const props: Props = {
+    playbackId,
+    shareUrl,
+    poster,
+    videoExists
+  };
+  if (dimensions?.aspectRatio) {
+    props.aspectRatio = dimensions.aspectRatio;
   }
+  return props;
 }
