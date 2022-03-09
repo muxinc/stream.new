@@ -92,7 +92,7 @@ const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster, aspectRatio }) 
   };
 
   const onOpenOverlay = () => {
-    setWasPlaying(videoRef.current?.plyr.playing || false);
+    setWasPlaying(videoRef.current?.plyr?.playing || false);
 
     videoRef.current?.pause();
 
