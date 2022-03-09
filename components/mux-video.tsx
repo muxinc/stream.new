@@ -15,6 +15,9 @@ const MuxPlayerInternal: React.FC<Props> = ({ playbackId, poster, currentTime, o
   }, []);
 
   return (
+    // Followup: Figure out why TS error occurs here but not in demo nextjs app (CJP)
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    /** @ts-ignore */
     <MuxVideo
       playbackId={playbackId}
       poster={poster}
