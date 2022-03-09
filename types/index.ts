@@ -5,7 +5,7 @@ export enum RecordState {
 }
 
 export interface HTMLVideoElementWithPlyr extends HTMLVideoElement {
-  plyr: Plyr
+  plyr?: Plyr
 }
 
 export type ModerationScores = {
