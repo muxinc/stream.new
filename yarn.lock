@@ -628,14 +628,14 @@
     hls.js "1.1.5"
     mux-embed "4.5.0"
 
-"@mux/mux-node@^3.2":
-  version "3.3.2"
-  resolved "https://registry.yarnpkg.com/@mux/mux-node/-/mux-node-3.3.2.tgz#ef8986b9b89161265d9e28d1c723eee2ca2cfadf"
-  integrity sha512-lBKRrsVwtUg0Vb9J/fI65M+9bw3Q27vCM5h5RzJc7BNwr7KxkykEdvaJwixflHbaQASosfa/lRROxYSL5L5S1Q==
+"@mux/mux-node@^5.0.0-rc.5":
+  version "5.0.0-rc.5"
+  resolved "https://registry.yarnpkg.com/@mux/mux-node/-/mux-node-5.0.0-rc.5.tgz#a38d67f2fb148dc517d8f7eab53e63aed3a1c3b8"
+  integrity sha512-Rp0F96MU05hAs+0P+blG8XR7NyARJ14+S7rzkIYFJegtGf+xzqWCf9yGbRMxEJVy/qmRQBp8JNPpFzuZEfVQsw==
   dependencies:
     axios "^0.25.0"
     esdoc-ecmascript-proposal-plugin "^1.0.0"
-    jsonwebtoken "^8.4.0"
+    jsonwebtoken "^8.5.1"
 
 "@mux/upchunk@^2.3":
   version "2.3.0"
@@ -3875,7 +3875,7 @@ json5@^2.1.2:
   dependencies:
     minimist "^1.2.5"
 
-jsonwebtoken@^8.4.0:
+jsonwebtoken@^8.5.1:
   version "8.5.1"
   resolved "https://registry.yarnpkg.com/jsonwebtoken/-/jsonwebtoken-8.5.1.tgz#00e71e0b8df54c2121a1f26137df2280673bcc0d"
   integrity sha512-XjwVfRS6jTMsqYs0EsuJ4LGxXV14zQybNd4L2r0UvbVnSF9Af8x7p5MzbJ90Ioz/9TI41/hTCvznF/loiSzn8w==
