@@ -4269,10 +4269,15 @@ ms@^2.1.1:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.3.tgz#574c8138ce1d2b5861f0b44579dbadd60c6615b2"
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
 
-mux-embed@4.5.0, mux-embed@^4.5.0:
+mux-embed@4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/mux-embed/-/mux-embed-4.5.0.tgz#f8f5a4171fd9e92a403c434ed5c68012c8141723"
   integrity sha512-vDtBuoZ/ubeLhTgrdHINSQ1HC/XyLFC/tEsdHy8nHzL4/tvogkYLvlxdyWM0EhCEJ4A+dQCRIm5MDEAw/JgsVg==
+
+mux-embed@^4.7.0:
+  version "4.7.0"
+  resolved "https://registry.yarnpkg.com/mux-embed/-/mux-embed-4.7.0.tgz#7719b5fa83cb4d285228627b9ed1fdd0a8ff7344"
+  integrity sha512-L2XtgWPiowHO5pgKapv5HWhThjnzZta2+Wm3nB+aqUbqTN8yFBQX1lorHsD46Afg4h4wyjl6OacLXFMkh2oepA==
 
 nanoid@^3.1.30:
   version "3.3.0"

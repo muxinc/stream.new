@@ -71,6 +71,7 @@ const PlyrPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoaded
         mux.monitor(video, {
           hlsjs: hls,
           Hls,
+          beaconCollectionDomain: 'data.stream.new',
           data: {
             env_key: process.env.NEXT_PUBLIC_MUX_ENV_KEY,
             player_name: 'Plyr',
