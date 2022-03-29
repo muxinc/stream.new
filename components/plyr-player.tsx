@@ -9,6 +9,7 @@ import { getStreamBaseUrl, getImageBaseUrl } from '../lib/urlutils';
 import { breakpoints } from '../style-vars';
 import { HTMLVideoElementWithPlyr } from '../types';
 import { useCombinedRefs } from '../util/use-combined-refs';
+import { MUX_DATA_CUSTOM_DOMAIN } from '../constants'
 
 type Props = {
   playbackId: string
@@ -71,7 +72,7 @@ const PlyrPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoaded
         mux.monitor(video, {
           hlsjs: hls,
           Hls,
-          beaconCollectionDomain: 'data.stream.new',
+          beaconCollectionDomain: MUX_DATA_CUSTOM_DOMAIN,
           data: {
             env_key: process.env.NEXT_PUBLIC_MUX_ENV_KEY,
             player_name: 'Plyr',

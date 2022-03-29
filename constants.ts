@@ -7,3 +7,4 @@ export const MUX_PLAYER_TYPE = "mux-player";
 export const MUX_VIDEO_TYPE = "mux-video";
 export const VALID_PLAYER_TYPES = [PLYR_TYPE, MUX_PLAYER_TYPE, MUX_VIDEO_TYPE];
 export type PlayerTypes = typeof PLYR_TYPE | typeof MUX_PLAYER_TYPE | typeof MUX_VIDEO_TYPE;
+export const MUX_DATA_CUSTOM_DOMAIN = "data.stream.new";
