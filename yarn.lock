@@ -331,9 +331,9 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@github/template-parts@git+https://github.com/muxinc/template-parts.git#mux-player":
+"@github/template-parts@https://github.com/muxinc/template-parts.git#mux-player":
   version "0.4.0"
-  resolved "git+https://github.com/muxinc/template-parts.git#b6f556fb97afe5ddade36ac5dee54ad683c009ff"
+  resolved "https://github.com/muxinc/template-parts.git#b6f556fb97afe5ddade36ac5dee54ad683c009ff"
 
 "@google-cloud/promisify@^2.0.0":
   version "2.0.4"
@@ -604,12 +604,12 @@
     "@mux-elements/mux-video" "^0.4.0"
     media-chrome "0.5.4"
 
-"@mux-elements/mux-video-react@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@mux-elements/mux-video-react/-/mux-video-react-0.3.0.tgz#bbcfae6f359c04c3436e463ffbc3a770395aee78"
-  integrity sha512-yCJRpNLYKe1zWDDoQKSNHxYpFPUBEDalA/qjem0n/ywKRNzOn70rWS/qjLrPwvMljVZFL5DkdVe0CgtlG6wBwg==
+"@mux-elements/mux-video-react@^0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@mux-elements/mux-video-react/-/mux-video-react-0.4.1.tgz#24dd83b04ec49627711d731a3b07a303134fc024"
+  integrity sha512-84WuUjqg22D1n17KqoTN5xDDr7UgDkua/PHhRVJuGItscENVyaHMpMZtEAJNG9By+2t5rGnbl/TA87FjvPjVBg==
   dependencies:
-    "@mux-elements/playback-core" "^0.2.0"
+    "@mux-elements/playback-core" "^0.3.0"
     prop-types "^15.7.2"
 
 "@mux-elements/mux-video@^0.4.0":
@@ -618,14 +618,6 @@
   integrity sha512-h84JcGU8Sl0xINyS7W7h8NhrAi8opWdRI4lAllrrOZj8hCQOXaS637/ilCxzQUlPtDmp62ay1GwOrgk1T/ThTg==
   dependencies:
     "@mux-elements/playback-core" "^0.3.0"
-
-"@mux-elements/playback-core@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@mux-elements/playback-core/-/playback-core-0.2.0.tgz#79a6d9d8badd4bfd4a962b494150f7b8a43b24c7"
-  integrity sha512-a73P52j4IYI1KMzotpZGCzsFWSmdXYSlEwrHkvkfE55/AwHF347rqFzZUHw9WQCSR4fVEa/49uA9RZbZi8Inlg==
-  dependencies:
-    hls.js "1.1.5"
-    mux-embed "4.5.0"
 
 "@mux-elements/playback-core@^0.3.0":
   version "0.3.0"
@@ -4275,11 +4267,6 @@ ms@^2.1.1:
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.3.tgz#574c8138ce1d2b5861f0b44579dbadd60c6615b2"
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
-
-mux-embed@4.5.0:
-  version "4.5.0"
-  resolved "https://registry.yarnpkg.com/mux-embed/-/mux-embed-4.5.0.tgz#f8f5a4171fd9e92a403c434ed5c68012c8141723"
-  integrity sha512-vDtBuoZ/ubeLhTgrdHINSQ1HC/XyLFC/tEsdHy8nHzL4/tvogkYLvlxdyWM0EhCEJ4A+dQCRIm5MDEAw/JgsVg==
 
 mux-embed@^4.7.0:
   version "4.7.0"

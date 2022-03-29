@@ -20,6 +20,7 @@ const MuxPlayerInternal: React.FC<Props> = ({ playbackId, poster, currentTime, o
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     /** @ts-ignore */
     <MuxVideo
+      beaconCollectionDomain={MUX_DATA_CUSTOM_DOMAIN}
       playbackId={playbackId}
       poster={poster}
       startTime={currentTime}
