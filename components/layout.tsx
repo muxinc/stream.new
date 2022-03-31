@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -40,9 +40,8 @@ type Props = {
   metaTitle?: string;
   metaDescription?: string;
   image?: string;
-  onFileDrop?: (acceptedFiles: File[]) => void; // this method happens when a File OR URL is dropped. so typescript (?) has us set the Type for these props as a File Object. 
-  // onURLPaste?: (acceptedURLs: URL[]) => void; // other idea - change to URL type instead of File type ?
-  urlString?: string; // I added this to see how we can handle string inputs that need to become files
+  onFileDrop?: (acceptedFiles: File[]) => void; // method happens when a File OR URL is dropped. so typescript (?) has us set the Type for these props as a File Object. 
+  urlString?: string; // I added thiss
   darkMode?: boolean;
   centered?: boolean;
   spinningLogo?: boolean;
@@ -57,7 +56,6 @@ const Layout: React.FC<Props> = ({
   image = "/stream-new-og-image.png",
   onFileDrop,
   urlString = "https://file-examples.com/storage/fedc20bc2262440d5c8c9f3/2017/04/file_example_MP4_480_1_5MG.mp4", // temporary string - change her to whatever URL the user is pasting
-  // onURLPaste, // ?
   darkMode,
   centered,
   spinningLogo,
@@ -68,7 +66,7 @@ const Layout: React.FC<Props> = ({
   const [isModalOpen, setModalOpen] = useState(false);
   const { acceptedFiles, getRootProps, isDragActive } = useDropzone({ onDrop: onFileDrop });
   const isDroppablePage = !!onFileDrop; // change to case where this is a droppable page if BOTH fileDrop and URL Paste events have not happened yet.
-  // console.log('acceptedFiles *', acceptedFiles  ); 
+  console.log('acceptedFiles *', acceptedFiles  ); 
   const containerProps = isDroppablePage ? getRootProps() : {};
 
   function isValidHTTPURL(inputString: string | URL) {
@@ -85,8 +83,6 @@ const Layout: React.FC<Props> = ({
 
   const onPasteUpload = () => {
     console.log("Started with our urlString which is: ", urlString);
-
-    let stringToTest = '';
     navigator.clipboard.readText()
       .then((clipboardText) => {
         // Success
@@ -103,7 +99,7 @@ const Layout: React.FC<Props> = ({
 
     console.log("Current urlString changed ", urlString);
 
-  }
+  };
   // const {toggle, getIsEnabled } = onPasteUpload
 
   return (
