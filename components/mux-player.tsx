@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import MuxPlayer from '@mux-elements/mux-player-react';
-import { MUX_DATA_CUSTOM_DOMAIN } from '../constants'
+import { MUX_DATA_CUSTOM_DOMAIN } from '../constants';
 
 type Props = {
   playbackId: string

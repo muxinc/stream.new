@@ -9,7 +9,7 @@ import { getStreamBaseUrl, getImageBaseUrl } from '../lib/urlutils';
 import { breakpoints } from '../style-vars';
 import { HTMLVideoElementWithPlyr } from '../types';
 import { useCombinedRefs } from '../util/use-combined-refs';
-import { MUX_DATA_CUSTOM_DOMAIN } from '../constants'
+import { MUX_DATA_CUSTOM_DOMAIN } from '../constants';
 
 type Props = {
   playbackId: string
