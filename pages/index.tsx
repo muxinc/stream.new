@@ -12,18 +12,34 @@ const Index: React.FC<Props> = () => {
   const [showUploadPage, setShowUploadPage] = useState(true);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
+  console.log('file at beginning of index', file); // This will become our File object
+  console.log('inputRef at beginning of index', inputRef); // this will become our HTML Input element from the video
+
+
   const onDrop = useCallback((acceptedFiles) => {
+    // onDrop is an callback function that happens when
+    console.log('onDrop file:', file); // null 
+    console.log('onDrop acceptedFiles:', acceptedFiles); // arg is the accepted files object we get from the onFileDrop method in Layout
     if (acceptedFiles && acceptedFiles[0]) {
       setFile(acceptedFiles[0]);
-      setShowUploadPage(true);
+      
+      setShowUploadPage(true); // revert this comment
+
+      // console.log('accepteFiles, =', acceptedFiles);
+      console.log('onDrop file changed to:', file);
+
     } else {
       console.warn('got a drop event but no file'); // eslint-disable-line no-console
     }
   }, []);
 
-  const onInputChange = () => {
+  // Q: Do we need a separate event to happen when a Paste event happens? Or just use onDrop to handle both the original drop event AND now a Paste event too.
+  // const onPaste = useCallback((acceptedURLs) => { ... }
+
+  // Q: we need to find a way to put a File object created from a URL pasted on the page and simply put it into this method.
+
+  const onInputChange = () => { // just takes whatever is in inputRef currently and updates the file with setFile. So we don't have to edit this function.
     if (inputRef.current && inputRef.current.files && inputRef.current.files[0]) {
-      setFile(inputRef.current.files[0]);
       setShowUploadPage(true);
     }
   };
@@ -43,7 +59,7 @@ const Index: React.FC<Props> = () => {
         </div>
         <div className="cta">
           <div className="drop-notice">
-            <h2>↓ Drag & drop a video file anywhere</h2>
+            <h2>↓ Drag & drop a video file anywhere - or - paste URL</h2>
           </div>
           <label htmlFor="file-input">
             <Button type="button" onClick={() => inputRef.current && inputRef.current.click()}>

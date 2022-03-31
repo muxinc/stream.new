@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -40,7 +40,9 @@ type Props = {
   metaTitle?: string;
   metaDescription?: string;
   image?: string;
-  onFileDrop?: (acceptedFiles: File[]) => void;
+  onFileDrop?: (acceptedFiles: File[]) => void; // this method happens when a File OR URL is dropped. so typescript (?) has us set the Type for these props as a File Object. 
+  // onURLPaste?: (acceptedURLs: URL[]) => void; // other idea - change to URL type instead of File type ?
+  urlString?: string; // I added this to see how we can handle string inputs that need to become files
   darkMode?: boolean;
   centered?: boolean;
   spinningLogo?: boolean;
@@ -54,6 +56,8 @@ const Layout: React.FC<Props> = ({
   metaDescription,
   image = "/stream-new-og-image.png",
   onFileDrop,
+  urlString = "https://file-examples.com/storage/fedc20bc2262440d5c8c9f3/2017/04/file_example_MP4_480_1_5MG.mp4", // temporary string - change her to whatever URL the user is pasting
+  // onURLPaste, // ?
   darkMode,
   centered,
   spinningLogo,
@@ -62,9 +66,46 @@ const Layout: React.FC<Props> = ({
 }) => {
   const router = useRouter();
   const [isModalOpen, setModalOpen] = useState(false);
-  const { getRootProps, isDragActive } = useDropzone({ onDrop: onFileDrop });
-  const isDroppablePage = !!onFileDrop;
+  const { acceptedFiles, getRootProps, isDragActive } = useDropzone({ onDrop: onFileDrop });
+  const isDroppablePage = !!onFileDrop; // change to case where this is a droppable page if BOTH fileDrop and URL Paste events have not happened yet.
+  // console.log('acceptedFiles *', acceptedFiles  ); 
   const containerProps = isDroppablePage ? getRootProps() : {};
+
+  const onCopyText = () => {
+    // test text
+    navigator.clipboard.writeText('oooooooooooooooooo')
+      .then((clipboardText) => {
+        // Success
+        console.log('Successful text copy of clipboard Text: ', clipboardText);
+
+      })
+      .catch(err => {
+        console.log('Something went wrong', err);
+      })
+  }
+
+
+  const onPasteUpload = () => {
+    console.log("Current urlString is: ", urlString);
+    // navigator.clipboard.writeText(urlString);
+
+    navigator.clipboard.readText()
+      .then((clipboardText) => {
+        // Success
+        urlString = clipboardText;
+        console.log('Successful read ', clipboardText);
+      })
+      .catch(err => {
+        console.log('Something went wrong', err);
+      });
+
+    // urlString = 'something new from clipboard';
+    console.log("Current urlString changed ", urlString);
+
+
+
+  }
+  // const {toggle, getIsEnabled } = onPasteUpload
 
   return (
     <>
@@ -86,7 +127,17 @@ const Layout: React.FC<Props> = ({
         {image && <meta property="twitter:image" content={image} />}
       </Head>
       <div className="app-container" {...containerProps}>
-        <div className={`drag-overlay ${isDragActive ? 'active' : ''}`}><h1>Upload to stream.new</h1></div>
+        <div className={`drag-overlay ${isDragActive ? 'active' : ''}`}><h1>Upload local file to stream.new</h1></div>
+        <button
+          onClick={() => onCopyText()}
+        >
+          Copy some text
+        </button>
+        <button
+          onClick={() => onPasteUpload()}
+        >
+          Paste
+        </button>
 
         <div className="modal-wrapper"><InfoModal close={() => setModalOpen(false)} /></div>
         <main className={`${centered ? "content-wrapper-centered" : ""}`}>
