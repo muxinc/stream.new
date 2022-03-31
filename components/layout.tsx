@@ -71,38 +71,37 @@ const Layout: React.FC<Props> = ({
   // console.log('acceptedFiles *', acceptedFiles  ); 
   const containerProps = isDroppablePage ? getRootProps() : {};
 
-  const onCopyText = () => {
-    // test text
-    navigator.clipboard.writeText('oooooooooooooooooo')
-      .then((clipboardText) => {
-        // Success
-        console.log('Successful text copy of clipboard Text: ', clipboardText);
+  function isValidHTTPURL(inputString: string | URL) {
+    let url;
 
-      })
-      .catch(err => {
-        console.log('Something went wrong', err);
-      })
+    try {
+      url = new URL(inputString);
+    } catch (_) {
+      return false;
+    }
+    return url.protocol === "http:" || url.protocol === "https:";
+
   }
 
-
   const onPasteUpload = () => {
-    console.log("Current urlString is: ", urlString);
-    // navigator.clipboard.writeText(urlString);
+    console.log("Started with our urlString which is: ", urlString);
 
+    let stringToTest = '';
     navigator.clipboard.readText()
       .then((clipboardText) => {
         // Success
-        urlString = clipboardText;
-        console.log('Successful read ', clipboardText);
+        // urlString = clipboardText; // revert after checking
+        console.log('Successful read clipboardText', clipboardText);
+
+        // Let's chek if it's a valid URL + turn it into a file
+        console.log('Is this a Valid HTTP(s) URL? Yes or No: ', isValidHTTPURL(clipboardText));
+        
       })
       .catch(err => {
         console.log('Something went wrong', err);
       });
 
-    // urlString = 'something new from clipboard';
     console.log("Current urlString changed ", urlString);
-
-
 
   }
   // const {toggle, getIsEnabled } = onPasteUpload
@@ -129,14 +128,9 @@ const Layout: React.FC<Props> = ({
       <div className="app-container" {...containerProps}>
         <div className={`drag-overlay ${isDragActive ? 'active' : ''}`}><h1>Upload local file to stream.new</h1></div>
         <button
-          onClick={() => onCopyText()}
-        >
-          Copy some text
-        </button>
-        <button
           onClick={() => onPasteUpload()}
         >
-          Paste
+          Paste a URL to change current urlString
         </button>
 
         <div className="modal-wrapper"><InfoModal close={() => setModalOpen(false)} /></div>
