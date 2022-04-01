@@ -600,12 +600,12 @@
     "@mux-elements/mux-video" "0.4.1"
     media-chrome "0.5.4"
 
-"@mux-elements/mux-video-react@^0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@mux-elements/mux-video-react/-/mux-video-react-0.4.1.tgz#24dd83b04ec49627711d731a3b07a303134fc024"
-  integrity sha512-84WuUjqg22D1n17KqoTN5xDDr7UgDkua/PHhRVJuGItscENVyaHMpMZtEAJNG9By+2t5rGnbl/TA87FjvPjVBg==
+"@mux-elements/mux-video-react@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@mux-elements/mux-video-react/-/mux-video-react-0.4.2.tgz#ee12642089dda1944bb36bbb3b592305d729fc53"
+  integrity sha512-nIQGLErDAw2TQHgicX7MlQy+MyILcu9spdVaDEqEvDXVVaRq+LQJqVghdmZUjEhZJzgDMX8R915wp5bj8F+71w==
   dependencies:
-    "@mux-elements/playback-core" "^0.3.0"
+    "@mux-elements/playback-core" "0.3.0"
     prop-types "^15.7.2"
 
 "@mux-elements/mux-video@0.4.1":
@@ -615,7 +615,7 @@
   dependencies:
     "@mux-elements/playback-core" "0.3.0"
 
-"@mux-elements/playback-core@0.3.0", "@mux-elements/playback-core@^0.3.0":
+"@mux-elements/playback-core@0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@mux-elements/playback-core/-/playback-core-0.3.0.tgz#4bba1816b348dfa684bf11c7b9c91df2e0585575"
   integrity sha512-+gB1S11VVfGGK1wT2tt5KpizvlWZsOPjiZDH/0QY7S2DXlTNCRz8ZuJ38jowIQ75pGIiHjyyswUKWJtV5zLlJQ==
