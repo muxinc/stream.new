@@ -152,10 +152,6 @@
   version "7.17.2"
   resolved "https://registry.yarnpkg.com/@babel/helpers/-/helpers-7.17.2.tgz#23f0a0746c8e287773ccd27c14be428891f63417"
   integrity sha512-0Qu7RLR1dILozr/6M0xgj+DFPmi6Bnulgm9M8BVa9ZCWxDqlSnqt3cf8IDPB5m45sVXUZ0kuQAgUrdSFFH79fQ==
-  dependencies:
-    "@babel/template" "^7.16.7"
-    "@babel/traverse" "^7.17.0"
-    "@babel/types" "^7.17.0"
 
 "@babel/highlight@^7.10.4", "@babel/highlight@^7.16.7":
   version "7.16.10"
@@ -331,9 +327,9 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@github/template-parts@https://github.com/muxinc/template-parts.git#mux-player":
+"@github/template-parts@git+https://github.com/muxinc/template-parts.git#mux-player":
   version "0.4.0"
-  resolved "https://github.com/muxinc/template-parts.git#b6f556fb97afe5ddade36ac5dee54ad683c009ff"
+  resolved "git+https://github.com/muxinc/template-parts.git#b6f556fb97afe5ddade36ac5dee54ad683c009ff"
 
 "@google-cloud/promisify@^2.0.0":
   version "2.0.4"
@@ -587,21 +583,21 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@mux-elements/mux-player-react@^0.1.0-beta.1":
-  version "0.1.0-beta.1"
-  resolved "https://registry.yarnpkg.com/@mux-elements/mux-player-react/-/mux-player-react-0.1.0-beta.1.tgz#08784f38cdda15022916a7ab2fbd6af5ac93478e"
-  integrity sha512-7/aPQAggOPp/+iNaV0aK1a7yB2FD9/xvBIt5HSI96NDRbaGsxGVM/Man6MLpiiTQ4IrOfccp3pkW8GgdnAPRsw==
+"@mux-elements/mux-player-react@^0.1.0-beta.2":
+  version "0.1.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@mux-elements/mux-player-react/-/mux-player-react-0.1.0-beta.2.tgz#fa6350060c0a82984ec18fcdd0fe751cf47538b2"
+  integrity sha512-HE1zx4f/ekM5aE3OVm79DS6TeMm+SbywJpyY8W5AWfITnGdrU5I0LRGQeyVUZG8DSLp4EN1ulVJcfui40mAeoA==
   dependencies:
-    "@mux-elements/mux-player" "^0.1.0-beta.1"
+    "@mux-elements/mux-player" "0.1.0-beta.2"
     prop-types "^15.7.2"
 
-"@mux-elements/mux-player@^0.1.0-beta.1":
-  version "0.1.0-beta.1"
-  resolved "https://registry.yarnpkg.com/@mux-elements/mux-player/-/mux-player-0.1.0-beta.1.tgz#bb3dce6c232b4937e4d674db84ae1a18ffbe36c8"
-  integrity sha512-EofK5EA7tdS8Dm0NUT9i6YqAiKaONo1X/XT2kI6Lj0nzQQn1Z3B13sXw3b8kLGA/nhFX3SFNoL58zkKg79yG4g==
+"@mux-elements/mux-player@0.1.0-beta.2":
+  version "0.1.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@mux-elements/mux-player/-/mux-player-0.1.0-beta.2.tgz#17d7e45aa65275dd15dc1c0b00c24e613ac984a9"
+  integrity sha512-Hic5RQVEYYHR1lPfqYKylL+yo6nF2os6RYsxNqcWU39fcEToWWmXYUKLlGEkRtfLshQqHWAMrcxIBivQiYooZQ==
   dependencies:
     "@github/template-parts" "https://github.com/muxinc/template-parts.git#mux-player"
-    "@mux-elements/mux-video" "^0.4.0"
+    "@mux-elements/mux-video" "0.4.1"
     media-chrome "0.5.4"
 
 "@mux-elements/mux-video-react@^0.4.1":
@@ -612,14 +608,14 @@
     "@mux-elements/playback-core" "^0.3.0"
     prop-types "^15.7.2"
 
-"@mux-elements/mux-video@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@mux-elements/mux-video/-/mux-video-0.4.0.tgz#8103aeb0238e553771a391dbb3a27273e2fee3ac"
-  integrity sha512-h84JcGU8Sl0xINyS7W7h8NhrAi8opWdRI4lAllrrOZj8hCQOXaS637/ilCxzQUlPtDmp62ay1GwOrgk1T/ThTg==
+"@mux-elements/mux-video@0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@mux-elements/mux-video/-/mux-video-0.4.1.tgz#8bbd8f06f7e8fdeaf94001ba6eba9493ac4e1412"
+  integrity sha512-QNUipMeUcAeuwmeoj5E1i7nZDSwv9vK3gV0L9b1gpC8uUMMhSibkyPCtle1VHT0p3U7VghY7eJ1v/XHZgF174Q==
   dependencies:
-    "@mux-elements/playback-core" "^0.3.0"
+    "@mux-elements/playback-core" "0.3.0"
 
-"@mux-elements/playback-core@^0.3.0":
+"@mux-elements/playback-core@0.3.0", "@mux-elements/playback-core@^0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@mux-elements/playback-core/-/playback-core-0.3.0.tgz#4bba1816b348dfa684bf11c7b9c91df2e0585575"
   integrity sha512-+gB1S11VVfGGK1wT2tt5KpizvlWZsOPjiZDH/0QY7S2DXlTNCRz8ZuJ38jowIQ75pGIiHjyyswUKWJtV5zLlJQ==
@@ -1263,10 +1259,6 @@ array.prototype.find@^2.1.1:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/array.prototype.find/-/array.prototype.find-2.1.2.tgz#6abbd0c2573925d8094f7d23112306af8c16d534"
   integrity sha512-00S1O4ewO95OmmJW7EesWfQlrCrLEL8kZ40w3+GkLX2yTt0m2ggcePPa2uHPJ9KUmJvwRq+lCV9bD8Yim23x/Q==
-  dependencies:
-    call-bind "^1.0.2"
-    define-properties "^1.1.3"
-    es-abstract "^1.19.0"
 
 array.prototype.flat@^1.2.3:
   version "1.2.5"
@@ -2570,11 +2562,6 @@ fill-range@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/fill-range/-/fill-range-4.0.0.tgz#d544811d428f98eb06a63dc402d2403c328c38f7"
   integrity sha1-1USBHUKPmOsGpj3EAtJAPDKMOPc=
-  dependencies:
-    extend-shallow "^2.0.1"
-    is-number "^3.0.0"
-    repeat-string "^1.6.1"
-    to-regex-range "^2.1.0"
 
 fill-range@^7.0.1:
   version "7.0.1"
@@ -2726,9 +2713,6 @@ get-symbol-description@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/get-symbol-description/-/get-symbol-description-1.0.0.tgz#7fdb81c900101fbd564dd5f1a30af5aadc1e58d6"
   integrity sha512-2EmdH1YvIQiZpltCNgkuiUnyukzxM/R6NDJX31Ke3BG1Nq5b0S2PhX59UKi9vZpPDQVdqn+1IcaAwnzTT5vCjw==
-  dependencies:
-    call-bind "^1.0.2"
-    get-intrinsic "^1.1.1"
 
 get-value@^2.0.3, get-value@^2.0.6:
   version "2.0.6"
@@ -5763,11 +5747,6 @@ union-value@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/union-value/-/union-value-1.0.1.tgz#0b6fe7b835aecda61c6ea4d4f02c14221e109847"
   integrity sha512-tJfXmxMeWYnczCVs7XAEvIV7ieppALdyepWMkHkwciRpZraG/xwT+s2JN8+pr1+8jCRf80FFzvr+MpQeeoF4Xg==
-  dependencies:
-    arr-union "^3.1.0"
-    get-value "^2.0.6"
-    is-extendable "^0.1.1"
-    set-value "^2.0.1"
 
 universalify@^0.1.2:
   version "0.1.2"
