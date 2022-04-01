@@ -4,8 +4,6 @@ import { breakpoints } from '../style-vars';
 import Layout from '../components/layout';
 import Button from '../components/button';
 import UploadProgressFullpage from '../components/upload-progress-fullpage';
-// import Mux from '@mux/mux-node';
-// const { Video } = new Mux('', '')
 
 type Props = null;
 
