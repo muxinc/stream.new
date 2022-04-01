@@ -660,18 +660,18 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@mux-elements/mux-player-react@^0.1.0-beta.2":
-  version "0.1.0-beta.2"
-  resolved "https://registry.yarnpkg.com/@mux-elements/mux-player-react/-/mux-player-react-0.1.0-beta.2.tgz#fa6350060c0a82984ec18fcdd0fe751cf47538b2"
-  integrity sha512-HE1zx4f/ekM5aE3OVm79DS6TeMm+SbywJpyY8W5AWfITnGdrU5I0LRGQeyVUZG8DSLp4EN1ulVJcfui40mAeoA==
+"@mux-elements/mux-player-react@^0.1.0-beta.3":
+  version "0.1.0-beta.3"
+  resolved "https://registry.yarnpkg.com/@mux-elements/mux-player-react/-/mux-player-react-0.1.0-beta.3.tgz#cf918375d5b96aadce0dc25fa2e301eedc3bf931"
+  integrity sha512-/Ur6c74y4GuwcGqoCfh+1FTXyms4hIuiTqFVUWpLnNtsxYLtCjfrG2rApmmzAiXvCK0YVYbxLa+HAVvON99nRw==
   dependencies:
-    "@mux-elements/mux-player" "0.1.0-beta.2"
+    "@mux-elements/mux-player" "0.1.0-beta.3"
     prop-types "^15.7.2"
 
-"@mux-elements/mux-player@0.1.0-beta.2":
-  version "0.1.0-beta.2"
-  resolved "https://registry.yarnpkg.com/@mux-elements/mux-player/-/mux-player-0.1.0-beta.2.tgz#17d7e45aa65275dd15dc1c0b00c24e613ac984a9"
-  integrity sha512-Hic5RQVEYYHR1lPfqYKylL+yo6nF2os6RYsxNqcWU39fcEToWWmXYUKLlGEkRtfLshQqHWAMrcxIBivQiYooZQ==
+"@mux-elements/mux-player@0.1.0-beta.3":
+  version "0.1.0-beta.3"
+  resolved "https://registry.yarnpkg.com/@mux-elements/mux-player/-/mux-player-0.1.0-beta.3.tgz#8d506a63057652991073d000da3b3d9a2f39d85f"
+  integrity sha512-ijtJlBIvKQJ/tnLUduDUuSHgsPN8vhfYv+USapDEiQpIYtgTT1G4aYGn8KQwmhrpJQcAgzo3pYcn92AWgIar3Q==
   dependencies:
     "@github/template-parts" "https://github.com/muxinc/template-parts.git#mux-player"
     "@mux-elements/mux-video" "0.4.1"
