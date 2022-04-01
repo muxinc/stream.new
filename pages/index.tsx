@@ -55,6 +55,9 @@ const Index: React.FC<Props> = () => {
           body: myEndpoint.current.value
         })
           .then((res) => res.json())
+          // this needs to change because
+          // a direct upload isn't happening,
+          // if something different should happen
           .then(({ id, status }) => {
             setAssetId(id);
             return status;
