@@ -10,6 +10,7 @@ export default async (req: NextApiRequest, res: NextApiResponse): Promise<void> 
     case 'POST':
       try {
         const asset = await Video.Assets.create({
+          // this is the text box contents from index.ts
           input: req.body,
           "playback_policy": [
             "public"
@@ -22,7 +23,7 @@ export default async (req: NextApiRequest, res: NextApiResponse): Promise<void> 
       } catch (e) {
         res.statusCode = 500;
         console.error('Request error', e); // eslint-disable-line no-console
-        res.json({ error: 'Error creating upload' });
+        res.json({ error: 'Error creating asset' });
       }
       break;
     default:
