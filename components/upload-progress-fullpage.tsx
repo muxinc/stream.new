@@ -100,6 +100,9 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
 
         fetch('/api/telemetry', {
           method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({
             type: 'upload',
             data: uploadAnalytics,
