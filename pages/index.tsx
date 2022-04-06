@@ -11,6 +11,9 @@ const Index: React.FC<Props> = () => {
   const [file, setFile] = useState<File | null>(null);
   const [showUploadPage, setShowUploadPage] = useState(true);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const [assetID, setAssetId] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const myEndpoint = useRef<HTMLInputElement>(null);
 
   console.log('file at beginning of index', file); // This will become our File object
   console.log('inputRef at beginning of index', inputRef); // this will become our HTML Input element from the video
@@ -48,6 +51,57 @@ const Index: React.FC<Props> = () => {
     return <UploadProgressFullpage file={file} resetPage={() => setShowUploadPage(false)}/>;
   }
 
+  // const myFunc1 = async () => {
+  //   const asset = await Video.Assets.create({
+  //     input: myEndpoint,
+  //     "playback_policy": [
+  //       "public"
+  //     ],
+  //   });
+  // }
+
+  const myFunc2 = async () => {
+    if (myEndpoint) {
+
+      try {
+        return fetch('/api/assets', {
+          method: 'POST',
+          body: myEndpoint.current.value
+        })
+          .then((res) => res.json())
+          // this needs to change because
+          // a direct upload isn't happening,
+          // if something different should happen
+          .then(({ id, status }) => {
+            setAssetId(id);
+            return status;
+          });
+      } catch (e) {
+        console.error('Error in createUpload', e); // eslint-disable-line no-console
+        setErrorMessage('Error creating upload');
+        return Promise.reject(e);
+      }
+
+    }
+    try {
+      return fetch('/api/assets', {
+        method: 'POST',
+      })
+        .then((res) => res.json())
+        .then(({ id, status }) => {
+          setAssetId(id);
+          console.log(id)
+          console.log(status)
+          return status;
+        });
+    } catch (e) {
+      console.error('Error in createUpload', e); // eslint-disable-line no-console
+      setErrorMessage('Error creating upload');
+      return Promise.reject(e);
+    }
+
+  }
+
   return (
     <Layout
       onFileDrop={onDrop}
@@ -56,6 +110,8 @@ const Index: React.FC<Props> = () => {
         <div>
           <h1>Add a video.</h1>
           <h1>Get a shareable link to stream it.</h1>
+          <input className='aminBox' ref={myEndpoint} id="location" type="text" placeholder="Mux Upload URL" /> 
+          <input onClick={myFunc2} className='aminBox' id="startupload" type="button" value="start upload" /> 
         </div>
         <div className="cta">
           <div className="drop-notice">
@@ -77,7 +133,7 @@ const Index: React.FC<Props> = () => {
         </div>
       </div>
       <style jsx>{`
-        input {
+        input:not(.aminBox) {
           display: none;
         }
         .drop-notice {
