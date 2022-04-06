@@ -152,6 +152,7 @@ Set the optional environment variables either directly in the vercel UI or by up
 - `SLACK_WEBHOOK_ASSET_READY` - This is the `https://hooks.slack.com/services/....` URL when you created the Slack Incoming Webhook.
 - `SLACK_MODERATOR_PASSWORD` - This is the password that will be used to authorize deleting assets from the slack moderator (The button with the red text "DELETE (cannot be undone)")
 - `NEXT_PUBLIC_MUX_ENV_KEY` - This is the env key to use with [Mux Data](https://docs.mux.com/docs/data). Note this is different than your API key and this environment key can be found on your [environment page in the Mux dashboard](https://dashboard.mux.com/environments)
+- `TELEMETRY_ENDPOINT` - This is an endpoint where instrumented telemetry data is sent. As of this update, the only place we collect/send telemetry data is around upload performance in order to test different configurations of [UpChunk](https://github.com/muxinc/upchunk), but there may be more in the future.
 
 After all of this is set up the flow will be:
 
