@@ -36,10 +36,20 @@ const Index: React.FC<Props> = () => {
     }
   }, []);
 
-  // Q: Do we need a separate event to happen when a Paste event happens? Or just use onDrop to handle both the original drop event AND now a Paste event too.
-  // const onPaste = useCallback((acceptedURLs) => { ... }
+  // const pasteHandler = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
+  //   event.currentTarget.style.border = "5px solid purple";
+  //   event.currentTarget.style.backgroundColor = "orange";
 
-  // Q: we need to find a way to put a File object created from a URL pasted on the page and simply put it into this method.
+  //   console.log(event.clipboardData.getData("text"));
+
+  //   // Transform the copied/cut text to upper case
+  //   event.currentTarget.value = event.clipboardData
+  //     .getData("text")
+  //     .toUpperCase();
+
+  //   event.preventDefault();
+  // }; 
+
 
   const onInputChange = () => { // just takes whatever is in inputRef currently and updates the file with setFile. So we don't have to edit this function.
     if (inputRef.current && inputRef.current.files && inputRef.current.files[0]) {
@@ -51,14 +61,14 @@ const Index: React.FC<Props> = () => {
     return <UploadProgressFullpage file={file} resetPage={() => setShowUploadPage(false)}/>;
   }
 
-  // const myFunc1 = async () => {
-  //   const asset = await Video.Assets.create({
-  //     input: myEndpoint,
-  //     "playback_policy": [
-  //       "public"
-  //     ],
-  //   });
-  // }
+  const myFunc1 = async () => {
+    const asset = await Video.Assets.create({
+      input: myEndpoint,
+      "playback_policy": [
+        "public"
+      ],
+    });
+  }
 
   const myFunc2 = async () => {
     if (myEndpoint) {
