@@ -10,7 +10,14 @@ export default async (
 
   switch (method) {
     case 'POST':
-      console.log(body);
+      /* eslint-disable-next-line no-case-declarations */
+      const telemetryData = {
+        ...body,
+        uploaderCountry: headers['x-vercel-ip-country'],
+        uploaderCountryRegion: headers['x-vercel-ip-country-region'],
+        userAgent: headers['user-agent'],
+      };
+      console.log(telemetryData);
       if (TELEMETRY_ENDPOINT) {
         res.send(
           await fetch(TELEMETRY_ENDPOINT, {
@@ -18,10 +25,7 @@ export default async (
             headers: {
               'Content-Type': 'application/json',
             },
-            body: {
-              ...body,
-              uploaderCountry: headers['x-vercel-ip-country'],
-            },
+            body: JSON.stringify(telemetryData)
           })
         );
       } else {
