@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import copy from 'copy-to-clipboard';
@@ -50,6 +50,18 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
       setErrorMessage(`Don't know how to load the player called: ${playerType}`);
     }
   }, [playerType]);
+
+  const color = useMemo(() => {
+    if (router.query?.color) {
+      const val = (router.query?.color as string);
+      if (/^[0-9a-fA-F]+$/.test(val)) {
+        return `#${val}`;
+      } else {
+        logger.warn('Invalid color hex value param:', val);
+      }
+    }
+  }, [router.query]);
+
 
   if (router.isFallback) {
     return (
@@ -125,6 +137,7 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
         <div className="wrapper">
           {(tryToLoadPlayer && aspectRatio && !openReport) && (
             <PlayerLoader
+              color={color}
               playbackId={playbackId}
               poster={poster}
               currentTime={startTime}

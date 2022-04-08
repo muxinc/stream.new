@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 import MuxPlayer from '@mux-elements/mux-player-react';
-import { MUX_DATA_CUSTOM_DOMAIN } from '../constants'
+import { MUX_DATA_CUSTOM_DOMAIN } from '../constants';
 
 type Props = {
   playbackId: string
+  color?: string
   poster: string
   currentTime?: number
   aspectRatio: number
@@ -11,7 +12,7 @@ type Props = {
   onError: (error: ErrorEvent) => void;
 };
 
-const MuxPlayerInternal: React.FC<Props> = ({ playbackId, poster, currentTime, onLoaded, onError, aspectRatio}) => {
+const MuxPlayerInternal: React.FC<Props> = ({ playbackId, poster, currentTime, color, onLoaded, onError, aspectRatio}) => {
   useEffect(() => {
     onLoaded();
   }, []);
@@ -25,6 +26,7 @@ const MuxPlayerInternal: React.FC<Props> = ({ playbackId, poster, currentTime, o
       startTime={currentTime}
       envKey={process.env.NEXT_PUBLIC_MUX_ENV_KEY}
       streamType="on-demand"
+      primaryColor={color}
       style={{ aspectRatio: `${aspectRatio}`, maxWidth: '100%', maxHeight: '100%', width: 'auto', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
       metadata={{
         video_id: playbackId,

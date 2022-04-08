@@ -15,8 +15,9 @@ const MuxPlayer = dynamic(() => import('./mux-player'));
 const MuxVideo = dynamic(() => import('./mux-video'));
 
 type Props = {
-  playbackId: string
-  poster: string
+  playbackId: string;
+  poster: string;
+  color?: string;
   currentTime?: number
   aspectRatio: number;
   onLoaded: () => void;
@@ -24,12 +25,12 @@ type Props = {
   onError: (error: ErrorEvent) => void;
 };
 
-const PlayerLoader = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, poster, currentTime, aspectRatio, playerType, onLoaded, onError }, ref) => {
+const PlayerLoader = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, poster, currentTime, aspectRatio, playerType, color, onLoaded, onError }, ref) => {
   return (
     <>
       <div className='video-container'>
         {playerType === PLYR_TYPE && <PlyrPlayer forwardedRef={ref} aspectRatio={aspectRatio} playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
-        {playerType === MUX_PLAYER_TYPE && <MuxPlayer playbackId={playbackId} aspectRatio={aspectRatio} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
+        {playerType === MUX_PLAYER_TYPE && <MuxPlayer playbackId={playbackId} aspectRatio={aspectRatio} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} color={color} />}
         {playerType === MUX_VIDEO_TYPE && <MuxVideo playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
       </div>
       <style jsx>{`
