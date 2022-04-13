@@ -12,16 +12,20 @@ type Props = {
   onError: (error: ErrorEvent) => void;
 };
 
-const MuxPlayerInternal: React.FC<Props> = ({ playbackId, poster, currentTime, color, onLoaded, onError, aspectRatio}) => {
+const MuxPlayerInternal: React.FC<Props> = ({ playbackId, poster, currentTime, color, onLoaded, aspectRatio}) => {
   useEffect(() => {
     onLoaded();
   }, []);
+
+  const onError = (err: ErrorEvent) => {
+    console.warn('Got an onError from Mux Player, the Player UI should be showing an error', err);
+  };
 
   return (
     <MuxPlayer
       beaconCollectionDomain={MUX_DATA_CUSTOM_DOMAIN}
       playbackId={playbackId}
-      onError={(evt) => onError(evt as ErrorEvent)}
+      onError={(err) => onError(err as ErrorEvent)}
       poster={poster}
       startTime={currentTime}
       envKey={process.env.NEXT_PUBLIC_MUX_ENV_KEY}
