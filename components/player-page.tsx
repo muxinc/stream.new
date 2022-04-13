@@ -62,6 +62,10 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
     }
   }, [router.query]);
 
+  const startTime = useMemo(() => {
+    return (router.query?.time && parseFloat(router.query.time as string)) || 0;
+  }, [router.query]);
+
 
   if (router.isFallback) {
     return (
@@ -97,9 +101,6 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
       copyTimeoutRef.current = null;
     }, 5000);
   };
-
-  const startTime =
-    (router.query?.time && parseFloat(router.query.time as string)) || 0;
 
   if (errorMessage) {
     return (

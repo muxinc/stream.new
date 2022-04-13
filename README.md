@@ -248,7 +248,7 @@ Each dimension will have a score from 0-1 with a precision of 6 decimal places. 
 
 # Hidden playback features via query params:
 
-- `start`: will start the video at a specific timestamp in seconds, for example `?start=10` will start at 10 seconds [like this](https://stream.new/v/XQDCNm01ZPyGg81GzK4mQfL7fxFoqP8uo?start=10)
+- `time`: will start the video at a specific timestamp in seconds, for example `?time=10` will start at 10 seconds [like this](https://stream.new/v/XQDCNm01ZPyGg81GzK4mQfL7fxFoqP8uo?time=10)
 - `color`: a hex value *without* the `#` character will theme the Mux Player with the primaryColor. It's important to omit the `#` for example `?color=f97316` [like this](https://stream.new/v/XQDCNm01ZPyGg81GzK4mQfL7fxFoqP8uo?color=f97316)
 
 # Videos to test in development:
