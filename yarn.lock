@@ -406,9 +406,9 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@github/template-parts@https://github.com/muxinc/template-parts.git#mux-player":
+"@github/template-parts@git+https://github.com/muxinc/template-parts.git#mux-player":
   version "0.4.0"
-  resolved "https://github.com/muxinc/template-parts.git#b6f556fb97afe5ddade36ac5dee54ad683c009ff"
+  resolved "git+https://github.com/muxinc/template-parts.git#b6f556fb97afe5ddade36ac5dee54ad683c009ff"
 
 "@google-cloud/promisify@^2.0.0":
   version "2.0.4"
@@ -660,18 +660,18 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@mux-elements/mux-player-react@^0.1.0-beta.5":
-  version "0.1.0-beta.5"
-  resolved "https://registry.yarnpkg.com/@mux-elements/mux-player-react/-/mux-player-react-0.1.0-beta.5.tgz#d974285bb6d6697fbbbeaa2804a28b0647f93534"
-  integrity sha512-nj7xEvymdcp2m4W6lwPnw8OVSR7i/SPfejvU38IzDEA3Ipvu0oAXI4ps82ybEuKKWjIOy+aeK5ZAWzaHTGUYpA==
+"@mux-elements/mux-player-react@^0.1.0-beta.6":
+  version "0.1.0-beta.6"
+  resolved "https://registry.yarnpkg.com/@mux-elements/mux-player-react/-/mux-player-react-0.1.0-beta.6.tgz#d99bc61e5615e45de157335f93cb80d9639b6fa3"
+  integrity sha512-5lkJ7vl5bJP3/Nr10M1VmHD5tFbdrjLugK2Gr0s0RWFp5gp61UuCtYwtIpeQY9PWsAbCMzvLe6Fjkd4Lcuuqrw==
   dependencies:
-    "@mux-elements/mux-player" "0.1.0-beta.5"
+    "@mux-elements/mux-player" "0.1.0-beta.6"
     prop-types "^15.7.2"
 
-"@mux-elements/mux-player@0.1.0-beta.5":
-  version "0.1.0-beta.5"
-  resolved "https://registry.yarnpkg.com/@mux-elements/mux-player/-/mux-player-0.1.0-beta.5.tgz#e2836082fa3b88ade8e38ce0024614105d3887ea"
-  integrity sha512-iE5Rzz7uxIl/btvmFScVOHsm/d9TwLip4zC29lG3rhmGnb5cBMpexuwM3hO7Qw9oRkCZ9Ua6NGEUo/WI3gqebQ==
+"@mux-elements/mux-player@0.1.0-beta.6":
+  version "0.1.0-beta.6"
+  resolved "https://registry.yarnpkg.com/@mux-elements/mux-player/-/mux-player-0.1.0-beta.6.tgz#0a0b5c8791fa7de48a8b12e249fe21f97be68e0f"
+  integrity sha512-IRTUrBvMEJOtvVU00aNsC3E0GNuX5GzC++Aw39LSr8bXNTAmQtDozTYe8pRPYb/BWXG4QndmrUGYtBiQ4l9Cng==
   dependencies:
     "@github/template-parts" "https://github.com/muxinc/template-parts.git#mux-player"
     "@mux-elements/mux-video" "0.4.3"
