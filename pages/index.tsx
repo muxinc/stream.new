@@ -50,7 +50,7 @@ const Index: React.FC<Props> = () => {
 
   const myFunc2 = async () => {
     if (! isValidHTTPURL(myEndpoint.current?.value)) {
-      setErrorMessage('not a valid url, try again ')
+      setErrorMessage('not a valid url, try again ');
     }
     else {
       if (myEndpoint && isValidHTTPURL(myEndpoint.current?.value)) {
@@ -95,9 +95,7 @@ const Index: React.FC<Props> = () => {
     }
   };
 
-  const resetInputRef = async () => {
-
-  }
+  // const resetInputRef = async () => { ... }; // todo
 
   return (
     <Layout
