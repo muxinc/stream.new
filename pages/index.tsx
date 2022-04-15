@@ -13,7 +13,7 @@ const Index: React.FC<Props> = () => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [assetID, setAssetId] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const myEndpoint = useRef<HTMLInputElement>(null);
+  const myEndpoint = useRef<HTMLInputElement | null>(null);
 
   const onDrop = useCallback((acceptedFiles) => {
     if (acceptedFiles && acceptedFiles[0]) {
@@ -35,29 +35,56 @@ const Index: React.FC<Props> = () => {
     return <UploadProgressFullpage file={file} resetPage={() => setShowUploadPage(false)}/>;
   }
 
-  // const myFunc1 = async () => {
-  //   const asset = await Video.Assets.create({
-  //     input: myEndpoint,
-  //     "playback_policy": [
-  //       "public"
-  //     ],
-  //   });
-  // }
+  function isValidHTTPURL(inputString: string | URL) {
+    let url;
+    try {
+      url = new URL(inputString);
+    } catch (_) {
+      return false;
+    }
+    return url.protocol === "http:" || url.protocol === "https:";
+  }
 
   const myFunc2 = async () => {
-    if (myEndpoint) {
+    // console.log(isValidHTTPURL(myEndpoint.current?.value)) // true
+    if (! isValidHTTPURL(myEndpoint.current?.value)) {
+      console.log ('not a valid url, try again ')
+    }
+    else {
+      console.log ('valid url')
 
+      if (myEndpoint && isValidHTTPURL(myEndpoint.current?.value)) {
+        console.log('myEndpoint', myEndpoint, myEndpoint.current.value);
+        try {
+          return fetch('/api/assets', {
+            method: 'POST',
+            body: myEndpoint.current.value // Error: Endpoint is possibly null
+          })
+            .then((res) => res.json())
+            // this needs to change because
+            // a direct upload isn't happening,
+            // if something different should happen
+            .then(({ id, status }) => {
+              setAssetId(id);
+              console.log('new asset id', id);
+              console.log('status', status);
+              return status;
+            });
+        } catch (e) {
+          console.error('Error in createUpload', e); // eslint-disable-line no-console
+          setErrorMessage('Error creating upload');
+          return Promise.reject(e);
+        }
+      }
       try {
         return fetch('/api/assets', {
           method: 'POST',
-          body: myEndpoint.current.value
         })
           .then((res) => res.json())
-          // this needs to change because
-          // a direct upload isn't happening,
-          // if something different should happen
           .then(({ id, status }) => {
             setAssetId(id);
+            console.log('new asset id', id);
+            console.log('status', status)
             return status;
           });
       } catch (e) {
@@ -65,25 +92,7 @@ const Index: React.FC<Props> = () => {
         setErrorMessage('Error creating upload');
         return Promise.reject(e);
       }
-
     }
-    try {
-      return fetch('/api/assets', {
-        method: 'POST',
-      })
-        .then((res) => res.json())
-        .then(({ id, status }) => {
-          setAssetId(id);
-          console.log(id)
-          console.log(status)
-          return status;
-        });
-    } catch (e) {
-      console.error('Error in createUpload', e); // eslint-disable-line no-console
-      setErrorMessage('Error creating upload');
-      return Promise.reject(e);
-    }
-
   }
 
   return (
