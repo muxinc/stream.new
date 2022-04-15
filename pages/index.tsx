@@ -11,8 +11,8 @@ const Index: React.FC<Props> = () => {
   const [file, setFile] = useState<File | null>(null);
   const [showUploadPage, setShowUploadPage] = useState(true);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [assetID, setAssetId] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [assetID, setAssetId] = useState('');  // eslint-disable-line
+  const [errorMessage, setErrorMessage] = useState('');// eslint-disable-line
   const myEndpoint = useRef<HTMLInputElement | null>(null);
 
   const onDrop = useCallback((acceptedFiles) => {
@@ -48,10 +48,10 @@ const Index: React.FC<Props> = () => {
   const myFunc2 = async () => {
     // console.log(isValidHTTPURL(myEndpoint.current?.value)) // true
     if (! isValidHTTPURL(myEndpoint.current?.value)) {
-      console.log ('not a valid url, try again ')
+      console.log ('not a valid url, try again ');
     }
     else {
-      console.log ('valid url')
+      console.log ('valid url');
 
       if (myEndpoint && isValidHTTPURL(myEndpoint.current?.value)) {
         console.log('myEndpoint', myEndpoint, myEndpoint.current.value);
@@ -84,7 +84,7 @@ const Index: React.FC<Props> = () => {
           .then(({ id, status }) => {
             setAssetId(id);
             console.log('new asset id', id);
-            console.log('status', status)
+            console.log('status', status);
             return status;
           });
       } catch (e) {
@@ -93,7 +93,7 @@ const Index: React.FC<Props> = () => {
         return Promise.reject(e);
       }
     }
-  }
+  };
 
   return (
     <Layout

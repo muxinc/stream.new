@@ -4,7 +4,7 @@ import Mux from '@mux/mux-node';
 const { Video } = new Mux();
 
 export default async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
-  const { method, body } = req;
+  const { method, body } = req; // eslint-disable-line
 
   switch (method) {
     case 'POST':
