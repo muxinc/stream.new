@@ -8,16 +8,18 @@ import Button from './button';
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 const MAX_VIDEO_DURATION_MIN = 60;
 
+type ChunkInfo = {
+  size: number;
+  uploadStarted: number;
+  uploadFinished?: number;
+}
+
 type UploadTelemetry = {
   fileSize: number;
   uploadStarted: number;
   uploadFinished?: number;
   chunkSize: number;
-  [chunk: number]: {
-    size: number;
-    uploadStarted: number;
-    uploadFinished?: number;
-  };
+  chunks: ChunkInfo[];
 };
 
 type Props = {
@@ -74,17 +76,18 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
         fileSize: _file.size,
         chunkSize: upChunk.chunkSize,
         uploadStarted: Date.now(),
+        chunks: [],
       };
 
       upChunk.on('attempt', ({ detail }) => {
-        uploadAnalytics[detail.chunkNumber] = {
+        uploadAnalytics.chunks[detail.chunkNumber] = {
           size: detail.chunkSize,
           uploadStarted: Date.now(),
         };
       });
 
       upChunk.on('chunkSuccess', ({ detail }) => {
-        uploadAnalytics[detail.chunk].uploadFinished = Date.now();
+        uploadAnalytics.chunks[detail.chunk].uploadFinished = Date.now();
       });
 
       upChunk.on('error', (err) => {
