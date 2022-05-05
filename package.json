@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "@google-cloud/vision": "^2.3.2",
-    "@mux-elements/mux-player-react": "^0.1.0-beta.6",
-    "@mux-elements/mux-video-react": "^0.4.3",
+    "@mux-elements/mux-player-react": "^0.1.0-beta.9",
+    "@mux-elements/mux-video-react": "^0.4.6",
     "@mux/mux-node": "^3.2",
     "@mux/upchunk": "^2.3",
     "@types/probe-image-size": "^7.0.0",
