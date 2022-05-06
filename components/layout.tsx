@@ -81,7 +81,7 @@ const Layout: React.FC<Props> = ({
         )}
         {image && <meta property="og:image" content={image} />}
         {image && (
-          <meta property="twitter:card" content="summary_large_image" />
+          <meta property="twitter:card" content="player" />
         )}
         {image && <meta property="twitter:image" content={image} />}
       </Head>
