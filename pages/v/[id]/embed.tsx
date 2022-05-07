@@ -7,7 +7,7 @@ import PlayerLoader from '../../../components/player-loader';
 import Layout from '../../../components/layout';
 import Asterisk from '../../../components/asterisk';
 import { OPEN_SOURCE_URL, MUX_HOME_PAGE_URL, HOST_URL } from '../../../constants';
-import { HTMLVideoElementWithPlyr } from '../../../types';
+import { PlayerElement } from '../../../types';
 import logger from '../../../lib/logger';
 import { getImageDimensions } from '../../../lib/image-dimensions';
 import { getImageBaseUrl } from '../../../lib/urlutils';
@@ -60,7 +60,6 @@ const AsteriskButton: React.FC<AsteriskButtonProps> = ({ onOpenOverlay }) => {
       </a>
       <style jsx>{`
         a {
-          background: var(--plyr-video-control-background-hover,var(--plyr-color-main,var(--plyr-color-main,#00b3ff)));
           border-radius: 50%;
           padding: 5px;
           display: flex;
@@ -76,7 +75,7 @@ const AsteriskButton: React.FC<AsteriskButtonProps> = ({ onOpenOverlay }) => {
 };
 
 const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster, aspectRatio }) => {
-  const videoRef = useRef<HTMLVideoElementWithPlyr>(null);
+  const videoRef = useRef<PlayerElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showOverlay, setShowOverlay] = useState(false);
@@ -92,7 +91,7 @@ const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster, aspectRatio }) 
   };
 
   const onOpenOverlay = () => {
-    setWasPlaying(videoRef.current?.plyr?.playing || false);
+    setWasPlaying(!videoRef.current?.paused);
 
     videoRef.current?.pause();
 
@@ -129,7 +128,7 @@ const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster, aspectRatio }) 
       {errorMessage && <h1 className="error-message">{errorMessage}</h1>}
       {showLoading && <FullpageLoader text="Loading player" />}
       <div className="wrapper">
-        <PlayerLoader playerType="plyr" ref={videoRef} playbackId={playbackId} poster={poster} currentTime={startTime} aspectRatio={aspectRatio} onLoaded={() => setIsLoaded(true)} onError={onError} />
+        <PlayerLoader playerType="mux-player" ref={videoRef} playbackId={playbackId} poster={poster} currentTime={startTime} aspectRatio={aspectRatio} onLoaded={() => setIsLoaded(true)} onError={onError} />
         <div className='asterisk-container'>
           <AsteriskButton onOpenOverlay={onOpenOverlay} />
         </div>
@@ -156,12 +155,6 @@ const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster, aspectRatio }) 
         .error-message {
           color: #ccc;
         }
-        .wrapper :global(video) {
-          width: 100%;
-          height: 100%;
-          max-width: unset;
-          max-height: unset;
-        }
         .asterisk-container {
           position: absolute;
           top: 1.2rem;
@@ -185,7 +178,7 @@ const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster, aspectRatio }) 
           color: #f8f8f8;
           cursor: pointer;
         }
-        :global(.plyr), .overlay-container {
+        :global(mux-player), .overlay-container {
           position: absolute;
           top: 0;
           bottom: 0;
