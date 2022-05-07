@@ -1,5 +1,6 @@
-import { forwardRef } from 'react';
-import { HTMLVideoElementWithPlyr } from '../types';
+import { ForwardedRef, forwardRef } from 'react';
+import { HTMLVideoElementWithPlyr, PlayerElement } from '../types';
+import type MuxPlayerElement from '@mux-elements/mux-player';
 import { PLYR_TYPE, MUX_PLAYER_TYPE, MUX_VIDEO_TYPE } from '../constants';
 import dynamic from 'next/dynamic';
 
@@ -25,12 +26,14 @@ type Props = {
   onError: (error: ErrorEvent) => void;
 };
 
-const PlayerLoader = forwardRef<HTMLVideoElementWithPlyr, Props>(({ playbackId, poster, currentTime, aspectRatio, playerType, color, onLoaded, onError }, ref) => {
+
+
+const PlayerLoader = forwardRef<PlayerElement, Props>(({ playbackId, poster, currentTime, aspectRatio, playerType, color, onLoaded, onError }, ref) => {
   return (
     <>
       <div className='video-container'>
-        {playerType === PLYR_TYPE && <PlyrPlayer forwardedRef={ref} aspectRatio={aspectRatio} playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
-        {playerType === MUX_PLAYER_TYPE && <MuxPlayer playbackId={playbackId} aspectRatio={aspectRatio} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} color={color} />}
+        {playerType === PLYR_TYPE && <PlyrPlayer forwardedRef={ref as ForwardedRef<HTMLVideoElementWithPlyr>} aspectRatio={aspectRatio} playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
+        {playerType === MUX_PLAYER_TYPE && <MuxPlayer forwardedRef={ref as ForwardedRef<MuxPlayerElement>} playbackId={playbackId} aspectRatio={aspectRatio} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} color={color} />}
         {playerType === MUX_VIDEO_TYPE && <MuxVideo playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
       </div>
       <style jsx>{`

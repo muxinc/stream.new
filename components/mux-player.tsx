@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import MuxPlayer from '@mux-elements/mux-player-react';
+import type MuxPlayerElement from '@mux-elements/mux-player';
 import { MUX_DATA_CUSTOM_DOMAIN } from '../constants';
 
 type Props = {
@@ -9,10 +10,11 @@ type Props = {
   currentTime?: number
   aspectRatio: number
   onLoaded: () => void
-  onError: (error: ErrorEvent) => void;
+  onError: (error: ErrorEvent) => void
+  forwardedRef: React.ForwardedRef<MuxPlayerElement>;
 };
 
-const MuxPlayerInternal: React.FC<Props> = ({ playbackId, poster, currentTime, color, onLoaded, aspectRatio}) => {
+const MuxPlayerInternal: React.FC<Props> = ({ forwardedRef, playbackId, poster, currentTime, color, onLoaded, aspectRatio}) => {
   useEffect(() => {
     onLoaded();
   }, []);
@@ -23,6 +25,7 @@ const MuxPlayerInternal: React.FC<Props> = ({ playbackId, poster, currentTime, c
 
   return (
     <MuxPlayer
+      ref={forwardedRef}
       beaconCollectionDomain={MUX_DATA_CUSTOM_DOMAIN}
       playbackId={playbackId}
       onError={(err) => onError(err as ErrorEvent)}
