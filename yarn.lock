@@ -406,9 +406,10 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@github/template-parts@git+https://github.com/muxinc/template-parts.git#mux-player":
-  version "0.4.0"
-  resolved "git+https://github.com/muxinc/template-parts.git#b6f556fb97afe5ddade36ac5dee54ad683c009ff"
+"@github/template-parts@^0.5.2":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@github/template-parts/-/template-parts-0.5.2.tgz#7a1fd71c7b7234c53fcac6e34bd8b580785deee2"
+  integrity sha512-AjcJP1I12nhnjXJ2iiGptf3LUkPiv25oo7UtwVvHM1n4p53OdNITBy2QVvTbnU0RVPf2Aoj8qBwjiEWAbqgmYA==
 
 "@google-cloud/promisify@^2.0.0":
   version "2.0.4"
@@ -660,20 +661,20 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@mux-elements/mux-player-react@^0.1.0-beta.10":
-  version "0.1.0-beta.10"
-  resolved "https://registry.yarnpkg.com/@mux-elements/mux-player-react/-/mux-player-react-0.1.0-beta.10.tgz#1085003104381b95b6431da26a966d31a2b05111"
-  integrity sha512-GUDmfE1qPDepYhybB+/t2WjV3axZzvZrqlmufBxkl1hq63Sy4isV2CRPCYV/XKParkdma8IZu05uWBnkq7Qu2g==
+"@mux-elements/mux-player-react@^0.1.0-beta.11":
+  version "0.1.0-beta.11"
+  resolved "https://registry.yarnpkg.com/@mux-elements/mux-player-react/-/mux-player-react-0.1.0-beta.11.tgz#8a748dc8c3b51172ab8aae9ab7f633e4337fb246"
+  integrity sha512-8dgV1644CYcC9zRM3IRoKXQZ3WVnt6PEomS5QIcQx51BRIzMZcPRKbZCP3+6cs2k1PnPsSOzwiBpIONM3VXtNw==
   dependencies:
-    "@mux-elements/mux-player" "0.1.0-beta.10"
+    "@mux-elements/mux-player" "0.1.0-beta.11"
     prop-types "^15.7.2"
 
-"@mux-elements/mux-player@0.1.0-beta.10":
-  version "0.1.0-beta.10"
-  resolved "https://registry.yarnpkg.com/@mux-elements/mux-player/-/mux-player-0.1.0-beta.10.tgz#72ee2aaa97bb79ebc2c850f24877e484ab0bfc08"
-  integrity sha512-fzrsxENlFK+TV3D6zVqd3bbjQ1uCJs6CIX1RvWLxWn6qC7WOrVCwLgkTCXd65dTPJx+IKCQPFX+CjGzvO/4Fpw==
+"@mux-elements/mux-player@0.1.0-beta.11":
+  version "0.1.0-beta.11"
+  resolved "https://registry.yarnpkg.com/@mux-elements/mux-player/-/mux-player-0.1.0-beta.11.tgz#eda0585065e3a5caaa3048549158941c1621e964"
+  integrity sha512-7jOJ3CZFs3LlJxNXoZEE/OyhHOXjnpSsfhS0boPV8P7+nZdPYqoWwUtKGyQ1Czanvy8Kn6XCXZHuf/skQXgvjQ==
   dependencies:
-    "@github/template-parts" "https://github.com/muxinc/template-parts.git#mux-player"
+    "@github/template-parts" "^0.5.2"
     "@mux-elements/mux-video" "0.5.1"
     "@mux-elements/playback-core" "0.4.1"
     media-chrome "0.6.1"
