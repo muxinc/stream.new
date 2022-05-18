@@ -661,43 +661,43 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@mux-elements/mux-player-react@^0.1.0-beta.12":
-  version "0.1.0-beta.12"
-  resolved "https://registry.yarnpkg.com/@mux-elements/mux-player-react/-/mux-player-react-0.1.0-beta.12.tgz#9ee575754ef8ed96df2dc76efcdedef19986fd8a"
-  integrity sha512-UAXsLC7+B871y79tLCMP/widwbvsndbBT+2vfiVra7POBSD78mtGPK+dvfzFKRVXpBwVwdxLgSkLQqu97YW33w==
+"@mux-elements/mux-player-react@^0.1.0-beta.16":
+  version "0.1.0-beta.16"
+  resolved "https://registry.yarnpkg.com/@mux-elements/mux-player-react/-/mux-player-react-0.1.0-beta.16.tgz#226242d7bcffa9c38f7eaa5cfaf3cfe757b95c56"
+  integrity sha512-LlBF1lA5OGEelwReENWIBnUYME7f7DiV4jWS026Dbz1Gm9CsoQQc1M73nwjTXARYrFBsTlz+qQaIkwVFv7irIg==
   dependencies:
-    "@mux-elements/mux-player" "0.1.0-beta.12"
+    "@mux-elements/mux-player" "0.1.0-beta.16"
     prop-types "^15.7.2"
 
-"@mux-elements/mux-player@0.1.0-beta.12":
-  version "0.1.0-beta.12"
-  resolved "https://registry.yarnpkg.com/@mux-elements/mux-player/-/mux-player-0.1.0-beta.12.tgz#b7b9a06fb029f8ef01a193986b7600c547155489"
-  integrity sha512-qpAujRErCUxYXE/KsnVnkwPxu1djt0ZSbXZv5SNrl5iymVBjmeBeIE/pxPWEKP8WxcaXqLf/lzzeiP4id4m+pg==
+"@mux-elements/mux-player@0.1.0-beta.16":
+  version "0.1.0-beta.16"
+  resolved "https://registry.yarnpkg.com/@mux-elements/mux-player/-/mux-player-0.1.0-beta.16.tgz#47fe95cbd56606d22483df33a0602a340186a8e7"
+  integrity sha512-zJw04dftDjaWhuabF3V6OnZin/UlD8odH+zuZu2Qate3+9LbMXXToxoyAhXvDQyTPIn3fe/V3gXlqOyFztP3KQ==
   dependencies:
     "@github/template-parts" "^0.5.3"
-    "@mux-elements/mux-video" "0.5.1"
-    "@mux-elements/playback-core" "0.4.1"
-    media-chrome "0.6.3"
+    "@mux-elements/mux-video" "0.5.3"
+    "@mux-elements/playback-core" "0.5.1"
+    media-chrome "0.6.5"
 
-"@mux-elements/mux-video-react@^0.4.7":
-  version "0.4.7"
-  resolved "https://registry.yarnpkg.com/@mux-elements/mux-video-react/-/mux-video-react-0.4.7.tgz#71a9e917e31cfcabc73746eb0ed737a6243bdf90"
-  integrity sha512-hAHNP59ImWsiu1xErdYqF9jd9LEThD5CTE4ytXS2FOfk/d6DEyiJTilwugAFbCm90WhIj7sRNcZ0/b7ApLR+1g==
+"@mux-elements/mux-video-react@^0.4.9":
+  version "0.4.9"
+  resolved "https://registry.yarnpkg.com/@mux-elements/mux-video-react/-/mux-video-react-0.4.9.tgz#73141d195474923036d215e71eabc3b30a06c643"
+  integrity sha512-1loSzw+dNYwZ7mQFRJ5/nN7conGpFSUatXrO3PJ8Fl8cSbdWOykoA/gVV6n3/JdyWWpxdXYZNrkc+dWjT5/J+A==
   dependencies:
-    "@mux-elements/playback-core" "0.4.1"
+    "@mux-elements/playback-core" "0.5.1"
     prop-types "^15.7.2"
 
-"@mux-elements/mux-video@0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@mux-elements/mux-video/-/mux-video-0.5.1.tgz#a9f718469ad642d0d9013de299b123c6708fc9b5"
-  integrity sha512-K+qtd8TpEs0wQPsgSgER+2u4CPbLxS06Z4RIheQOEN7zG/JE+o8K9j1bFQdyQfwzWLYsxKp9kr7zUFPoeMQgkg==
+"@mux-elements/mux-video@0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@mux-elements/mux-video/-/mux-video-0.5.3.tgz#ef4cfe16b76a6ad004b04b29a4bfaca6697017ef"
+  integrity sha512-PmgmWaxXLHhudUwEQlO3dDRCoS36BvZaKTK2nHrlsXh63qFVoLwMt6aGh7/dZDUJL+AKaIePvZvF12zf4/+eIw==
   dependencies:
-    "@mux-elements/playback-core" "0.4.1"
+    "@mux-elements/playback-core" "0.5.1"
 
-"@mux-elements/playback-core@0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@mux-elements/playback-core/-/playback-core-0.4.1.tgz#a2eb3c9edf5fd04eff8981d6c3dbd6e7b4727f5f"
-  integrity sha512-abTVDdfAKYXJzRsxLkd3LZ0RgitKY4U0QY/hWFGsgGPOzFcDCDAkcglIWf7rDf8pmxSnS1s7Z2xeuVCjDo1b4A==
+"@mux-elements/playback-core@0.5.1":
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/@mux-elements/playback-core/-/playback-core-0.5.1.tgz#be06b6a0b67a007435e70c404363439f43243ee9"
+  integrity sha512-pnYN8Va5f8pzPwNuAKyPdRXVKS1lMJe97ZNe4xfip3I9sik37fT0MTnbx+ilt7/7NyvsKz6oYkykfbVtmmFmyw==
   dependencies:
     hls.js "1.1.5"
     mux-embed "^4.7.0"
@@ -3789,10 +3789,10 @@ makeerror@1.0.12:
   dependencies:
     tmpl "1.0.5"
 
-media-chrome@0.6.3:
-  version "0.6.3"
-  resolved "https://registry.yarnpkg.com/media-chrome/-/media-chrome-0.6.3.tgz#bad94e27a347a6cb2b0bd15d28d8cf7e24c7cc02"
-  integrity sha512-5OmHU10ZxgljClNRUUxTfh9FGpFDKRdkGHhRIUDTm4veGEhJA0ZruPHfux6K6lY6YFzMLfsgdeCk8sAWf2NY6g==
+media-chrome@0.6.5:
+  version "0.6.5"
+  resolved "https://registry.yarnpkg.com/media-chrome/-/media-chrome-0.6.5.tgz#1d3f57e1dfbcaa445157476acdf3ce1b6745de77"
+  integrity sha512-XlYTkXBV28Sk6HQDHMCR3lOn8qRO3c1Cu+LNwJOZRZqm6YGGJyjqWRkcbYqE+otNuxNcl4Q9+i9RojUoxYk1YA==
 
 merge-stream@^2.0.0:
   version "2.0.0"
