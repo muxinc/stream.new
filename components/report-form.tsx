@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Button from './button';
 
 const REPORT_REASONS = [
+  '',
   'Promotes violence',
   'Pornography or graphic',
   'Copyright infringement',
@@ -64,7 +65,7 @@ const ReportForm: React.FC<Props> = ({ playbackId, close }) => {
     <div className="wrapper">
       <form onSubmit={saveReport} className="report-form">
         <p>Tell us why you are reporting this video</p>
-        <select value={reportReason} onChange={(evt) => setReportReason(evt.target.value)} onBlur={(evt) => setReportReason(evt.target.value) }>
+        <select required value={reportReason} onChange={(evt) => setReportReason(evt.target.value)} onBlur={(evt) => setReportReason(evt.target.value) }>
          {REPORT_REASONS.map((reason) => {
             return <option key={reason} value={reason}>{reason}</option>;
           })}
