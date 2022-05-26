@@ -66,12 +66,17 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
     return (router.query?.time && parseFloat(router.query.time as string)) || 0;
   }, [router.query]);
 
+  const playerEmbedUrl = useMemo(() => {
+    return `${HOST_URL}/v/${playbackId}/embed`;
+  }, [playbackId]);
 
   if (router.isFallback) {
     return (
       <Layout
         metaTitle="View this video created on stream.new"
         image={poster}
+        playerEmbedUrl={playerEmbedUrl}
+        aspectRatio={aspectRatio}
         centered
         darkMode
       >
@@ -131,6 +136,8 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
       <Layout
         metaTitle={META_TITLE}
         image={poster}
+        playerEmbedUrl={playerEmbedUrl}
+        aspectRatio={aspectRatio}
         centered={showLoading}
         darkMode
       >

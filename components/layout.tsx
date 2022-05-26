@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -40,6 +40,8 @@ type Props = {
   metaTitle?: string;
   metaDescription?: string;
   image?: string;
+  playerEmbedUrl?: string;
+  aspectRatio?: number;
   onFileDrop?: (acceptedFiles: File[]) => void;
   darkMode?: boolean;
   centered?: boolean;
@@ -53,6 +55,8 @@ const Layout: React.FC<Props> = ({
   metaTitle,
   metaDescription,
   image = "/stream-new-og-image.png",
+  playerEmbedUrl,
+  aspectRatio,
   onFileDrop,
   darkMode,
   centered,
@@ -66,11 +70,21 @@ const Layout: React.FC<Props> = ({
   const isDroppablePage = !!onFileDrop;
   const containerProps = isDroppablePage ? getRootProps() : {};
 
+  const [width, height] = useMemo(() => {
+    if (aspectRatio) {
+      const width = 480;
+      const height = (width / aspectRatio);
+      return [width, height];
+    }
+    return [null, null];
+  }, [aspectRatio]);
+
   return (
     <>
       <Head>
         <title>{title}</title>
         <link rel="icon" href="/stream-new-asterisk.svg" />
+        <meta name="twitter:site" content="@muxhq" />
         {metaTitle && <meta property="og:title" content={metaTitle} />}
         {metaTitle && <meta property="twitter:title" content={metaTitle} />}
         {metaDescription && (
@@ -81,9 +95,12 @@ const Layout: React.FC<Props> = ({
         )}
         {image && <meta property="og:image" content={image} />}
         {image && (
-          <meta property="twitter:card" content="summary_large_image" />
+          <meta property="twitter:card" content="player" />
         )}
         {image && <meta property="twitter:image" content={image} />}
+        {playerEmbedUrl && <meta property="twitter:player" content={playerEmbedUrl} />}
+        {width && <meta property="twitter:player:width" content={`${width}`} />}
+        {height && <meta property="twitter:player:height" content={`${height}`} />}
       </Head>
       <div className="app-container" {...containerProps}>
         <div className={`drag-overlay ${isDragActive ? 'active' : ''}`}><h1>Upload to stream.new</h1></div>
