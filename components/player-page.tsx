@@ -191,7 +191,8 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
               padding-right: 15px;
             }
             .report-form {
-              margin-top: 20px;
+              margin: 20px auto auto;
+              max-width: 800px;
             }
             .wrapper {
               display: flex;
