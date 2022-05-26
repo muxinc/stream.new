@@ -158,7 +158,7 @@ const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster, aspectRatio }) 
         .asterisk-container {
           position: absolute;
           top: 1.2rem;
-          right: 1.2rem;
+          left: 1.2rem;
         }
         .overlay-container {
           padding: 1.25rem;
@@ -166,6 +166,7 @@ const PlaybackEmbedded: React.FC<Props> = ({ playbackId, poster, aspectRatio }) 
           display: flex;
           flex-direction: column;
           justify-content: space-between;
+          z-index: 200;
         }
         .overlay-container p {
           color: #fff;
