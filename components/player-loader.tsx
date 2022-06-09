@@ -3,6 +3,7 @@ import { HTMLVideoElementWithPlyr, PlayerElement } from '../types';
 import type MuxPlayerElement from '@mux-elements/mux-player';
 import { PLYR_TYPE, MUX_PLAYER_TYPE, MUX_VIDEO_TYPE } from '../constants';
 import dynamic from 'next/dynamic';
+import Script from 'next/script';
 
 /*
  * It is important for these to be loaded with next/dynamic so that we don't load all
@@ -47,6 +48,7 @@ const PlayerLoader = forwardRef<PlayerElement, Props>(({ playbackId, poster, cur
         }
       `}
       </style>
+      {playerType === MUX_PLAYER_TYPE && <Script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1" />}
     </>
   );
 });
