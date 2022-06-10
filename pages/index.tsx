@@ -11,6 +11,12 @@ const Index: React.FC<Props> = () => {
   const [file, setFile] = useState<File | null>(null);
   const [showUploadPage, setShowUploadPage] = useState(true);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  // const [inputRef, setInputRef] = useState(null); // not really working
+
+  const [assetID, setAssetId] = useState('');  // eslint-disable-line
+  const [errorMessage, setErrorMessage] = useState('');// eslint-disable-line
+  const myEndpoint = useRef<HTMLInputElement | null>(null);
+  const [resetButton, setResetButton] = useState(true);  // eslint-disable-line
 
   const onDrop = useCallback((acceptedFiles) => {
     if (acceptedFiles && acceptedFiles[0]) {
@@ -32,6 +38,65 @@ const Index: React.FC<Props> = () => {
     return <UploadProgressFullpage file={file} resetPage={() => setShowUploadPage(false)}/>;
   }
 
+  function isValidHTTPURL(inputString: string | URL) {
+    let url;
+    try {
+      url = new URL(inputString);
+    } catch (_) {
+      return false;
+    }
+    return url.protocol === "http:" || url.protocol === "https:";
+  }
+
+  const myFunc2 = async () => {
+    if (! isValidHTTPURL(myEndpoint.current?.value)) {
+      setErrorMessage('not a valid url, try again ');
+    }
+    else {
+      if (myEndpoint && isValidHTTPURL(myEndpoint.current?.value)) {
+        try {
+          return fetch('/api/assets', {
+            method: 'POST',
+            body: myEndpoint.current.value // Error: Endpoint is possibly null
+          })
+            .then((res) => res.json())
+            // this needs to change because
+            // a direct upload isn't happening,
+            // if something different should happen
+            .then(({ id, status }) => {
+              setAssetId(id);
+              setErrorMessage('');
+              console.log('new asset id', id);
+              console.log('status', status);
+              return status;
+            });
+        } catch (e) {
+          console.error('Error in createUpload', e); // eslint-disable-line no-console
+          setErrorMessage('Error creating upload');
+          return Promise.reject(e);
+        }
+      }
+      try {
+        return fetch('/api/assets', {
+          method: 'POST',
+        })
+          .then((res) => res.json())
+          .then(({ id, status }) => {
+            setAssetId(id);
+            console.log('new asset id', id);
+            console.log('status', status);
+            return status;
+          });
+      } catch (e) {
+        console.error('Error in createUpload', e); // eslint-disable-line no-console
+        setErrorMessage('Error creating upload');
+        return Promise.reject(e);
+      }
+    }
+  };
+
+  // const resetInputRef = async () => { ... }; // todo
+
   return (
     <Layout
       onFileDrop={onDrop}
@@ -40,6 +105,14 @@ const Index: React.FC<Props> = () => {
         <div>
           <h1>Add a video.</h1>
           <h1>Get a shareable link to stream it.</h1>
+          <input className='aminBox' ref={myEndpoint} id="location" type="text" placeholder="Mux Upload URL" /> 
+          <input onClick={myFunc2} className='aminBox' id="startupload" type="button" value="start upload" /> 
+          {assetID && <p className='show'>Asset created: {assetID}</p>}
+          {errorMessage && <p className='show'>Error with upload please try again</p>}
+
+          {/* {resetButton && <a>Reset and upload again</a>} */}
+          {/* <button onClick={setInputRef('')} className='resetUpload' id="resetUpload" type="button" value=" reset upload">Reset and upload again</button>  */}
+
         </div>
         <div className="cta">
           <div className="drop-notice">
@@ -61,11 +134,19 @@ const Index: React.FC<Props> = () => {
         </div>
       </div>
       <style jsx>{`
-        input {
+        input:not(.aminBox) {
           display: none;
         }
         .drop-notice {
           display: none;
+        }
+        .hide{
+          display:none;
+          font-size: 15px;
+        }
+        .show{
+          display:block;
+          font-size: 15px;
         }
 
         .cta {
