@@ -297,19 +297,13 @@ const RecordPage: React.FC<NoProps> = () => {
       setStartRecordTime((new Date()).valueOf());
       const videoBitsPerSecond = 5000000; // Double the default quality from 2.5Mbps to 5Mbps
       const audioBitsPerSecond = 128000; // 128kbps
-      const mimeTypeStack = ['video/mp4;codecs=avc1', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8,opus'];
-      const preferredOptions = { videoBitsPerSecond, audioBitsPerSecond, mimeType: mimeTypeStack[0] };
-      const backupOptions = { ...preferredOptions, mimeType: mimeTypeStack[1] };
-      const lastResortOptions = { ...preferredOptions, mimeType: mimeTypeStack[2] };
-      let options = preferredOptions;
+      const MIME_TYPE_STACK = ['video/mp4;codecs=avc1', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8,opus'];
+      const supportedMimeType = MIME_TYPE_STACK.find((mimeType) =>
+        MediaRecorder.isTypeSupported(mimeType)
+      );
 
-      if (!MediaRecorder.isTypeSupported(preferredOptions.mimeType)) {
-        options = backupOptions;
-        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-          options = lastResortOptions;
-        }
-      }
-
+      if (!supportedMimeType) throw new Error('Cannot find a supported mimeType');
+      const options = { videoBitsPerSecond, audioBitsPerSecond, mimeType: supportedMimeType };
       const stream = streamRef.current;
       if (!stream) throw new Error('Cannot record without a stream');
       recorderRef.current = new MediaRecorder(stream, options);
