@@ -1,6 +1,6 @@
 import { ForwardedRef, forwardRef } from 'react';
 import { HTMLVideoElementWithPlyr, PlayerElement } from '../types';
-import type MuxPlayerElement from '@mux-elements/mux-player';
+import type MuxPlayerElement from '@mux/mux-player';
 import { PLYR_TYPE, MUX_PLAYER_TYPE, MUX_VIDEO_TYPE } from '../constants';
 import dynamic from 'next/dynamic';
 import Script from 'next/script';
