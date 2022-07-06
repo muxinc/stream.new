@@ -1,5 +1,5 @@
-import type MuxPlayerElement from '@mux-elements/mux-player';
-import type MuxVideoElement from '@mux-elements/mux-video';
+import type MuxPlayerElement from '@mux/mux-player';
+import type MuxVideoElement from '@mux/mux-video';
 
 export enum RecordState {
   IDLE,
