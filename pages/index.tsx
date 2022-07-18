@@ -1,39 +1,68 @@
 import { useCallback, useState, useRef } from 'react';
 import Link from 'next/link';
+import MuxUploader from '@mux/mux-uploader-react';
 import { breakpoints } from '../style-vars';
 import Layout from '../components/layout';
 import Button from '../components/button';
-import UploadProgressFullpage from '../components/upload-progress-fullpage';
+// import UploadProgressFullpage from '../components/upload-progress-fullpage';
 
 type Props = null;
 
 const Index: React.FC<Props> = () => {
   const [file, setFile] = useState<File | null>(null);
-  const [showUploadPage, setShowUploadPage] = useState(true);
+  const [url, setUrl] = useState('');
+  // const [showUploadPage, setShowUploadPage] = useState(true);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const onDrop = useCallback((acceptedFiles) => {
-    if (acceptedFiles && acceptedFiles[0]) {
-      setFile(acceptedFiles[0]);
-      setShowUploadPage(true);
+  const onDrop = useCallback((acceptedFiles) => { 
+    if (acceptedFiles && acceptedFiles[0]) {  // MuxUploader handles the file instead
+      setFile(acceptedFiles[0]); // Same as above
+      // NEW: Create upload URL and pass to MuxUploader below
     } else {
       console.warn('got a drop event but no file'); // eslint-disable-line no-console
     }
   }, []);
 
   const onInputChange = () => {
-    if (inputRef.current && inputRef.current.files && inputRef.current.files[0]) {
-      setFile(inputRef.current.files[0]);
-      setShowUploadPage(true);
+    if (inputRef.current && inputRef.current.files && inputRef.current.files[0]) { // MuxUploader handles the file instead
+      setFile(inputRef.current.files[0]);// Same as above
+      // NEW: Create upload URL
+      setUrl(url); // which is passed as a prop in MuxUploader below
     }
   };
 
-  if (file && showUploadPage) {
-    return <UploadProgressFullpage file={file} resetPage={() => setShowUploadPage(false)}/>;
-  }
+  const updateUploadAnalytics = () => {
+    // This kind of stuff:
+    /*
+      uploadAnalytics.chunks[detail.chunkNumber] = {
+        size: detail.chunkSize,
+        uploadStarted: Date.now(),
+      };
+    */
+  };
+
+  const updateTelemetry = () => {
+    // This kind of stuff:
+    /*
+      fetch('/api/telemetry', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'upload',
+          data: uploadAnalytics,
+        })
+      });
+    */
+  };
+
+  // if (file && showUploadPage) {
+  //   return <UploadProgressFullpage file={file} resetPage={() => setShowUploadPage(false)}/>;
+  // }
 
   return (
-    <Layout
+    <Layout // Inside this is MuxUploaderDrop
       onFileDrop={onDrop}
     >
       <div>
@@ -45,13 +74,23 @@ const Index: React.FC<Props> = () => {
           <div className="drop-notice">
             <h2>↓ Drag & drop a video file anywhere</h2>
           </div>
-          <label htmlFor="file-input">
+          <MuxUploader 
+            url={url}
+            type="bar"
+            onFileReady={onFileReady} // Could replace both onDrop and onInputChange below
+            onDrop={onDrop} // Doesn't currently exist
+            onInputChange={onInputChange} // Doesn't currently exist
+            onAttempt={updateUploadAnalytics} // Doesn't currently exist
+            onChunkSuccess={updateUploadAnalytics} // Doesn't currently exist
+            onSuccess={updateTelemetry} // Doesn't currently exist
+          />
+          {/* <label htmlFor="file-input">
             <Button type="button" onClick={() => inputRef.current && inputRef.current.click()}>
               <span className="cta-text-mobile">Add a video</span>
               <span className="cta-text-desktop">Upload a video</span>
             </Button>
             <input id="file-input" type="file" onChange={onInputChange} ref={inputRef} />
-          </label>
+          </label> */}
           <div className="cta-record">
             <Link href="/record?source=camera"><Button>Record from camera</Button></Link>
           </div>

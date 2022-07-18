@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useDropzone } from 'react-dropzone';
+import { useDropzone } from 'react-dropzone'; // Replace with MuxUploaderDrop
+import { MuxUploaderDrop } from '@mux/mux-uploader-react';
 import { breakpoints, transitionDuration } from '../style-vars';
 import Asterisk from './asterisk';
 import InfoModal from './info-modal';
@@ -67,6 +68,7 @@ const Layout: React.FC<Props> = ({
   const router = useRouter();
   const [isModalOpen, setModalOpen] = useState(false);
   const { getRootProps, isDragActive } = useDropzone({ onDrop: onFileDrop });
+  // Remove use of useDropZone but user still needs to be able to pass an event handler onDrop/onInputChange/onFileReady i.e. to create an upload link
   const isDroppablePage = !!onFileDrop;
   const containerProps = isDroppablePage ? getRootProps() : {};
 
@@ -102,8 +104,10 @@ const Layout: React.FC<Props> = ({
         {width && <meta property="twitter:player:width" content={`${width}`} />}
         {height && <meta property="twitter:player:height" content={`${height}`} />}
       </Head>
-      <div className="app-container" {...containerProps}>
-        <div className={`drag-overlay ${isDragActive ? 'active' : ''}`}><h1>Upload to stream.new</h1></div>
+      {/* <div className="app-container" {...containerProps}> */}
+      <MuxUploaderDrop className="app-container" overlay overlayText="Upload to stream.new" style={{ position: 'static', 
+        display: 'flex', flexDirection: 'column', maxHeight: '100%' }} {...containerProps}>
+        {/* <div className={`drag-overlay ${isDragActive ? 'active' : ''}`}><h1>Upload to stream.new</h1></div> */}
 
         <div className="modal-wrapper"><InfoModal close={() => setModalOpen(false)} /></div>
         <main className={`${centered ? "content-wrapper-centered" : ""}`}>
@@ -398,7 +402,8 @@ const Layout: React.FC<Props> = ({
           }
         `}
         </style>
-      </div>
+      </MuxUploaderDrop>
+      {/* </div> */}
     </>
   );
 };
