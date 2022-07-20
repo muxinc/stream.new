@@ -77,11 +77,11 @@ const Index: React.FC<Props> = () => {
           <MuxUploader 
             url={url}
             type="bar"
-            onFileReady={onFileReady} // Could replace both onDrop and onInputChange below
-            onDrop={onDrop} // Doesn't currently exist
-            onInputChange={onInputChange} // Doesn't currently exist
-            onAttempt={updateUploadAnalytics} // Doesn't currently exist
-            onChunkSuccess={updateUploadAnalytics} // Doesn't currently exist
+            // onFileReady={onFileReady} // Could replace both onDrop and onInputChange below
+            // onDrop={onDrop} // Doesn't currently exist
+            // onInputChange={onInputChange} // Doesn't currently exist
+            // onAttempt={updateUploadAnalytics} // Doesn't currently exist
+            // onChunkSuccess={updateUploadAnalytics} // Doesn't currently exist
             onSuccess={updateTelemetry} // Doesn't currently exist
           />
           {/* <label htmlFor="file-input">

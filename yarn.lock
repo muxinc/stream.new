@@ -766,6 +766,21 @@
     "@mux/playback-core" "0.8.0"
     media-chrome "0.6.9"
 
+"@mux/mux-uploader-react@^0.1.0-beta.2":
+  version "0.1.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@mux/mux-uploader-react/-/mux-uploader-react-0.1.0-beta.2.tgz#809308e836a3eb61677a3b4160ec7fdf8ffd43b8"
+  integrity sha512-YyAGugrZG/ytfk+Xfe2UoxXksTbdsmcbwul4g/5myzukU0KKkLDnChjKTt6z91weBz08O+AN/4bI+jga2QkYfw==
+  dependencies:
+    "@mux/mux-uploader" "0.1.0-beta.3"
+    prop-types "^15.7.2"
+
+"@mux/mux-uploader@0.1.0-beta.3":
+  version "0.1.0-beta.3"
+  resolved "https://registry.yarnpkg.com/@mux/mux-uploader/-/mux-uploader-0.1.0-beta.3.tgz#a06af3fbbf97110a49ca891c4d0e5e3f2b29ebd0"
+  integrity sha512-GDg/Tf868F9cvJ/QPmlRHxhNIY3Ba6GiBiz98/ldjC0KJxionc2IWIjeXpXUZOrRh7AV9EL3CRtUqo4RYaRGjQ==
+  dependencies:
+    "@mux/upchunk" "^2.3.1"
+
 "@mux/mux-video-react@^0.5.0":
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/@mux/mux-video-react/-/mux-video-react-0.5.0.tgz#68bf0c4a229b24f0d033aee1b2e5524dbfa6f5ff"
@@ -789,12 +804,12 @@
     hls.js "1.1.5"
     mux-embed "^4.7.0"
 
-"@mux/upchunk@^2.3":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@mux/upchunk/-/upchunk-2.3.0.tgz#8d48a1fb1c8734bd71958c6eb56ad9e32c0bb8c5"
-  integrity sha512-i0EIjMZs3fEOk73E7PW/i5QoiLLkdMxBjiYBoOySnw65wFvC9ttjrcWX/hsPqniJ+tEFeAJsbB8A16Y+8vDrJw==
+"@mux/upchunk@^2.3.1":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@mux/upchunk/-/upchunk-2.4.0.tgz#bb8d539eb47cb420ba9ef3c20f97b92bb88c5a91"
+  integrity sha512-KzXq4hYz7ak3nkRe0UR9ho7rZHUgm5SdsiJlk+wt5VnhdPObuk4S8gZhcqI56xrAxPO0G6FFxlSJhUJ+l4IdPQ==
   dependencies:
-    event-target-shim "^4.0.3"
+    event-target-shim "^6.0.2"
     xhr "^2.6.0"
 
 "@next/env@12.0.10":
@@ -2395,15 +2410,15 @@ esutils@^2.0.2:
   resolved "https://registry.yarnpkg.com/esutils/-/esutils-2.0.3.tgz#74d2eb4de0b8da1293711910d50775b9b710ef64"
   integrity sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==
 
-event-target-shim@^4.0.3:
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/event-target-shim/-/event-target-shim-4.0.3.tgz#758cd632cd4241f5a73ceec64f93f0d7b0ae77d6"
-  integrity sha512-YXVJDPGzU0yhSzrXGoEFAByEaLnZXSlJDHXkq4Hp6WrlnV66tADiZugYf1utTaCP/dsYRcLndAhecbq9mnbbqg==
-
 event-target-shim@^5.0.0:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/event-target-shim/-/event-target-shim-5.0.1.tgz#5d4d3ebdf9583d63a5333ce2deb7480ab2b05789"
   integrity sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==
+
+event-target-shim@^6.0.2:
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/event-target-shim/-/event-target-shim-6.0.2.tgz#ea5348c3618ee8b62ff1d344f01908ee2b8a2b71"
+  integrity sha512-8q3LsZjRezbFZ2PN+uP+Q7pnHUMmAOziU2vA2OwoFaKIXxlxl38IylhSSgUorWu/rf4er67w0ikBqjBFk/pomA==
 
 execa@^5.0.0:
   version "5.1.1"
