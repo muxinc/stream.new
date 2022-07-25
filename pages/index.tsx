@@ -1,5 +1,6 @@
 import { useCallback, useState, useRef } from 'react';
 import Link from 'next/link';
+import MuxUploader from '@mux/mux-uploader-react';
 import { breakpoints } from '../style-vars';
 import Layout from '../components/layout';
 import Button from '../components/button';
@@ -10,7 +11,21 @@ type Props = null;
 const Index: React.FC<Props> = () => {
   const [file, setFile] = useState<File | null>(null);
   const [showUploadPage, setShowUploadPage] = useState(true);
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  // const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const createUpload = async () => {
+    try {
+      return fetch('/api/uploads', {
+        method: 'POST',
+      })
+        .then((res) => res.json())
+        .then(({ id, url }) => {
+          return url;
+        });
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
 
   const onDrop = useCallback((acceptedFiles) => {
     if (acceptedFiles && acceptedFiles[0]) {
@@ -21,12 +36,12 @@ const Index: React.FC<Props> = () => {
     }
   }, []);
 
-  const onInputChange = () => {
-    if (inputRef.current && inputRef.current.files && inputRef.current.files[0]) {
-      setFile(inputRef.current.files[0]);
-      setShowUploadPage(true);
-    }
-  };
+  // const onInputChange = () => {
+  //   if (inputRef.current && inputRef.current.files && inputRef.current.files[0]) {
+  //     setFile(inputRef.current.files[0]);
+  //     setShowUploadPage(true);
+  //   }
+  // };
 
   if (file && showUploadPage) {
     return <UploadProgressFullpage file={file} resetPage={() => setShowUploadPage(false)}/>;
@@ -45,13 +60,23 @@ const Index: React.FC<Props> = () => {
           <div className="drop-notice">
             <h2>↓ Drag & drop a video file anywhere</h2>
           </div>
-          <label htmlFor="file-input">
+          {/* TO-DO: Revisit typescript errors. Add ability to style button border and button padding. */}
+          <MuxUploader 
+            style={{ 
+              '--button-border-radius': '50px',
+              '--button-hover-background': '#222', 
+              fontSize: '26px',
+              fontFamily: 'Akkurat',
+              lineHeight: '33px',
+            }} 
+            id="uploader" endpoint={createUpload} type="bar" status />
+          {/* <label htmlFor="file-input">
             <Button type="button" onClick={() => inputRef.current && inputRef.current.click()}>
               <span className="cta-text-mobile">Add a video</span>
               <span className="cta-text-desktop">Upload a video</span>
             </Button>
             <input id="file-input" type="file" onChange={onInputChange} ref={inputRef} />
-          </label>
+          </label> */}
           <div className="cta-record">
             <Link href="/record?source=camera"><Button>Record from camera</Button></Link>
           </div>
