@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useDropzone } from 'react-dropzone';
+import { MuxUploaderDrop } from '@mux/mux-uploader-react';
 import { breakpoints, transitionDuration } from '../style-vars';
 import Asterisk from './asterisk';
 import InfoModal from './info-modal';
@@ -42,7 +42,7 @@ type Props = {
   image?: string;
   playerEmbedUrl?: string;
   aspectRatio?: number;
-  onFileDrop?: (acceptedFiles: File[]) => void;
+  dragActive?: boolean;
   darkMode?: boolean;
   centered?: boolean;
   spinningLogo?: boolean;
@@ -57,7 +57,7 @@ const Layout: React.FC<Props> = ({
   image = "/stream-new-og-image.png",
   playerEmbedUrl,
   aspectRatio,
-  onFileDrop,
+  dragActive,
   darkMode,
   centered,
   spinningLogo,
@@ -66,9 +66,6 @@ const Layout: React.FC<Props> = ({
 }) => {
   const router = useRouter();
   const [isModalOpen, setModalOpen] = useState(false);
-  const { getRootProps, isDragActive } = useDropzone({ onDrop: onFileDrop });
-  const isDroppablePage = !!onFileDrop;
-  const containerProps = isDroppablePage ? getRootProps() : {};
 
   const [width, height] = useMemo(() => {
     if (aspectRatio) {
@@ -102,9 +99,11 @@ const Layout: React.FC<Props> = ({
         {width && <meta property="twitter:player:width" content={`${width}`} />}
         {height && <meta property="twitter:player:height" content={`${height}`} />}
       </Head>
-      <div className="app-container" {...containerProps}>
-        <div className={`drag-overlay ${isDragActive ? 'active' : ''}`}><h1>Upload to stream.new</h1></div>
-
+      <div className="app-container">
+        {/* TO-DO: Text styles with overlay. CSS vars? Bake into package CSS styles? (TD).*/}
+        {/* TO-DO: Disable drag and drop + overlay when attr present. Consider making its own component. (TD).*/}
+        <MuxUploaderDrop className="drag-overlay" overlay overlayText="Upload to stream.new" mux-uploader="uploader" style={{ position: 'static', 
+          display: 'flex', flexDirection: 'column', height: '100%' }}>
         <div className="modal-wrapper"><InfoModal close={() => setModalOpen(false)} /></div>
         <main className={`${centered ? "content-wrapper-centered" : ""}`}>
           {children}
@@ -398,6 +397,7 @@ const Layout: React.FC<Props> = ({
           }
         `}
         </style>
+        </MuxUploaderDrop>
       </div>
     </>
   );

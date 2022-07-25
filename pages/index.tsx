@@ -19,7 +19,7 @@ const Index: React.FC<Props> = () => {
         method: 'POST',
       })
         .then((res) => res.json())
-        .then(({ id, url }) => {
+        .then(({ url }) => {
           return url;
         });
     } catch (e) {
@@ -27,29 +27,13 @@ const Index: React.FC<Props> = () => {
     }
   };
 
-  const onDrop = useCallback((acceptedFiles) => {
-    if (acceptedFiles && acceptedFiles[0]) {
-      setFile(acceptedFiles[0]);
-      setShowUploadPage(true);
-    } else {
-      console.warn('got a drop event but no file'); // eslint-disable-line no-console
-    }
-  }, []);
-
-  // const onInputChange = () => {
-  //   if (inputRef.current && inputRef.current.files && inputRef.current.files[0]) {
-  //     setFile(inputRef.current.files[0]);
-  //     setShowUploadPage(true);
-  //   }
-  // };
-
   if (file && showUploadPage) {
     return <UploadProgressFullpage file={file} resetPage={() => setShowUploadPage(false)}/>;
   }
 
   return (
     <Layout
-      onFileDrop={onDrop}
+      dragActive
     >
       <div>
         <div>
@@ -60,7 +44,7 @@ const Index: React.FC<Props> = () => {
           <div className="drop-notice">
             <h2>↓ Drag & drop a video file anywhere</h2>
           </div>
-          {/* TO-DO: Revisit typescript errors. Add ability to style button border and button padding. */}
+          {/* TO-DO: Revisit typescript errors. Add ability to style button border and button padding. (TD). */}
           <MuxUploader 
             style={{ 
               '--button-border-radius': '50px',
@@ -70,13 +54,6 @@ const Index: React.FC<Props> = () => {
               lineHeight: '33px',
             }} 
             id="uploader" endpoint={createUpload} type="bar" status />
-          {/* <label htmlFor="file-input">
-            <Button type="button" onClick={() => inputRef.current && inputRef.current.click()}>
-              <span className="cta-text-mobile">Add a video</span>
-              <span className="cta-text-desktop">Upload a video</span>
-            </Button>
-            <input id="file-input" type="file" onChange={onInputChange} ref={inputRef} />
-          </label> */}
           <div className="cta-record">
             <Link href="/record?source=camera"><Button>Record from camera</Button></Link>
           </div>
