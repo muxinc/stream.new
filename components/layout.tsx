@@ -44,6 +44,7 @@ type Props = {
   playerEmbedUrl?: string;
   aspectRatio?: number;
   dragActive?: boolean;
+  isUploading?: boolean;
   darkMode?: boolean;
   centered?: boolean;
   spinningLogo?: boolean;
@@ -59,6 +60,7 @@ const Layout: React.FC<Props> = ({
   playerEmbedUrl,
   aspectRatio,
   dragActive,
+  isUploading,
   darkMode,
   centered,
   spinningLogo,
@@ -108,24 +110,26 @@ const Layout: React.FC<Props> = ({
         <main className={`${centered ? "content-wrapper-centered" : ""}`}>
           {children}
         </main>
-        <div className="footer-wrapper"> {/* Render if upload not in progress.*/}
-          <footer>
-            <div className="nav">
-             {
-               backNav ?
-               <div className="footer-link back"><a onClick={() => router.back()} role="presentation">Back</a></div> :
-               <>
-                <div className="footer-link info"><a role="presentation" onClick={() => setModalOpen(true)}>Info</a></div>
-                <div className="footer-link mux">An <a href={OPEN_SOURCE_URL}>open source</a> project by <a href={MUX_HOME_PAGE_URL}>Mux</a></div>
-                <div className="divider" />
-                <div className="footer-link terms"><Link href="/terms"><a>Terms</a></Link></div>
-               </>
-
-             }
-            </div>
-            <div className="footer-link"><AsteriskLink spinning={spinningLogo} /></div>
-          </footer>
-        </div>
+        {!isUploading && (
+            <div className="footer-wrapper">
+            <footer>
+              <div className="nav">
+                {
+                  backNav ?
+                  <div className="footer-link back"><a onClick={() => router.back()} role="presentation">Back</a></div> :
+                  <>
+                  <div className="footer-link info"><a role="presentation" onClick={() => setModalOpen(true)}>Info</a></div>
+                  <div className="footer-link mux">An <a href={OPEN_SOURCE_URL}>open source</a> project by <a href={MUX_HOME_PAGE_URL}>Mux</a></div>
+                  <div className="divider" />
+                  <div className="footer-link terms"><Link href="/terms"><a>Terms</a></Link></div>
+                  </>
+  
+                }
+              </div>
+              <div className="footer-link"><AsteriskLink spinning={spinningLogo} /></div>
+            </footer>
+          </div>
+        )}
 
         <style jsx>{`
           .modal-wrapper {

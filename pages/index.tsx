@@ -1,17 +1,27 @@
-import { useCallback, useState, useRef } from 'react';
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import Router from 'next/router';
 import MuxUploader from '@mux/mux-uploader-react';
-import { breakpoints } from '../style-vars';
+import useSwr from 'swr';
 import Layout from '../components/layout';
-import Button from '../components/button';
-import UploadProgressFullpage from '../components/upload-progress-fullpage';
+import HomePage from '../components/home-page';
+import UploadProgressFullpage from '../components/upload-progress-fullpage'; // Also used for recording from camera and screen. Remove import. Not file. (TD).
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 type Props = null;
 
 const Index: React.FC<Props> = () => {
-  const [file, setFile] = useState<File | null>(null);
-  const [showUploadPage, setShowUploadPage] = useState(true);
-  // const inputRef = useRef<HTMLInputElement | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadId, setUploadId] = useState('');
+  const [isPreparing, setIsPreparing] = useState(false);
+
+  const { data, error } = useSwr(
+    () => (isPreparing ? `/api/uploads/${uploadId}` : null),
+    fetcher,
+    { refreshInterval: 5000 }
+  );
+
+  const upload = data && data.upload;
 
   const createUpload = async () => {
     try {
@@ -19,7 +29,8 @@ const Index: React.FC<Props> = () => {
         method: 'POST',
       })
         .then((res) => res.json())
-        .then(({ url }) => {
+        .then(({ id, url }) => {
+          setUploadId(id);
           return url;
         });
     } catch (e) {
@@ -27,25 +38,37 @@ const Index: React.FC<Props> = () => {
     }
   };
 
-  if (file && showUploadPage) {
-    return <UploadProgressFullpage file={file} resetPage={() => setShowUploadPage(false)}/>;
-  }
+  const handleUpload = (upload: any) => {
+    setIsUploading(true);
+    console.log(upload.detail);
+
+    // TO-DO: Set initial upload analytics. (TD).
+  };
+
+  const handleSuccess = () => {
+    setIsPreparing(true);
+  };
+
+  useEffect(() => {
+    if (upload && upload.asset_id) {
+      Router.push({
+        pathname: `/assets/${upload.asset_id}`,
+      });
+    }
+  }, [upload]);
 
   return (
     <Layout
       dragActive
+      isUploading={false}
     >
-      <div>
-        <div>
-          <h1>Add a video.</h1>
-          <h1>Get a shareable link to stream it.</h1>
-        </div>
-        <div className="cta">
-          <div className="drop-notice">
-            <h2>↓ Drag & drop a video file anywhere</h2>
-          </div>
+      {/* Render with children if upload in progress. Render only children if upload not in progress. (TD).*/}
+      <HomePage isUploading={false}>
           {/* TO-DO: Revisit typescript errors. Add ability to style button border and button padding. (TD). */}
           <MuxUploader 
+            onUploadStart={handleUpload}
+            onSuccess={handleSuccess}
+            className="uploader"
             style={{ 
               '--button-border-radius': '50px',
               '--button-hover-background': '#222', 
@@ -54,79 +77,13 @@ const Index: React.FC<Props> = () => {
               lineHeight: '33px',
             }} 
             id="uploader" endpoint={createUpload} type="bar" status />
-          <div className="cta-record">
-            <Link href="/record?source=camera"><Button>Record from camera</Button></Link>
-          </div>
-          <div className="cta-record">
-            <Link href="/record?source=screen"><Button>Record my screen</Button></Link>
-          </div>
-        </div>
-      </div>
-      <style jsx>{`
-        input {
-          display: none;
-        }
-        .drop-notice {
-          display: none;
-        }
-
-        .cta {
-          display: flex;
-          flex-direction: column;
-          position: absolute;
-          right: 0;
-          bottom: 0;
-          align-items: flex-end;
-          justify-content: flex-end;
-          margin-bottom: 100px;
-          margin-right: 30px;
-        }
-        .cta .button {
-          margin: 8px 0;
-        }
-
-        .cta {
-          margin-top: 30px;
-          display: flex;
-          flex-direction: column;
-        }
-        .cta-text-mobile {
-          display: inline-block;
-        }
-        .cta-text-desktop {
-          display: none;
-        }
-        .cta-record {
-          display: none;
-        }
-
-        @media only screen and (min-width: ${breakpoints.md}px) {
-          .drop-notice {
-            display: block;
-            text-align: right;
-            float: right;
-            color: #fff;
-            margin-bottom: 5px;
-            opacity: 0.5;
-            mix-blend-mode: exclusion;
-          }
-          .drop-notice h2 {
-            margin-top: 0;
-          }
-
-          .cta-text-mobile {
-            display: none;
-          }
-          .cta-text-desktop {
-            display: inline-block;
-          }
-          .cta-record {
-            display: block;
-            margin-top: 30px;
-          }
-        }
-      `}
-      </style>
+          <style>{`
+            [upload-in-progress] {
+              width: 100%;
+            }
+          `}
+          </style>
+      </HomePage>
     </Layout>
   );
 };
