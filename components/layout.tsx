@@ -6,6 +6,7 @@ import { MuxUploaderDrop } from '@mux/mux-uploader-react';
 import { breakpoints, transitionDuration } from '../style-vars';
 import Asterisk from './asterisk';
 import InfoModal from './info-modal';
+import DragOverlay from '../components/drag-overlay';
 import { OPEN_SOURCE_URL, MUX_HOME_PAGE_URL } from '../constants';
 
 type AsteriskProps = {
@@ -100,15 +101,14 @@ const Layout: React.FC<Props> = ({
         {height && <meta property="twitter:player:height" content={`${height}`} />}
       </Head>
       <div className="app-container">
-        {/* TO-DO: Text styles with overlay. CSS vars? Bake into package CSS styles? (TD).*/}
-        {/* TO-DO: Disable drag and drop + overlay when attr present. Consider making its own component. (TD).*/}
-        <MuxUploaderDrop className="drag-overlay" overlay overlayText="Upload to stream.new" mux-uploader="uploader" style={{ position: 'static', 
-          display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <DragOverlay dragActive={dragActive}>
+        {/* <MuxUploaderDrop className="drag-overlay" overlay overlayText="Upload to stream.new" mux-uploader="uploader" style={{ position: 'static', 
+          display: 'flex', flexDirection: 'column', height: '100%' }}> */}
         <div className="modal-wrapper"><InfoModal close={() => setModalOpen(false)} /></div>
         <main className={`${centered ? "content-wrapper-centered" : ""}`}>
           {children}
         </main>
-        <div className="footer-wrapper">
+        <div className="footer-wrapper"> {/* Render if upload not in progress.*/}
           <footer>
             <div className="nav">
              {
@@ -397,7 +397,8 @@ const Layout: React.FC<Props> = ({
           }
         `}
         </style>
-        </MuxUploaderDrop>
+        {/* </MuxUploaderDrop> */}
+        </DragOverlay>
       </div>
     </>
   );
