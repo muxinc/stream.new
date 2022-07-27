@@ -1,17 +1,17 @@
-import { ReactElement } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Button from '../components/button';
 import { breakpoints } from '../style-vars';
 
 type Props = {
   isUploading?: boolean;
-  children: ReactElement;
 };
 
 const HomePage: React.FC<Props> = ({ isUploading, children }) => {
-  {/* TO-DO: Children not displaying correctly like with the DragOverlay. Children have 0 height. (TD).*/}
+  {/* TO-DO: Re-render between two states interferes with upload-in-progress attribute applying to MuxUploader). 
+      Could we memoize the children? Prevent re-rendering? Edit: Pitfills of memo + children: https://gist.github.com/slikts/e224b924612d53c1b61f359cfb962c06 (TD).*/}
   if (isUploading) {
-    return children;
+    return <>{children}</>;
   }
 
   return (
@@ -25,7 +25,7 @@ const HomePage: React.FC<Props> = ({ isUploading, children }) => {
           <div className="drop-notice">
             <h2>↓ Drag & drop a video file anywhere</h2>
           </div>
-        {children}
+        {children} {/* Ideally, we want children to be unaffected by the changes around it. Whether we're uploading or not. */}
         <div className="cta-record">
             <Link href="/record?source=camera"><Button>Record from camera</Button></Link>
           </div>

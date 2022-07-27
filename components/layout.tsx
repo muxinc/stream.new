@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { MuxUploaderDrop } from '@mux/mux-uploader-react';
 import { breakpoints, transitionDuration } from '../style-vars';
 import Asterisk from './asterisk';
 import InfoModal from './info-modal';
@@ -102,12 +101,10 @@ const Layout: React.FC<Props> = ({
         {width && <meta property="twitter:player:width" content={`${width}`} />}
         {height && <meta property="twitter:player:height" content={`${height}`} />}
       </Head>
-      <div className="app-container">
-        <DragOverlay dragActive={dragActive}>
-        {/* <MuxUploaderDrop className="drag-overlay" overlay overlayText="Upload to stream.new" mux-uploader="uploader" style={{ position: 'static', 
-          display: 'flex', flexDirection: 'column', height: '100%' }}> */}
+      <DragOverlay dragActive={dragActive}>
+        <div className="app-container">
         <div className="modal-wrapper"><InfoModal close={() => setModalOpen(false)} /></div>
-        <main className={`${centered ? "content-wrapper-centered" : ""}`}>
+        <main className={`${centered ? "content-wrapper-centered" : ""}${isUploading ? 'uploader-container' : ''}`}>
           {children}
         </main>
         {!isUploading && (
@@ -182,6 +179,14 @@ const Layout: React.FC<Props> = ({
             display: flex;
             flex-direction: column;
             align-items: center;
+            height: 100%;
+          }
+
+          main.uploader-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             height: 100%;
           }
 
@@ -401,9 +406,8 @@ const Layout: React.FC<Props> = ({
           }
         `}
         </style>
-        {/* </MuxUploaderDrop> */}
-        </DragOverlay>
-      </div>
+        </div>
+      </DragOverlay>
     </>
   );
 };
