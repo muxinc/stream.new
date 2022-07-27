@@ -1,22 +1,19 @@
-import { ReactElement } from 'react';
+import React from 'react';
 import { MuxUploaderDrop } from '@mux/mux-uploader-react';
 import { breakpoints } from '../style-vars';
 
 type Props = {
   dragActive?: boolean | undefined,
-  children: ReactElement,
 };
 
 const DragOverlay: React.FC<Props> = ({ children, dragActive }) => {
-  {/* TO-DO: CSS is messed up here. Children - MuxPlayer - has a height of 0. (TD).*/}
   if (!dragActive) {
-    return children;
+    return <>{children}</>;
   }
 
   return (
     <>
-      {/* TO-DO: Text styles with overlay. CSS vars? Bake into package CSS styles? (TD).*/}
-      {/* TO-DO: Disable drag and drop + overlay when attr present. Consider making its own component. (TD).*/}
+      {/* TO-DO: Allow adjusting text styles with overlay. CSS vars? Bake into package CSS styles? (TD). */}
       <MuxUploaderDrop className="drag-overlay" overlay overlayText="Upload to stream.new" mux-uploader="uploader" style={{ position: 'static', 
           display: 'flex', flexDirection: 'column', height: '100%' }}>
         {children}

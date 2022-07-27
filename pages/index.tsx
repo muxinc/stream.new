@@ -2,20 +2,37 @@ import { useState, useEffect } from 'react';
 import Router from 'next/router';
 import MuxUploader from '@mux/mux-uploader-react';
 import useSwr from 'swr';
+import Link from 'next/link';
+import Button from '../components/button';
 import Layout from '../components/layout';
-import HomePage from '../components/home-page';
-import UploadProgressFullpage from '../components/upload-progress-fullpage'; // Also used for recording from camera and screen. Remove import. Not file. (TD).
+import HomePage from '../components/home-page'; // Wrapper was the first attempt. See component for notes on pain points.
+import { breakpoints } from '../style-vars';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 type Props = null;
 
+type ChunkInfo = {
+  size: number;
+  uploadStarted: number;
+  uploadFinished?: number;
+}
+
+type UploadTelemetry = {
+  fileSize: number;
+  uploadStarted: number;
+  uploadFinished?: number;
+  chunkSize: number;
+  chunks: ChunkInfo[];
+};
+
 const Index: React.FC<Props> = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadId, setUploadId] = useState('');
   const [isPreparing, setIsPreparing] = useState(false);
+  const [uploadAnalytics, setUploadAnalytics] = useState({});
 
-  const { data, error } = useSwr(
+  const { data } = useSwr(
     () => (isPreparing ? `/api/uploads/${uploadId}` : null),
     fetcher,
     { refreshInterval: 5000 }
@@ -38,14 +55,54 @@ const Index: React.FC<Props> = () => {
     }
   };
 
-  const handleUpload = (upload: any) => {
+  const handleUpload = ({ detail }) => {
     setIsUploading(true);
-    console.log(upload.detail);
 
-    // TO-DO: Set initial upload analytics. (TD).
+    const initialUploadAnalytics: UploadTelemetry = {
+      fileSize: detail.file.size,
+      chunkSize: detail.chunkSize,
+      uploadStarted: Date.now(),
+      chunks: [],
+    };
+
+    setUploadAnalytics(initialUploadAnalytics);
+  };
+
+  const handleChunkAttempt = ({ detail }) => {
+    const chunks = [...uploadAnalytics.chunks];
+    chunks[detail.chunkNumber] = detail;
+
+    setUploadAnalytics({
+      ...uploadAnalytics,
+      chunks,
+    });
+  };
+
+  const handleChunkSuccess = ({ detail }) => {
+    const chunks = [...uploadAnalytics.chunks];
+    chunks[detail.chunk].uploadFinished = Date.now();
+
+    setUploadAnalytics({
+      ...uploadAnalytics,
+      chunks,
+    });
   };
 
   const handleSuccess = () => {
+    const finalAnalytics = {...uploadAnalytics};
+    finalAnalytics.uploadFinished = Date.now();
+
+    fetch('/api/telemetry', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        type: 'upload',
+        data: finalAnalytics,
+      })
+    });
+
     setIsPreparing(true);
   };
 
@@ -60,30 +117,116 @@ const Index: React.FC<Props> = () => {
   return (
     <Layout
       dragActive
-      isUploading={false}
+      isUploading={isUploading}
     >
-      {/* Render with children if upload in progress. Render only children if upload not in progress. (TD).*/}
-      <HomePage isUploading={false}>
-          {/* TO-DO: Revisit typescript errors. Add ability to style button border and button padding. (TD). */}
+      <div style={{ width: isUploading ? '100%' : 'auto' }}>
+        {!isUploading ? (
+          <div>
+            <h1>Add a video.</h1>
+            <h1>Get a shareable link to stream it.</h1>
+          </div>
+          ) : null}
+        <div className={isUploading ? '' : 'cta'}>
+          {!isUploading ? (
+            <div className="drop-notice">
+              <h2>↓ Drag & drop a video file anywhere</h2>
+          </div>
+          ) : null}
+          {/* <HomePage isUploading={isUploading}> */}
           <MuxUploader 
             onUploadStart={handleUpload}
+            onChunkAttempt={handleChunkAttempt}
+            onChunkSuccess={handleChunkSuccess}
             onSuccess={handleSuccess}
             className="uploader"
             style={{ 
               '--button-border-radius': '50px',
-              '--button-hover-background': '#222', 
-              fontSize: '26px',
+              '--button-hover-background': '#222',
+              '--button-border': '2px solid #000',
+              '--button-padding': '20px 20px',
+              fontSize: isUploading ? '4vw': '26px', // TO-DO: Either overflows on large screens (8vw) or too small on small screens (4vw). (TD).
               fontFamily: 'Akkurat',
               lineHeight: '33px',
             }} 
             id="uploader" endpoint={createUpload} type="bar" status />
-          <style>{`
-            [upload-in-progress] {
-              width: 100%;
-            }
-          `}
-          </style>
-      </HomePage>
+        {/* </HomePage> */}
+        {!isUploading ? (
+          <>
+            <div className="cta-record">
+              <Link href="/record?source=camera"><Button>Record from camera</Button></Link>
+            </div>
+            <div className="cta-record">
+              <Link href="/record?source=screen"><Button>Record my screen</Button></Link>
+            </div>
+          </>
+        ) : null}
+        </div>
+      </div>
+      <style jsx>{`
+        input {
+          display: none;
+        }
+        .drop-notice {
+          display: none;
+        }
+
+        .cta {
+          display: flex;
+          flex-direction: column;
+          position: absolute;
+          right: 0;
+          bottom: 0;
+          align-items: flex-end;
+          justify-content: flex-end;
+          margin-bottom: 100px;
+          margin-right: 30px;
+        }
+        .cta .button {
+          margin: 8px 0;
+        }
+
+        .cta {
+          margin-top: 30px;
+          display: flex;
+          flex-direction: column;
+        }
+        .cta-text-mobile {
+          display: inline-block;
+        }
+        .cta-text-desktop {
+          display: none;
+        }
+        .cta-record {
+          display: none;
+        }
+        
+        @media only screen and (min-width: ${breakpoints.md}px) {
+          .drop-notice {
+            display: block;
+            text-align: right;
+            float: right;
+            color: #fff;
+            margin-bottom: 5px;
+            opacity: 0.5;
+            mix-blend-mode: exclusion;
+          }
+          .drop-notice h2 {
+            margin-top: 0;
+          }
+
+          .cta-text-mobile {
+            display: none;
+          }
+          .cta-text-desktop {
+            display: inline-block;
+          }
+          .cta-record {
+            display: block;
+            margin-top: 30px;
+          }
+        }
+      `}
+      </style>
     </Layout>
   );
 };
