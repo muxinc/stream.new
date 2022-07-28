@@ -5,7 +5,6 @@ import useSwr from 'swr';
 import Link from 'next/link';
 import Button from '../components/button';
 import Layout from '../components/layout';
-import HomePage from '../components/home-page'; // Wrapper was the first attempt. See component for notes on pain points.
 import { breakpoints } from '../style-vars';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -132,7 +131,6 @@ const Index: React.FC<Props> = () => {
               <h2>↓ Drag & drop a video file anywhere</h2>
           </div>
           ) : null}
-          {/* <HomePage isUploading={isUploading}> */}
           <MuxUploader 
             onUploadStart={handleUpload}
             onChunkAttempt={handleChunkAttempt}
@@ -149,7 +147,6 @@ const Index: React.FC<Props> = () => {
               lineHeight: '33px',
             }} 
             id="uploader" endpoint={createUpload} type="bar" status />
-        {/* </HomePage> */}
         {!isUploading ? (
           <>
             <div className="cta-record">
