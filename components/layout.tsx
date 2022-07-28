@@ -245,10 +245,6 @@ const Layout: React.FC<Props> = ({
           }
 
           @media only screen and (min-width: ${breakpoints.md}px) {
-            .drag-overlay h1 {
-              font-size: 96px;
-              line-height: 120px;
-            }
             .nav > .footer-link {
               padding-right: 0;
             }
