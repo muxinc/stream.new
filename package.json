@@ -15,6 +15,7 @@
     "@google-cloud/vision": "^2.3.2",
     "@mux/mux-node": "^3.2",
     "@mux/mux-player-react": "^0.1.0-beta.26",
+    "@mux/mux-uploader-react": "^0.1.0-beta.4",
     "@mux/mux-video-react": "^0.5.1",
     "@mux/upchunk": "^2.3",
     "@types/probe-image-size": "^7.0.0",

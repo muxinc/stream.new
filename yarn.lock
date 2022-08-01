@@ -766,6 +766,21 @@
     "@mux/playback-core" "0.9.0"
     media-chrome "0.9.0"
 
+"@mux/mux-uploader-react@^0.1.0-beta.4":
+  version "0.1.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@mux/mux-uploader-react/-/mux-uploader-react-0.1.0-beta.4.tgz#90fc7ca3a83a6e96d8a437dd8566e000d88036a9"
+  integrity sha512-nxrLzH39t8dMKvhrzXKdA+bBOzGwXreQ7+xuWlGqUXTTzGXKSKWEI/u5F6wCJv4rhcOnhmSd6SuDQ3G/OFMoFg==
+  dependencies:
+    "@mux/mux-uploader" "0.1.0-beta.4"
+    prop-types "^15.7.2"
+
+"@mux/mux-uploader@0.1.0-beta.4":
+  version "0.1.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@mux/mux-uploader/-/mux-uploader-0.1.0-beta.4.tgz#c5ed9dd07b8922243b57556fa5300371ccf3a46e"
+  integrity sha512-rCNSHpse7oynsOGAqTF5Cvu17OCdmX3BwjCd3/lRnHKSaAnMA43Xm9P3uIG6IZd9mJxN1ZxnKwo4feIQ28ZzJg==
+  dependencies:
+    "@mux/upchunk" "^2.3.1"
+
 "@mux/mux-video-react@^0.5.1":
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/@mux/mux-video-react/-/mux-video-react-0.5.1.tgz#b6208013498537d0fb86cadfe3a2055a75b3be80"
@@ -795,6 +810,14 @@
   integrity sha512-i0EIjMZs3fEOk73E7PW/i5QoiLLkdMxBjiYBoOySnw65wFvC9ttjrcWX/hsPqniJ+tEFeAJsbB8A16Y+8vDrJw==
   dependencies:
     event-target-shim "^4.0.3"
+    xhr "^2.6.0"
+
+"@mux/upchunk@^2.3.1":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@mux/upchunk/-/upchunk-2.4.0.tgz#bb8d539eb47cb420ba9ef3c20f97b92bb88c5a91"
+  integrity sha512-KzXq4hYz7ak3nkRe0UR9ho7rZHUgm5SdsiJlk+wt5VnhdPObuk4S8gZhcqI56xrAxPO0G6FFxlSJhUJ+l4IdPQ==
+  dependencies:
+    event-target-shim "^6.0.2"
     xhr "^2.6.0"
 
 "@next/env@12.0.10":
@@ -2404,6 +2427,11 @@ event-target-shim@^5.0.0:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/event-target-shim/-/event-target-shim-5.0.1.tgz#5d4d3ebdf9583d63a5333ce2deb7480ab2b05789"
   integrity sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==
+
+event-target-shim@^6.0.2:
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/event-target-shim/-/event-target-shim-6.0.2.tgz#ea5348c3618ee8b62ff1d344f01908ee2b8a2b71"
+  integrity sha512-8q3LsZjRezbFZ2PN+uP+Q7pnHUMmAOziU2vA2OwoFaKIXxlxl38IylhSSgUorWu/rf4er67w0ikBqjBFk/pomA==
 
 execa@^5.0.0:
   version "5.1.1"
