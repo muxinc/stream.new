@@ -29,6 +29,7 @@ const Index: React.FC<Props> = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadId, setUploadId] = useState('');
   const [isPreparing, setIsPreparing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [uploadAnalytics, setUploadAnalytics] = useState({});
 
   const { data } = useSwr(
@@ -50,6 +51,8 @@ const Index: React.FC<Props> = () => {
           return url;
         });
     } catch (e) {
+      console.error('Error in createUpload', e);
+      setErrorMessage('Error creating upload.');
       return Promise.reject(e);
     }
   };
@@ -112,6 +115,17 @@ const Index: React.FC<Props> = () => {
       });
     }
   }, [upload]);
+
+  if (errorMessage) {
+    return (
+      <Layout>
+        <div style={{ paddingBottom: '20px'}}><h1>{errorMessage}</h1></div>
+        <div>
+          <Button onClick={Router.reload}>Reset</Button>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout
