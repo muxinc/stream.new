@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Router from 'next/router';
 import MuxUploader from '@mux/mux-uploader-react';
+import type { MuxUploaderProps } from '@mux/mux-uploader-react';
 import useSwr from 'swr';
 import Link from 'next/link';
 import Button from '../components/button';
@@ -26,11 +27,11 @@ type UploadTelemetry = {
 };
 
 const Index: React.FC<Props> = () => {
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadId, setUploadId] = useState('');
-  const [isPreparing, setIsPreparing] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [uploadAnalytics, setUploadAnalytics] = useState({});
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [uploadId, setUploadId] = useState<string>('');
+  const [isPreparing, setIsPreparing] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [uploadAnalytics, setUploadAnalytics] = useState<Partial<UploadTelemetry> & Pick<UploadTelemetry, 'chunks'>>({ chunks: []});
 
   const { data } = useSwr(
     () => (isPreparing ? `/api/uploads/${uploadId}` : null),
@@ -57,7 +58,7 @@ const Index: React.FC<Props> = () => {
     }
   };
 
-  const handleUpload = ({ detail }) => {
+  const handleUpload: MuxUploaderProps['onUploadStart'] = ({ detail }) => {
     setIsUploading(true);
 
     const initialUploadAnalytics: UploadTelemetry = {
@@ -70,9 +71,12 @@ const Index: React.FC<Props> = () => {
     setUploadAnalytics(initialUploadAnalytics);
   };
 
-  const handleChunkAttempt = ({ detail }) => {
-    const chunks = [...uploadAnalytics.chunks];
-    chunks[detail.chunkNumber] = detail;
+  const handleChunkAttempt: MuxUploaderProps['onChunkAttempt'] = ({ detail }) => {
+    const chunks: ChunkInfo[] = [...uploadAnalytics.chunks];
+    chunks[detail.chunkNumber] = {
+      size: detail.chunkSize,
+      uploadStarted: Date.now(),
+    };
 
     setUploadAnalytics({
       ...uploadAnalytics,
@@ -80,7 +84,7 @@ const Index: React.FC<Props> = () => {
     });
   };
 
-  const handleChunkSuccess = ({ detail }) => {
+  const handleChunkSuccess: MuxUploaderProps['onChunkSuccess'] = ({ detail }) => {
     const chunks = [...uploadAnalytics.chunks];
     chunks[detail.chunk].uploadFinished = Date.now();
 
@@ -90,7 +94,7 @@ const Index: React.FC<Props> = () => {
     });
   };
 
-  const handleSuccess = () => {
+  const handleSuccess: MuxUploaderProps['onSuccess'] = () => {
     const finalAnalytics = {...uploadAnalytics};
     finalAnalytics.uploadFinished = Date.now();
 
@@ -150,7 +154,6 @@ const Index: React.FC<Props> = () => {
             onChunkAttempt={handleChunkAttempt}
             onChunkSuccess={handleChunkSuccess}
             onSuccess={handleSuccess}
-            className="uploader"
             style={{ 
               '--button-border-radius': '50px',
               '--button-hover-background': '#222',
