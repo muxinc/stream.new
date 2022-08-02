@@ -766,18 +766,18 @@
     "@mux/playback-core" "0.9.0"
     media-chrome "0.9.0"
 
-"@mux/mux-uploader-react@^0.1.0-beta.4":
-  version "0.1.0-beta.4"
-  resolved "https://registry.yarnpkg.com/@mux/mux-uploader-react/-/mux-uploader-react-0.1.0-beta.4.tgz#90fc7ca3a83a6e96d8a437dd8566e000d88036a9"
-  integrity sha512-nxrLzH39t8dMKvhrzXKdA+bBOzGwXreQ7+xuWlGqUXTTzGXKSKWEI/u5F6wCJv4rhcOnhmSd6SuDQ3G/OFMoFg==
+"@mux/mux-uploader-react@^0.1.0-beta.5":
+  version "0.1.0-beta.5"
+  resolved "https://registry.yarnpkg.com/@mux/mux-uploader-react/-/mux-uploader-react-0.1.0-beta.5.tgz#ed187fe84df73149c5c10d272772ae5e82472a60"
+  integrity sha512-OPIGr8f6snlAjwUHeSwtISsHNoj3rn59Cgur69x5YkjmFTyqX21oOYyTYwQPfNuWusmU9JX+WFqf+yOWtN38Uw==
   dependencies:
-    "@mux/mux-uploader" "0.1.0-beta.4"
+    "@mux/mux-uploader" "0.1.0-beta.5"
     prop-types "^15.7.2"
 
-"@mux/mux-uploader@0.1.0-beta.4":
-  version "0.1.0-beta.4"
-  resolved "https://registry.yarnpkg.com/@mux/mux-uploader/-/mux-uploader-0.1.0-beta.4.tgz#c5ed9dd07b8922243b57556fa5300371ccf3a46e"
-  integrity sha512-rCNSHpse7oynsOGAqTF5Cvu17OCdmX3BwjCd3/lRnHKSaAnMA43Xm9P3uIG6IZd9mJxN1ZxnKwo4feIQ28ZzJg==
+"@mux/mux-uploader@0.1.0-beta.5":
+  version "0.1.0-beta.5"
+  resolved "https://registry.yarnpkg.com/@mux/mux-uploader/-/mux-uploader-0.1.0-beta.5.tgz#b759d4963351fdb9f9f74f5018d95ba4596d4be2"
+  integrity sha512-p7AxWUfRtK8sirczIwWMIj5aKKnKMJYWSi50DpIgMc2D4QJrB/Xg5tttZA9H6HpqQMe5EEZ/Ml3WWLX3Kg5ucQ==
   dependencies:
     "@mux/upchunk" "^2.3.1"
 
