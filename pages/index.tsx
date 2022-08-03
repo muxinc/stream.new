@@ -213,7 +213,7 @@ const Index: React.FC<Props> = () => {
         .cta-record {
           display: none;
         }
-        
+
         @media only screen and (min-width: ${breakpoints.md}px) {
           .drop-notice {
             display: block;
