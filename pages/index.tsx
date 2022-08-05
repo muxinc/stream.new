@@ -5,6 +5,9 @@ import Layout from '../components/layout';
 import Button from '../components/button';
 import UploadProgressFullpage from '../components/upload-progress-fullpage';
 
+const foo = 'THIS IS A VALUE';
+console.log('THIS IS A CHANGE!', foo);
+
 type Props = null;
 
 const Index: React.FC<Props> = () => {
