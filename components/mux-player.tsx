@@ -29,7 +29,7 @@ const MuxPlayerInternal: React.FC<Props> = ({ forwardedRef, playbackId, poster, 
       onError={(err) => onError(err as ErrorEvent)}
       poster={poster}
       startTime={currentTime}
-      envKey={process.env.NEXT_PUBLIC_MUX_ENV_KEY}
+      envKey={'b6qi9n2fgctdopffhsg9h14b9'}
       streamType="on-demand"
       primaryColor={color}
       style={{ aspectRatio: `${aspectRatio}`, maxWidth: '100%', maxHeight: '100%', width: 'auto', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
