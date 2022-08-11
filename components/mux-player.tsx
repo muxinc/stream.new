@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import MuxPlayer from '@mux/mux-player-react';
 import type MuxPlayerElement from '@mux/mux-player';
-import { MUX_DATA_CUSTOM_DOMAIN } from '../constants';
 
 type Props = {
   playbackId: string
@@ -26,7 +25,6 @@ const MuxPlayerInternal: React.FC<Props> = ({ forwardedRef, playbackId, poster, 
   return (
     <MuxPlayer
       ref={forwardedRef}
-      beaconCollectionDomain={MUX_DATA_CUSTOM_DOMAIN}
       playbackId={playbackId}
       onError={(err) => onError(err as ErrorEvent)}
       poster={poster}
