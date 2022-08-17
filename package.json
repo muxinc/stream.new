@@ -19,6 +19,7 @@
     "@mux/mux-video-react": "^0.5.1",
     "@mux/upchunk": "^2.3",
     "@types/probe-image-size": "^7.0.0",
+    "@upstash/qstash": "^0.1.7",
     "copy-to-clipboard": "^3.3.1",
     "got": "^11.8.3",
     "hls.js": "^1.1.5",

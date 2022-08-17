@@ -1,12 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Mux from '@mux/mux-node';
 import { buffer } from 'micro';
-import { sendSlackAssetReady, sendSlackAutoDeleteMessage } from '../../../lib/slack-notifier';
-import { getScores as moderationGoogle } from '../../../lib/moderation-google';
-import { getScores as moderationHive } from '../../../lib/moderation-hive';
-import { autoDelete } from '../../../lib/moderation-action';
+import { Client } from "@upstash/qstash";
 
 const webhookSignatureSecret = process.env.MUX_WEBHOOK_SIGNATURE_SECRET;
+const qstashTopic = process.env.QSTASH_TOPIC;
+const qstashToken = process.env.QSTASH_TOKEN;
 
 const verifyWebhookSignature = (rawBody: string | Buffer, req: NextApiRequest) => {
   if (webhookSignatureSecret) {
@@ -16,6 +15,16 @@ const verifyWebhookSignature = (rawBody: string | Buffer, req: NextApiRequest) =
     console.log('Skipping webhook sig verification because no secret is configured'); // eslint-disable-line no-console
   }
   return true;
+};
+
+const scheduleAsyncJob = async (rawBody: string) => {
+  const qstashClient = new Client({
+    token: `${qstashToken}`,
+  });
+  return await qstashClient.publishJSON({
+    url: qstashTopic,
+    body: rawBody,
+  });
 };
 
 //
@@ -47,40 +56,14 @@ export default async function muxWebhookHandler (req: NextApiRequest, res: NextA
         res.status(400).json({ message: (e as Error).message });
         return;
       }
-      const jsonBody = JSON.parse(rawBody);
-      const { data, type } = jsonBody;
 
-      if (type !== 'video.asset.ready') {
-        res.json({ message: 'thanks Mux' });
-        return;
-      }
       try {
-        const assetId = data.id;
-        const playbackId = data.playback_ids && data.playback_ids[0] && data.playback_ids[0].id;
-        const duration = data.duration;
-
-        const googleScores = await moderationGoogle ({ playbackId, duration });
-        const hiveScores = await moderationHive ({ playbackId, duration });
-
-        const didAutoDelete = hiveScores ? (await autoDelete({ assetId, playbackId, hiveScores })) : false;
-
-        if (didAutoDelete) {
-          await sendSlackAutoDeleteMessage({ assetId, duration, hiveScores });
-          res.json({ message: 'thanks Mux, I autodeleted this asset because it was bad' });
-        } else {
-          await sendSlackAssetReady({
-            assetId,
-            playbackId,
-            duration,
-            googleScores,
-            hiveScores,
-          });
-          res.json({ message: 'thanks Mux, I notified myself about this' });
-        }
+        const { messageId } = await scheduleAsyncJob(rawBody);
+        console.log('qstash messageId: ', messageId);
+        res.json({ message: 'Thanks Mux, webhook received.' });
       } catch (e) {
-        res.statusCode = 500;
-        console.error('Request error', e); // eslint-disable-line no-console
-        res.json({ error: 'Error handling webhook' });
+        console.error('Error in muxWebhookReceiver, qstash response: ', e);
+        res.status(400).json({ message: 'Error handling webhook.' });
       }
       break;
     } default:
