@@ -1,18 +1,28 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Mux from '@mux/mux-node';
+import { processMuxWebhook } from '../../../lib/mux-webhook-processor';
 import { buffer } from 'micro';
-import { Client } from "@upstash/qstash";
+import { Client } from '@upstash/qstash';
 
 const webhookSignatureSecret = process.env.MUX_WEBHOOK_SIGNATURE_SECRET;
 const qstashTopic = process.env.QSTASH_TOPIC;
 const qstashToken = process.env.QSTASH_TOKEN;
 
-const verifyWebhookSignature = (rawBody: string | Buffer, req: NextApiRequest) => {
+const verifyWebhookSignature = (
+  rawBody: string | Buffer,
+  req: NextApiRequest
+) => {
   if (webhookSignatureSecret) {
     // this will raise an error if signature is not valid
-    Mux.Webhooks.verifyHeader(rawBody, req.headers['mux-signature'] as string, webhookSignatureSecret);
+    Mux.Webhooks.verifyHeader(
+      rawBody,
+      req.headers['mux-signature'] as string,
+      webhookSignatureSecret
+    );
   } else {
-    console.log('Skipping webhook sig verification because no secret is configured'); // eslint-disable-line no-console
+    console.log(
+      'Skipping webhook sig verification because no secret is configured'
+    ); // eslint-disable-line no-console
   }
   return true;
 };
@@ -43,7 +53,10 @@ export const config = {
   },
 };
 
-export default async function muxWebhookHandler (req: NextApiRequest, res: NextApiResponse): Promise<void> {
+export default async function muxWebhookHandler(
+  req: NextApiRequest,
+  res: NextApiResponse
+): Promise<void> {
   const { method } = req;
 
   switch (method) {
@@ -52,21 +65,35 @@ export default async function muxWebhookHandler (req: NextApiRequest, res: NextA
       try {
         verifyWebhookSignature(rawBody, req);
       } catch (e) {
-        console.error('Error verifyWebhookSignature - is the correct signature secret set?', e);
+        console.error(
+          'Error verifyWebhookSignature - is the correct signature secret set?',
+          e
+        );
         res.status(400).json({ message: (e as Error).message });
+        return;
+      }
+      const jsonBody = JSON.parse(rawBody);
+      if (jsonBody.type !== 'video.asset.ready') {
+        res.json({ message: 'Thanks Mux, webhook received.' });
         return;
       }
 
       try {
-        const { messageId } = await scheduleAsyncJob(rawBody);
-        console.log('qstash messageId: ', messageId);
+        if (qstashTopic && qstashToken) {
+          const { messageId } = await scheduleAsyncJob(rawBody);
+          console.log('qstash messageId: ', messageId);
+        } else {
+          await processMuxWebhook(jsonBody);
+          console.log('webhook processed sync');
+        }
         res.json({ message: 'Thanks Mux, webhook received.' });
       } catch (e) {
-        console.error('Error in muxWebhookReceiver, qstash response: ', e);
-        res.status(400).json({ message: 'Error handling webhook.' });
+        console.error('Error in muxWebhookReceiver, request error: ', e); // eslint-disable-line no-console
+        res.status(500).json({ error: 'Error handling webhook' });
       }
       break;
-    } default:
+    }
+    default:
       res.setHeader('Allow', ['POST']);
       res.status(405).end(`Method ${method} Not Allowed`);
   }
