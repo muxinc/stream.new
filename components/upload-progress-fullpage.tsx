@@ -4,6 +4,7 @@ import * as UpChunk from '@mux/upchunk';
 import useSwr from 'swr';
 import Layout from './layout';
 import Button from './button';
+import Cookies from 'js-cookie';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 const MAX_VIDEO_DURATION_MIN = 60;
@@ -19,6 +20,7 @@ type UploadTelemetry = {
   uploadStarted: number;
   uploadFinished?: number;
   chunkSize: number;
+  dynamicChunkSize: boolean;
   chunks: ChunkInfo[];
 };
 
@@ -70,12 +72,14 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
         endpoint: createUpload,
         maxFileSize: 2 ** 20, // 1GB
         file: _file,
+        dynamicChunkSize: isDynamicChuckSizeSet,
       });
 
       const uploadAnalytics: UploadTelemetry = {
         fileSize: _file.size,
         chunkSize: upChunk.chunkSize,
         uploadStarted: Date.now(),
+        dynamicChunkSize: isDynamicChuckSizeSet,
         chunks: [],
       };
 
@@ -119,7 +123,10 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
     }
   };
 
+  const [isDynamicChunkSizeSet, setIsDynamicChunkSizeSet] = useState(false);
   useEffect(() => {
+    const isDynamic = Cookies.get('dynamicChunkSize') || false;
+    setIsDynamicChunkSizeSet(isDynamic);
     if (upload && upload.asset_id) {
       Router.push({
         pathname: `/assets/${upload.asset_id}`,
