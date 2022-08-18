@@ -72,14 +72,14 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
         endpoint: createUpload,
         maxFileSize: 2 ** 20, // 1GB
         file: _file,
-        dynamicChunkSize: isDynamicChuckSizeSet,
+        dynamicChunkSize: isDynamicChunkSizeSet,
       });
 
       const uploadAnalytics: UploadTelemetry = {
         fileSize: _file.size,
         chunkSize: upChunk.chunkSize,
         uploadStarted: Date.now(),
-        dynamicChunkSize: isDynamicChuckSizeSet,
+        dynamicChunkSize: isDynamicChunkSizeSet,
         chunks: [],
       };
 
