@@ -139,6 +139,7 @@ const Index: React.FC<Props> = () => {
   }
  
   // TODO: Uncomment once the mux-uploader supports this attribute
+  // Then, add the attribute to the MuxUploader element
   // const dynamicChunkSize = isDynamicChunkSizeSet.current;
 
   return (
@@ -174,7 +175,6 @@ const Index: React.FC<Props> = () => {
               lineHeight: '33px',
             }} 
             id="uploader" endpoint={createUpload} type="bar" status />
-          // TODO: Add dynamicChunkSize attribute to MuxUploader once it's supported  
         {!isUploading ? (
           <>
             <div className="cta-record">
