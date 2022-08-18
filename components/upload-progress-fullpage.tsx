@@ -95,7 +95,7 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
       upChunk.on('chunkSuccess', ({ detail }) => {
         uploadAnalytics.chunks[detail.chunk].uploadFinished = Date.now();
         // chunk size may have changed due to dynamic chunk sizes
-        uploadAnalytics.chunks[detail.chunk].chunkSize = detail.chunkSize;
+        uploadAnalytics.chunks[detail.chunk].size = detail.chunkSize;
       });
 
       upChunk.on('error', (err) => {
