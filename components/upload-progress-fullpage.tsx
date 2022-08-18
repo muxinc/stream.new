@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Router from 'next/router';
 import * as UpChunk from '@mux/upchunk';
 import useSwr from 'swr';
@@ -66,20 +66,22 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
       return;
     }
 
+    const dynamicChunkSize = isDynamicChunkSizeSet.current;
+
     setIsUploading(true);
     try {
       const upChunk = UpChunk.createUpload({
         endpoint: createUpload,
         maxFileSize: 2 ** 20, // 1GB
         file: _file,
-        dynamicChunkSize: isDynamicChunkSizeSet,
+        dynamicChunkSize,
       });
 
       const uploadAnalytics: UploadTelemetry = {
         fileSize: _file.size,
         chunkSize: upChunk.chunkSize,
         uploadStarted: Date.now(),
-        dynamicChunkSize: isDynamicChunkSizeSet,
+        dynamicChunkSize,
         chunks: [],
       };
 
@@ -123,10 +125,11 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
     }
   };
 
-  const [isDynamicChunkSizeSet, setIsDynamicChunkSizeSet] = useState(false);
+  const isDynamicChunkSizeSet = useRef(false);
   useEffect(() => {
     const isDynamic: string = Cookies.get('dynamicChunkSize') || '';
-    setIsDynamicChunkSizeSet(isDynamic==='true');
+    isDynamicChunkSizeSet.current = isDynamic === 'true';
+
     if (upload && upload.asset_id) {
       Router.push({
         pathname: `/assets/${upload.asset_id}`,
