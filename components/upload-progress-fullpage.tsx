@@ -125,8 +125,8 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
 
   const [isDynamicChunkSizeSet, setIsDynamicChunkSizeSet] = useState(false);
   useEffect(() => {
-    const isDynamic = Cookies.get('dynamicChunkSize') || false;
-    setIsDynamicChunkSizeSet(isDynamic);
+    const isDynamic: string = Cookies.get('dynamicChunkSize') || '';
+    setIsDynamicChunkSizeSet(isDynamic==='true');
     if (upload && upload.asset_id) {
       Router.push({
         pathname: `/assets/${upload.asset_id}`,

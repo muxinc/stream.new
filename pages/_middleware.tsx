@@ -11,9 +11,9 @@ export function middleware(request: NextRequest): NextResponse {
     const selectedForExperiment = Math.random() <= 0.2;
 
     if (selectedForExperiment) {
-      response.cookie(COOKIE_KEY, true);
+      response.cookie(COOKIE_KEY, "true");
     } else {
-      response.cookie(COOKIE_KEY, false);
+      response.cookie(COOKIE_KEY, "false");
     }
   }
 
