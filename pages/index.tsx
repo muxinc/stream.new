@@ -66,6 +66,7 @@ const Index: React.FC<Props> = () => {
       fileSize: detail.file.size,
       chunkSize: detail.chunkSize,
       uploadStarted: Date.now(),
+      dynamicChukSize: isDynamicChunkSizeSet,
       chunks: [],
     };
 
