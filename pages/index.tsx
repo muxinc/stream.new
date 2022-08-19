@@ -88,8 +88,7 @@ const Index: React.FC<Props> = () => {
   const handleChunkSuccess: MuxUploaderProps['onChunkSuccess'] = ({ detail }) => {
     const chunks = [...uploadAnalytics.chunks];
     chunks[detail.chunk].uploadFinished = Date.now();
-    // TODO: Uncomment when we have mux-uploader fixed
-    // chunks[detail.chunk].size = detail.chunkSize;
+    chunks[detail.chunk].size = detail.chunkSize;
 
     setUploadAnalytics({
       ...uploadAnalytics,
@@ -115,10 +114,10 @@ const Index: React.FC<Props> = () => {
     setIsPreparing(true);
   };
 
-  const isDynamicChunkSizeSet = useRef(false);
+  const [isDynamicChunkSizeSet, setIsDynamicChunkSizeSet] = useState(false);
   useEffect(() => {
     const isDynamic: string = Cookies.get('dynamicChunkSize') || '';
-    isDynamicChunkSizeSet.current = isDynamic === 'true';
+    setIsDynamicChunkSizeSet(isDynamic === 'true');
 
     if (upload && upload.asset_id) {
       Router.push({
@@ -138,9 +137,6 @@ const Index: React.FC<Props> = () => {
     );
   }
  
-  // TODO: Uncomment once the mux-uploader supports this attribute
-  // Then, add the attribute to the MuxUploader element
-  // const dynamicChunkSize = isDynamicChunkSizeSet.current;
 
   return (
     <Layout
@@ -174,6 +170,7 @@ const Index: React.FC<Props> = () => {
               fontFamily: 'Akkurat',
               lineHeight: '33px',
             }} 
+            dynamicChunkSize={isDynamicChunkSizeSet}
             id="uploader" endpoint={createUpload} type="bar" status />
         {!isUploading ? (
           <>
