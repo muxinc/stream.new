@@ -42,10 +42,10 @@
         <li><a href="#step-2-set-up-environment-variables">Step 2. Set Up Environment Variables</a></li>
         <li><a href="#step-3-deploy-on-vercel">Step 3. Deploy on Vercel</a></li>
         <li><a href="#step-4-optional-slackbot-moderator">Step 4. (Optional) Slackbot Moderator</a></li>
-        <li><a 
+        <li><a
         href="#step-5-optional-add-automatic-content-analysis-to-slackbot-moderator-google-vision-api"
         >Step 5. (Optional) Add automatic content analysis to Slackbot Moderator (Google Vision API)</a></li>
-        <li><a 
+        <li><a
         href="#step-6-optional-add-automatic-content-analysis-to-slackbot-moderator-hive-ai"
         >Step 6. (Optional) Add automatic content analysis to Slackbot Moderator Hive AI</a></li>
       </ul>
@@ -245,6 +245,28 @@ Each dimension will have a score from 0-1 with a precision of 6 decimal places. 
 <div align="center">
   <img src="images/moderation-score-slack.png" width="80%" alt="Slackbot Moderation Message"></img>
 </div>
+
+
+
+## Step 7 (optional) Process Mux webhooks asynchronously ([QStash](https://docs.upstash.com/qstash/))
+
+stream.new can leverage [QStash](https://docs.upstash.com/qstash/) to process Mux webhooks asynchronously to address time-out issues. When stream.new receives a webhook from Mux, it will send the webhook data to QStash topic to be processed later. Data sent to QStash will be sent back to stream.new for the actual processing.
+
+Follow these steps to set it up:
+
+1. First, you will need to set up an account at [upstash.com](https://upstash.com/).
+2. Navigate to QStash, create a topic under Topics tab
+You need to enter webhook URL(s) where messages in topic will need to be sent
+3. After setting up the topic, you will need to set following env vars:
+
+- `QSTASH_TOKEN` - This is a token that will be used to send webhook data to QStash topic.
+- `QSTASH_TOPIC` - Topic name to send webhook data to.
+- `QSTASH_CURRENT_SIGNING_KEY` - Signing key to be used to verify the request from QStash.
+- `QSTASH_NEXT_SIGNING_KEY` - Next signing key to be used to verify the request from QStash.
+
+Once all environment variables set, stream.new will send webhook data to the QStash after verifying the request and then it will respond back to the Mux webhook request. You should be able to find the QStash message id in the console of your application. From QStash, it will send the webhook data back to stream.new for actual processing.
+
+Read more about QStash [here](https://docs.upstash.com/qstash).
 
 # Hidden playback features via query params:
 
