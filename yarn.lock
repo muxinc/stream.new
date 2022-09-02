@@ -804,15 +804,7 @@
     hls.js "1.1.5"
     mux-embed "^4.7.0"
 
-"@mux/upchunk@^2.3":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@mux/upchunk/-/upchunk-2.3.0.tgz#8d48a1fb1c8734bd71958c6eb56ad9e32c0bb8c5"
-  integrity sha512-i0EIjMZs3fEOk73E7PW/i5QoiLLkdMxBjiYBoOySnw65wFvC9ttjrcWX/hsPqniJ+tEFeAJsbB8A16Y+8vDrJw==
-  dependencies:
-    event-target-shim "^4.0.3"
-    xhr "^2.6.0"
-
-"@mux/upchunk@^2.6.0":
+"@mux/upchunk@^2.6", "@mux/upchunk@^2.6.0":
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/@mux/upchunk/-/upchunk-2.6.0.tgz#076b1186c3b859e44a3293514b28d8ef8162ee21"
   integrity sha512-r7nMbgsjjVudjzhRwV8pfhamMrKyBvEXERSj3Fngy9EPwukXK6e1A5wMeFCvsL7mBGGLYQp9HmSDkhoiyq8phw==
@@ -2412,11 +2404,6 @@ esutils@^2.0.2:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/esutils/-/esutils-2.0.3.tgz#74d2eb4de0b8da1293711910d50775b9b710ef64"
   integrity sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==
-
-event-target-shim@^4.0.3:
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/event-target-shim/-/event-target-shim-4.0.3.tgz#758cd632cd4241f5a73ceec64f93f0d7b0ae77d6"
-  integrity sha512-YXVJDPGzU0yhSzrXGoEFAByEaLnZXSlJDHXkq4Hp6WrlnV66tADiZugYf1utTaCP/dsYRcLndAhecbq9mnbbqg==
 
 event-target-shim@^5.0.0:
   version "5.0.1"

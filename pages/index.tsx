@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
 import Router from 'next/router';
 import MuxUploader from '@mux/mux-uploader-react';
 import type { MuxUploaderProps } from '@mux/mux-uploader-react';
@@ -22,6 +23,7 @@ type UploadTelemetry = {
   fileSize: number;
   uploadStarted: number;
   uploadFinished?: number;
+  dynamicChunkSize?: boolean;
   chunkSize: number;
   chunks: ChunkInfo[];
 };
@@ -65,6 +67,7 @@ const Index: React.FC<Props> = () => {
       fileSize: detail.file.size,
       chunkSize: detail.chunkSize,
       uploadStarted: Date.now(),
+      dynamicChunkSize: isDynamicChunkSizeSet,
       chunks: [],
     };
 
@@ -87,6 +90,7 @@ const Index: React.FC<Props> = () => {
   const handleChunkSuccess: MuxUploaderProps['onChunkSuccess'] = ({ detail }) => {
     const chunks = [...uploadAnalytics.chunks];
     chunks[detail.chunk].uploadFinished = Date.now();
+    chunks[detail.chunk].size = detail.chunkSize;
 
     setUploadAnalytics({
       ...uploadAnalytics,
@@ -112,7 +116,11 @@ const Index: React.FC<Props> = () => {
     setIsPreparing(true);
   };
 
+  const [isDynamicChunkSizeSet, setIsDynamicChunkSizeSet] = useState(false);
   useEffect(() => {
+    const isDynamic: string = Cookies.get('dynamicChunkSize') || '';
+    setIsDynamicChunkSizeSet(isDynamic === 'true');
+
     if (upload && upload.asset_id) {
       Router.push({
         pathname: `/assets/${upload.asset_id}`,
@@ -130,6 +138,7 @@ const Index: React.FC<Props> = () => {
       </Layout>
     );
   }
+ 
 
   return (
     <Layout
@@ -163,6 +172,7 @@ const Index: React.FC<Props> = () => {
               fontFamily: 'Akkurat',
               lineHeight: '33px',
             }} 
+            dynamicChunkSize={isDynamicChunkSizeSet}
             id="uploader" endpoint={createUpload} type="bar" status />
         {!isUploading ? (
           <>

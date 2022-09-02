@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Router from 'next/router';
 import * as UpChunk from '@mux/upchunk';
 import useSwr from 'swr';
 import Layout from './layout';
 import Button from './button';
+import Cookies from 'js-cookie';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 const MAX_VIDEO_DURATION_MIN = 60;
@@ -19,6 +20,7 @@ type UploadTelemetry = {
   uploadStarted: number;
   uploadFinished?: number;
   chunkSize: number;
+  dynamicChunkSize: boolean;
   chunks: ChunkInfo[];
 };
 
@@ -64,18 +66,22 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
       return;
     }
 
+    const dynamicChunkSize = isDynamicChunkSizeSet.current;
+
     setIsUploading(true);
     try {
       const upChunk = UpChunk.createUpload({
         endpoint: createUpload,
         maxFileSize: 2 ** 20, // 1GB
         file: _file,
+        dynamicChunkSize,
       });
 
       const uploadAnalytics: UploadTelemetry = {
         fileSize: _file.size,
         chunkSize: upChunk.chunkSize,
         uploadStarted: Date.now(),
+        dynamicChunkSize,
         chunks: [],
       };
 
@@ -88,6 +94,8 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
 
       upChunk.on('chunkSuccess', ({ detail }) => {
         uploadAnalytics.chunks[detail.chunk].uploadFinished = Date.now();
+        // chunk size may have changed due to dynamic chunk sizes
+        uploadAnalytics.chunks[detail.chunk].size = detail.chunkSize;
       });
 
       upChunk.on('error', (err) => {
@@ -119,7 +127,11 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
     }
   };
 
+  const isDynamicChunkSizeSet = useRef(false);
   useEffect(() => {
+    const isDynamic: string = Cookies.get('dynamicChunkSize') || '';
+    isDynamicChunkSizeSet.current = isDynamic === 'true';
+
     if (upload && upload.asset_id) {
       Router.push({
         pathname: `/assets/${upload.asset_id}`,
