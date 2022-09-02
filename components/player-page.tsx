@@ -70,7 +70,7 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
     return `${HOST_URL}/v/${playbackId}/embed`;
   }, [playbackId]);
 
-  if (router.isFallback) {
+  if (router.isFallback || !router.isReady) {
     return (
       <Layout
         metaTitle="View this video created on stream.new"
