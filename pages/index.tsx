@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import Router from 'next/router';
 import MuxUploader from '@mux/mux-uploader-react';
@@ -23,6 +23,7 @@ type UploadTelemetry = {
   fileSize: number;
   uploadStarted: number;
   uploadFinished?: number;
+  dynamicChunkSize?: boolean;
   chunkSize: number;
   chunks: ChunkInfo[];
 };
@@ -66,7 +67,7 @@ const Index: React.FC<Props> = () => {
       fileSize: detail.file.size,
       chunkSize: detail.chunkSize,
       uploadStarted: Date.now(),
-      dynamicChukSize: isDynamicChunkSizeSet,
+      dynamicChunkSize: isDynamicChunkSizeSet,
       chunks: [],
     };
 

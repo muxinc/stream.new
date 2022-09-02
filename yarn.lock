@@ -804,26 +804,10 @@
     hls.js "1.1.5"
     mux-embed "^4.7.0"
 
-"@mux/upchunk@^2.3":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@mux/upchunk/-/upchunk-2.3.0.tgz#8d48a1fb1c8734bd71958c6eb56ad9e32c0bb8c5"
-  integrity sha512-i0EIjMZs3fEOk73E7PW/i5QoiLLkdMxBjiYBoOySnw65wFvC9ttjrcWX/hsPqniJ+tEFeAJsbB8A16Y+8vDrJw==
-  dependencies:
-    event-target-shim "^4.0.3"
-    xhr "^2.6.0"
-
-"@mux/upchunk@^2.6.0":
+"@mux/upchunk@^2.6", "@mux/upchunk@^2.6.0":
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/@mux/upchunk/-/upchunk-2.6.0.tgz#076b1186c3b859e44a3293514b28d8ef8162ee21"
   integrity sha512-r7nMbgsjjVudjzhRwV8pfhamMrKyBvEXERSj3Fngy9EPwukXK6e1A5wMeFCvsL7mBGGLYQp9HmSDkhoiyq8phw==
-  dependencies:
-    event-target-shim "^6.0.2"
-    xhr "^2.6.0"
-
-"@mux/upchunk@^2.5":
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/@mux/upchunk/-/upchunk-2.5.0.tgz#8615e8a645e071a6a8917addee820f3469ff3997"
-  integrity sha512-XR3rCA1iNkUuVAWkcy1z3K5epXYW3Xh9XxDGOcjDj4oxlF1tTgM72Xd49os7dj30c0kE+VNAn7Hx+BHJX5X9Eg==
   dependencies:
     event-target-shim "^6.0.2"
     xhr "^2.6.0"
