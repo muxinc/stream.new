@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import MuxPlayer from '@mux/mux-player-react';
 import type MuxPlayerElement from '@mux/mux-player';
 import { MUX_DATA_CUSTOM_DOMAIN } from '../constants';
@@ -15,6 +15,8 @@ type Props = {
 };
 
 const MuxPlayerInternal: React.FC<Props> = ({ forwardedRef, playbackId, poster, currentTime, color, onLoaded, aspectRatio}) => {
+  const [preferMse, setPreferMse] = useState(Math.random() < 0.5);
+
   useEffect(() => {
     onLoaded();
   }, []);
@@ -35,10 +37,12 @@ const MuxPlayerInternal: React.FC<Props> = ({ forwardedRef, playbackId, poster, 
       streamType="on-demand"
       primaryColor={color}
       style={{ aspectRatio: `${aspectRatio}`, maxWidth: '100%', maxHeight: '100%', width: 'auto', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
+      preferMse={preferMse}
       metadata={{
         video_id: playbackId,
         video_title: playbackId,
         player_name: 'Mux Player',
+        experiment_name: `preferMse: ${preferMse}`,
       }}
     />
   );
