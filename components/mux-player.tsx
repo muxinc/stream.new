@@ -15,7 +15,10 @@ type Props = {
 };
 
 const MuxPlayerInternal: React.FC<Props> = ({ forwardedRef, playbackId, poster, currentTime, color, onLoaded, aspectRatio}) => {
-  const [preferMse, setPreferMse] = useState(Math.random() < 0.5);
+  const [
+    preferMse, 
+    _setPreferMse // eslint-disable-line @typescript-eslint/no-unused-vars
+  ] = useState(Math.random() < 0.5);
 
   useEffect(() => {
     onLoaded();
@@ -37,7 +40,7 @@ const MuxPlayerInternal: React.FC<Props> = ({ forwardedRef, playbackId, poster, 
       streamType="on-demand"
       primaryColor={color}
       style={{ aspectRatio: `${aspectRatio}`, maxWidth: '100%', maxHeight: '100%', width: 'auto', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
-      preferMse={preferMse}
+      preferPlayback={preferMse ? 'mse' : 'native'}
       metadata={{
         video_id: playbackId,
         video_title: playbackId,
