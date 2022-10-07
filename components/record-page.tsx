@@ -11,7 +11,7 @@ import ScreenOptions from './screen-options';
 import AccessSkeletonFrame from './access-skeleton-frame';
 import UploadProgressFullpage from './upload-progress-fullpage';
 import logger from '../lib/logger';
-import CountdownTimer, {CountdownTimerHandles} from './countdown-timer';
+import CountdownTimer, { CountdownTimerHandles } from './countdown-timer';
 import { RecordState } from '../types';
 
 const MEDIA_RECORDER_TIMESLICE_MS = 2000;
@@ -111,7 +111,7 @@ const RecordPage: React.FC<NoProps> = () => {
       if (recorderRef?.current?.state === 'inactive') {
         logger('skipping recorder stop() b/c state is "inactive"');
       } else {
-        recorderRef.current.onstop = function onRecorderStop () {
+        recorderRef.current.onstop = function onRecorderStop() {
           logger('recorder cleanup');
         };
         recorderRef.current.stop();
@@ -158,8 +158,8 @@ const RecordPage: React.FC<NoProps> = () => {
     const AudioContext = getAudioContext();
 
     if (
-        AudioContext && videoSource === 'camera' ||
-        AudioContext && videoSource === 'screen' && isMicDeviceEnabled
+      AudioContext && videoSource === 'camera' ||
+      AudioContext && videoSource === 'screen' && isMicDeviceEnabled
     ) {
       const audioContext = new AudioContext();
       const mediaStreamSource = audioContext.createMediaStreamSource(stream);
@@ -183,7 +183,11 @@ const RecordPage: React.FC<NoProps> = () => {
 
   const startCamera = async () => {
     if (navigator.mediaDevices) {
-      const video = videoDeviceId ? { deviceId: videoDeviceId } : true;
+      const videoBaseConstraints = {
+        width: { min: 1024, ideal: 1280, max: 1920 },
+        height: { min: 576, ideal: 720, max: 1080 }
+      };
+      const video = videoDeviceId ? { ...videoBaseConstraints, deviceId: videoDeviceId } : videoBaseConstraints;
       const audio = audioDeviceId ? { deviceId: audioDeviceId } : true;
       const constraints = { video, audio };
       try {
@@ -218,7 +222,7 @@ const RecordPage: React.FC<NoProps> = () => {
     } else {
       setErrorMessage('navigator.mediaDevices not available in this browser');
     }
-    return function teardown () {
+    return function teardown() {
       hardCleanup();
     };
   };
@@ -250,7 +254,7 @@ const RecordPage: React.FC<NoProps> = () => {
     } else {
       setErrorMessage('navigator.mediaDevices not available in this browser');
     }
-    return function teardown () {
+    return function teardown() {
       hardCleanup();
     };
   };
@@ -336,7 +340,7 @@ const RecordPage: React.FC<NoProps> = () => {
       logger.warn('cannot stopRecording() without a recorderRef');
       return;
     }
-    recorderRef.current.onstop = function onRecorderStop () {
+    recorderRef.current.onstop = function onRecorderStop() {
       finalBlob.current = new Blob(mediaChunks.current, { type: recorderRef.current?.mimeType });
       const objUrl = URL.createObjectURL(finalBlob.current);
       if (videoRef.current !== null) {
@@ -357,7 +361,7 @@ const RecordPage: React.FC<NoProps> = () => {
       logger.error('Cannot submit recording without a blob');
       return;
     }
-    const createdFile = new File([finalBlob.current], 'video-from-camera', {type: finalBlob.current.type});
+    const createdFile = new File([finalBlob.current], 'video-from-camera', { type: finalBlob.current.type });
     setFile(createdFile);
     setShowUploadPage(true);
   };
@@ -389,7 +393,7 @@ const RecordPage: React.FC<NoProps> = () => {
   };
 
   if (file && showUploadPage) {
-    return <UploadProgressFullpage file={file} resetPage={hardCleanup}/>;
+    return <UploadProgressFullpage file={file} resetPage={hardCleanup} />;
   }
 
   /*
@@ -423,19 +427,19 @@ const RecordPage: React.FC<NoProps> = () => {
       {errorMessage && <div className='error-message'>{errorMessage}</div>}
       <div className="skeleton-container">
         {!haveDeviceAccess && videoSource === 'camera' &&
-          <AccessSkeletonFrame onClick={startCamera} text={ isRequestingMedia ? 'Loading device...' : 'Allow the browser to use your camera/mic' } />
+          <AccessSkeletonFrame onClick={startCamera} text={isRequestingMedia ? 'Loading device...' : 'Allow the browser to use your camera/mic'} />
         }
         {!haveDeviceAccess && videoSource === 'screen' &&
-          <AccessSkeletonFrame onClick={startScreenshare} text={ isRequestingMedia ? 'Loading device...' : 'Allow the browser to access screenshare' } />
+          <AccessSkeletonFrame onClick={startScreenshare} text={isRequestingMedia ? 'Loading device...' : 'Allow the browser to access screenshare'} />
         }
       </div>
-      { videoSource === '' && <div>Select camera or screenshare to get started</div>}
+      {videoSource === '' && <div>Select camera or screenshare to get started</div>}
       <div className='video-container'>
         {<video className={showMirrorImage() ? 'mirror-image' : ''} ref={videoRef} width="400" autoPlay />}
         <CountdownTimer ref={countdownTimerRef} onElapsed={startRecording} />
       </div>
       <div>
-        { isLoadingPreview && 'Loading preview...' }
+        {isLoadingPreview && 'Loading preview...'}
       </div>
       {haveDeviceAccess && videoSource === 'camera' &&
         <CameraOptions
@@ -463,17 +467,17 @@ const RecordPage: React.FC<NoProps> = () => {
           selectAudio={selectAudio}
         />
       }
-      { haveDeviceAccess && (
-      <RecordingControls
-        recordState={recordState}
-        isLoadingPreview={isLoadingPreview}
-        isReviewing={isReviewing}
-        startRecording={prepRecording}
-        cancelRecording={cancelRecording}
-        stopRecording={stopRecording}
-        submitRecording={submitRecording}
-        reset={reset}
-      />
+      {haveDeviceAccess && (
+        <RecordingControls
+          recordState={recordState}
+          isLoadingPreview={isLoadingPreview}
+          isReviewing={isReviewing}
+          startRecording={prepRecording}
+          cancelRecording={cancelRecording}
+          stopRecording={stopRecording}
+          submitRecording={submitRecording}
+          reset={reset}
+        />
       )}
       <style jsx>{`
         .error-message {
