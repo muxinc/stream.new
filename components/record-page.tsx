@@ -320,6 +320,18 @@ const RecordPage: React.FC<NoProps> = () => {
         mediaChunks.current.push(evt.data);
         logger('added media recorder chunk', mediaChunks.current.length);
       };
+      recorderRef.current.onstop = function onRecorderStop () {
+        finalBlob.current = new Blob(mediaChunks.current, { type: recorderRef.current?.mimeType });
+        const objUrl = URL.createObjectURL(finalBlob.current);
+        if (videoRef.current !== null) {
+          videoRef.current.srcObject = null;
+          videoRef.current.src = objUrl;
+          videoRef.current.controls = true;
+          videoRef.current.muted = false;
+          setIsReviewing(true);
+        }
+        cleanup();
+      };
       setRecordState(RecordState.RECORDING);
     } catch (err) {
       logger.error(err); // eslint-disable-line no-console
@@ -331,23 +343,12 @@ const RecordPage: React.FC<NoProps> = () => {
     countdownTimerRef.current?.reset();
     cleanup();
   };
+
   const stopRecording = () => {
     if (!recorderRef.current) {
       logger.warn('cannot stopRecording() without a recorderRef');
       return;
     }
-    recorderRef.current.onstop = function onRecorderStop () {
-      finalBlob.current = new Blob(mediaChunks.current, { type: recorderRef.current?.mimeType });
-      const objUrl = URL.createObjectURL(finalBlob.current);
-      if (videoRef.current !== null) {
-        videoRef.current.srcObject = null;
-        videoRef.current.src = objUrl;
-        videoRef.current.controls = true;
-        videoRef.current.muted = false;
-        setIsReviewing(true);
-      }
-      cleanup();
-    };
     recorderRef.current.stop();
     stopUserMedia();
   };
