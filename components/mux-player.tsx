@@ -8,13 +8,14 @@ type Props = {
   color?: string
   poster: string
   currentTime?: number
+  blurHashBase64?: string
   aspectRatio: number
   onLoaded: () => void
   onError: (error: ErrorEvent) => void
   forwardedRef: React.ForwardedRef<MuxPlayerElement>;
 };
 
-const MuxPlayerInternal: React.FC<Props> = ({ forwardedRef, playbackId, poster, currentTime, color, onLoaded, aspectRatio}) => {
+const MuxPlayerInternal: React.FC<Props> = ({ forwardedRef, playbackId, poster, currentTime, color, blurHashBase64, onLoaded, aspectRatio}) => {
   const [
     preferMse, 
     _setPreferMse // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -39,6 +40,7 @@ const MuxPlayerInternal: React.FC<Props> = ({ forwardedRef, playbackId, poster, 
       envKey={process.env.NEXT_PUBLIC_MUX_ENV_KEY}
       streamType="on-demand"
       primaryColor={color}
+      placeholder={blurHashBase64}
       style={{ aspectRatio: `${aspectRatio}`, maxWidth: '100%', maxHeight: '100%', width: 'auto', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
       preferPlayback={preferMse ? 'mse' : 'native'}
       metadata={{

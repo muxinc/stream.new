@@ -23,7 +23,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-const Playback: React.FC<Props> = ({ playbackId, videoExists, shareUrl, poster, aspectRatio }) => {
+const Playback: React.FC<Props> = ({ playbackId, videoExists, shareUrl, poster, blurHashBase64, aspectRatio }) => {
   return (
     <PlayerPage
       playbackId={playbackId}
@@ -31,6 +31,7 @@ const Playback: React.FC<Props> = ({ playbackId, videoExists, shareUrl, poster, 
       shareUrl={shareUrl}
       poster={poster}
       aspectRatio={aspectRatio}
+      blurHashBase64={blurHashBase64}
       playerType={MUX_PLAYER_TYPE}
     />
   );
