@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import MuxPlayer from '@mux/mux-player-react';
+import MuxPlayer from '@mux/mux-player-react/lazy';
 import type MuxPlayerElement from '@mux/mux-player';
 import { MUX_DATA_CUSTOM_DOMAIN } from '../constants';
 
