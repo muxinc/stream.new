@@ -15,7 +15,7 @@
     "@google-cloud/vision": "^2.3.2",
     "@mux/blurhash": "^0.1.1",
     "@mux/mux-node": "^6.3.0",
-    "@mux/mux-player-react": "^1.0.0",
+    "@mux/mux-player-react": "canary",
     "@mux/mux-uploader-react": "^1.0.0-beta.1",
     "@mux/mux-video-react": "^0.6.0",
     "@mux/upchunk": "^2.6.0",
