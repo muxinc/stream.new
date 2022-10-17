@@ -5,7 +5,7 @@ import { HOST_URL } from "../constants";
 import type { PlayerTypes } from "../constants";
 
 export type Props = {
-  blurHashBase64: string;
+  blurHashBase64?: string;
   playbackId: string;
   shareUrl: string;
   poster: string;
@@ -27,7 +27,7 @@ export async function getPropsFromPlaybackId(
   const poster = `${getImageBaseUrl()}/${playbackId}/thumbnail.jpg`;
   const shareUrl = `${HOST_URL}/v/${playbackId}`;
   const dimensions = await getImageDimensions(playbackId);
-  let blurHashBase64 = null;
+  let blurHashBase64;
   try {
     blurHashBase64 = (await muxBlurHash(playbackId)).blurHashBase64;
   } catch (e) {
