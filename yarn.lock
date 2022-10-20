@@ -218,6 +218,10 @@
   version "7.17.2"
   resolved "https://registry.yarnpkg.com/@babel/helpers/-/helpers-7.17.2.tgz#23f0a0746c8e287773ccd27c14be428891f63417"
   integrity sha512-0Qu7RLR1dILozr/6M0xgj+DFPmi6Bnulgm9M8BVa9ZCWxDqlSnqt3cf8IDPB5m45sVXUZ0kuQAgUrdSFFH79fQ==
+  dependencies:
+    "@babel/template" "^7.16.7"
+    "@babel/traverse" "^7.17.0"
+    "@babel/types" "^7.17.0"
 
 "@babel/helpers@^7.17.8":
   version "7.17.8"
@@ -669,34 +673,6 @@
     blurhash "^1.1.5"
     sharp "^0.30.7"
 
-"@mux/mux-audio-react@0.5.0-canary.0-c4b2b97":
-  version "0.5.0-canary.0-c4b2b97"
-  resolved "https://registry.yarnpkg.com/@mux/mux-audio-react/-/mux-audio-react-0.5.0-canary.0-c4b2b97.tgz#afc57cf1b9ec12cad8865a11eebccdbb6fa4e8d5"
-  integrity sha512-iLYTtnEp9s5/IIANX98erkfeajR+7OL/YdIFXQsccbQ78F299rnTBJBvLL0CXQswyvrHTGLMrmoovp8crjg0vw==
-  dependencies:
-    "@mux/mux-elements-codemod" "1.1.4-canary.0-c4b2b97"
-    "@mux/playback-core" "0.9.1-canary.108-c4b2b97"
-    prop-types "^15.7.2"
-
-"@mux/mux-audio@0.7.0-canary.0-c4b2b97":
-  version "0.7.0-canary.0-c4b2b97"
-  resolved "https://registry.yarnpkg.com/@mux/mux-audio/-/mux-audio-0.7.0-canary.0-c4b2b97.tgz#085fa7fc181598737fc064c2d56370267a76d61a"
-  integrity sha512-0XjrylW9mMvOZfdk//qUgQ2bBz3acuqAYH7aCGiBUFtRgNtVrzJbm05frK/uYdY7zrH/TdAOJudmHi8MXtuZVw==
-  dependencies:
-    "@mux/mux-audio-react" "0.5.0-canary.0-c4b2b97"
-    "@mux/mux-elements-codemod" "1.1.4-canary.0-c4b2b97"
-    "@mux/mux-uploader-react" "0.1.0-canary.108-c4b2b97"
-    "@mux/playback-core" "0.9.1-canary.108-c4b2b97"
-
-"@mux/mux-elements-codemod@1.1.4-canary.0-c4b2b97":
-  version "1.1.4-canary.0-c4b2b97"
-  resolved "https://registry.yarnpkg.com/@mux/mux-elements-codemod/-/mux-elements-codemod-1.1.4-canary.0-c4b2b97.tgz#e98628a7fff1ba72dfb22648011dc945dd54f7c9"
-  integrity sha512-eN6a5w8/sJDoUQVhgKWym84pIt1mI6W0efvom8n+9lDVguWZ2a4gVNa0eqC8skz+vrrBpq8USwPMHhiSHtCdqQ==
-  dependencies:
-    chalk "^5.0.1"
-    minimist "^1.2.6"
-    shelljs "^0.8.5"
-
 "@mux/mux-node@^6.3.0":
   version "6.3.0"
   resolved "https://registry.yarnpkg.com/@mux/mux-node/-/mux-node-6.3.0.tgz#fad1fa36d7631de7f5b19953fe5ab6c8c8739af5"
@@ -706,44 +682,24 @@
     esdoc-ecmascript-proposal-plugin "^1.0.0"
     jsonwebtoken "^8.5.1"
 
-"@mux/mux-player-react@^1.1.3-canary.0-c4b2b97":
-  version "1.1.3-canary.0-c4b2b97"
-  resolved "https://registry.yarnpkg.com/@mux/mux-player-react/-/mux-player-react-1.1.3-canary.0-c4b2b97.tgz#7db70bdb94ef6f656cdb6b11c9e9ff2757c46379"
-  integrity sha512-uvqy2fXw2hHR61qu35lhM8IxFDY7oVMIEvdwoR3rWGhs96ANyEq69fucff4U4YMn3fEMfhKzS2Z1HIQ7QfRP4Q==
+"@mux/mux-player-react@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@mux/mux-player-react/-/mux-player-react-1.2.0.tgz#e97b1738c05b9fa16ca22d877c2b9854496c10e5"
+  integrity sha512-qDpeUpvQg4PzU/6mr0kR1/uHLfEJqh6DSd5yg4yI+H6VYwoAHzyeDPJg235kfSf7RAF5WmwGLZejgkEyiKy6Bg==
   dependencies:
-    "@mux/mux-audio" "0.7.0-canary.0-c4b2b97"
-    "@mux/mux-audio-react" "0.5.0-canary.0-c4b2b97"
-    "@mux/mux-elements-codemod" "1.1.4-canary.0-c4b2b97"
-    "@mux/mux-player" "1.1.3-canary.0-c4b2b97"
-    "@mux/mux-uploader-react" "0.1.0-canary.108-c4b2b97"
-    "@mux/mux-video" "0.9.2-canary.0-c4b2b97"
-    "@mux/mux-video-react" "0.6.0-canary.0-c4b2b97"
-    "@mux/playback-core" "0.9.1-canary.108-c4b2b97"
+    "@mux/mux-player" "1.2.0"
+    "@mux/playback-core" "0.12.0"
     prop-types "^15.7.2"
 
-"@mux/mux-player@1.1.3-canary.0-c4b2b97":
-  version "1.1.3-canary.0-c4b2b97"
-  resolved "https://registry.yarnpkg.com/@mux/mux-player/-/mux-player-1.1.3-canary.0-c4b2b97.tgz#089de60de4dd5e01009b67ecfbe9780c30c37b76"
-  integrity sha512-6IQBvPmRkrQelUnJ7ilknWbbKS1zREtyyQ9/x8TevgIVk4c0tigI6pdoK5J+MK8DIags9ymOuw8i+wuNdbqwOw==
+"@mux/mux-player@1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@mux/mux-player/-/mux-player-1.2.0.tgz#a31da0405ca246aef20b1a364be5d305dd4be254"
+  integrity sha512-cQPij3jUpZT8GcA8KYMqbo/CxeY/iI+yFEYqCN+KEtlV8FX1XTfyoOaRLu6upsJBuiGP8b1s4HyL0Q5oCKUItA==
   dependencies:
     "@github/template-parts" "^0.5.3"
-    "@mux/mux-audio" "0.7.0-canary.0-c4b2b97"
-    "@mux/mux-audio-react" "0.5.0-canary.0-c4b2b97"
-    "@mux/mux-elements-codemod" "1.1.4-canary.0-c4b2b97"
-    "@mux/mux-uploader-react" "0.1.0-canary.108-c4b2b97"
-    "@mux/mux-video" "0.9.2-canary.0-c4b2b97"
-    "@mux/mux-video-react" "0.6.0-canary.0-c4b2b97"
-    "@mux/playback-core" "0.9.1-canary.108-c4b2b97"
+    "@mux/mux-video" "0.9.2"
+    "@mux/playback-core" "0.12.0"
     media-chrome "0.14.0"
-
-"@mux/mux-uploader-react@0.1.0-canary.108-c4b2b97":
-  version "0.1.0-canary.108-c4b2b97"
-  resolved "https://registry.yarnpkg.com/@mux/mux-uploader-react/-/mux-uploader-react-0.1.0-canary.108-c4b2b97.tgz#1ff6ca86e7e58d71325d51a96287ffcb4fd0d180"
-  integrity sha512-1hvPk0MHzsrDjnrbcQzqBhwH45kZATswA8n4Ne/SFkwzrqBpmkSkOwPnI45BrmhVyE39LnLEbWWX3zUaU37Ghw==
-  dependencies:
-    "@mux/mux-elements-codemod" "1.1.4-canary.0-c4b2b97"
-    "@mux/mux-uploader" "0.1.0-canary.109-c4b2b97"
-    prop-types "^15.7.2"
 
 "@mux/mux-uploader-react@^1.0.0-beta.1":
   version "1.0.0-beta.1"
@@ -753,30 +709,12 @@
     "@mux/mux-uploader" "1.0.0-beta.1"
     prop-types "^15.7.2"
 
-"@mux/mux-uploader@0.1.0-canary.109-c4b2b97":
-  version "0.1.0-canary.109-c4b2b97"
-  resolved "https://registry.yarnpkg.com/@mux/mux-uploader/-/mux-uploader-0.1.0-canary.109-c4b2b97.tgz#e303a03ffbe7bf873b2625a1f31d10bf0b8b26c6"
-  integrity sha512-tbD/+5vaGmCD5wg5mFFCxVIlPgnoDUfm++ebHnP8WMvp2PNTAG7GFjiJinsIOTBi1AXOZMkX8GgRc20aOK5CSA==
-  dependencies:
-    "@mux/upchunk" "^2.6.0"
-
 "@mux/mux-uploader@1.0.0-beta.1":
   version "1.0.0-beta.1"
   resolved "https://registry.yarnpkg.com/@mux/mux-uploader/-/mux-uploader-1.0.0-beta.1.tgz#7361def06a3bf55b1c5b4ca8da41ddc537f7fab9"
   integrity sha512-49dU5Vzyb66VKIM3bcUoOom9DXLES8UYul/1iiW1JSNQyG1799+I+Edhw5pA9CeTDjWWNzHif/mCwma8a16nKA==
   dependencies:
     "@mux/upchunk" "^2.6.0"
-
-"@mux/mux-video-react@0.6.0-canary.0-c4b2b97":
-  version "0.6.0-canary.0-c4b2b97"
-  resolved "https://registry.yarnpkg.com/@mux/mux-video-react/-/mux-video-react-0.6.0-canary.0-c4b2b97.tgz#6b9d73cea8969cd389c4ac1ea0740d57a4c8874f"
-  integrity sha512-u4CpA6wFt37H1UeiiyIK9ZWexbLNrq8EeAYfokzPKqJPoLvxLJs8QZTRUvy2STkCYtAUUVvwi8afX70ELyoXeg==
-  dependencies:
-    "@mux/mux-audio-react" "0.5.0-canary.0-c4b2b97"
-    "@mux/mux-elements-codemod" "1.1.4-canary.0-c4b2b97"
-    "@mux/mux-uploader-react" "0.1.0-canary.108-c4b2b97"
-    "@mux/playback-core" "0.9.1-canary.108-c4b2b97"
-    prop-types "^15.7.2"
 
 "@mux/mux-video-react@^0.6.0":
   version "0.6.0"
@@ -786,31 +724,18 @@
     "@mux/playback-core" "0.12.0"
     prop-types "^15.7.2"
 
-"@mux/mux-video@0.9.2-canary.0-c4b2b97":
-  version "0.9.2-canary.0-c4b2b97"
-  resolved "https://registry.yarnpkg.com/@mux/mux-video/-/mux-video-0.9.2-canary.0-c4b2b97.tgz#11ada6dc3dd119bdcfacf48d9dc0ec525c958339"
-  integrity sha512-XiYFwUsI36tvc1LGK7fpC9eIImDByTzKUDs8Kt1a6YqCnON6DPrJBADOOlXggBwefS/4IvjQbx9UQq6nFofNjg==
+"@mux/mux-video@0.9.2":
+  version "0.9.2"
+  resolved "https://registry.yarnpkg.com/@mux/mux-video/-/mux-video-0.9.2.tgz#3e76b85645c458e713bba4387ca1c62e766faeae"
+  integrity sha512-nkpHQUgyg2HanyUT0iKWKBwA+TkmD+JfZdN2DnsKruzD8Hh8Xmzr7ywgm3vpunowHoWAb0fEluMswJ8XwpiP8w==
   dependencies:
-    "@mux/mux-audio" "0.7.0-canary.0-c4b2b97"
-    "@mux/mux-audio-react" "0.5.0-canary.0-c4b2b97"
-    "@mux/mux-elements-codemod" "1.1.4-canary.0-c4b2b97"
-    "@mux/mux-uploader-react" "0.1.0-canary.108-c4b2b97"
-    "@mux/playback-core" "0.9.1-canary.108-c4b2b97"
+    "@mux/playback-core" "0.12.0"
 
 "@mux/playback-core@0.12.0":
   version "0.12.0"
   resolved "https://registry.yarnpkg.com/@mux/playback-core/-/playback-core-0.12.0.tgz#73931fca60d15207aa85c6f347c8f388b20bd365"
   integrity sha512-4ZyskFcYXDyK45jxLj8BCKF+XwyC7OK6BucNU7hZ1OK8LoMYEJvbUV59w/55tYphizGbm/7QfqVmclob++X1zw==
   dependencies:
-    hls.js "1.2.3"
-    mux-embed "^4.7.0"
-
-"@mux/playback-core@0.9.1-canary.108-c4b2b97":
-  version "0.9.1-canary.108-c4b2b97"
-  resolved "https://registry.yarnpkg.com/@mux/playback-core/-/playback-core-0.9.1-canary.108-c4b2b97.tgz#b5a40e0ddf16342729ced6474d4c0643f4c26931"
-  integrity sha512-Q9RxLWFfI9OLX0jjrAna4HTifWfOPryrfOfgVw94CFGGVTwofWigCIi21yT8dLzwaz591uHTyOx+TayRNPfk/A==
-  dependencies:
-    "@mux/mux-elements-codemod" "1.1.4-canary.0-c4b2b97"
     hls.js "1.2.3"
     mux-embed "^4.7.0"
 
@@ -1420,6 +1345,10 @@ array.prototype.find@^2.1.1:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/array.prototype.find/-/array.prototype.find-2.1.2.tgz#6abbd0c2573925d8094f7d23112306af8c16d534"
   integrity sha512-00S1O4ewO95OmmJW7EesWfQlrCrLEL8kZ40w3+GkLX2yTt0m2ggcePPa2uHPJ9KUmJvwRq+lCV9bD8Yim23x/Q==
+  dependencies:
+    call-bind "^1.0.2"
+    define-properties "^1.1.3"
+    es-abstract "^1.19.0"
 
 array.prototype.flat@^1.2.3:
   version "1.2.5"
@@ -1706,11 +1635,6 @@ chalk@^4.0.0:
   dependencies:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
-
-chalk@^5.0.1:
-  version "5.1.2"
-  resolved "https://registry.yarnpkg.com/chalk/-/chalk-5.1.2.tgz#d957f370038b75ac572471e83be4c5ca9f8e8c45"
-  integrity sha512-E5CkT4jWURs1Vy5qGJye+XwCkNj7Od3Af7CP6SujMetSMkLs8Do2RWJK5yx1wamHV/op8Rz+9rltjaTQWDnEFQ==
 
 char-regex@^1.0.2:
   version "1.0.2"
@@ -2713,6 +2637,9 @@ get-symbol-description@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/get-symbol-description/-/get-symbol-description-1.0.0.tgz#7fdb81c900101fbd564dd5f1a30af5aadc1e58d6"
   integrity sha512-2EmdH1YvIQiZpltCNgkuiUnyukzxM/R6NDJX31Ke3BG1Nq5b0S2PhX59UKi9vZpPDQVdqn+1IcaAwnzTT5vCjw==
+  dependencies:
+    call-bind "^1.0.2"
+    get-intrinsic "^1.1.1"
 
 github-from-package@0.0.0:
   version "0.0.0"
@@ -2725,18 +2652,6 @@ glob-parent@^5.1.2:
   integrity sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==
   dependencies:
     is-glob "^4.0.1"
-
-glob@^7.0.0:
-  version "7.2.3"
-  resolved "https://registry.yarnpkg.com/glob/-/glob-7.2.3.tgz#b8df0fb802bbfa8e89bd1d938b4e16578ed44f2b"
-  integrity sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==
-  dependencies:
-    fs.realpath "^1.0.0"
-    inflight "^1.0.4"
-    inherits "2"
-    minimatch "^3.1.1"
-    once "^1.3.0"
-    path-is-absolute "^1.0.0"
 
 glob@^7.1.1, glob@^7.1.2, glob@^7.1.3, glob@^7.1.4:
   version "7.2.0"
@@ -3044,11 +2959,6 @@ internal-slot@^1.0.3:
     has "^1.0.3"
     side-channel "^1.0.4"
 
-interpret@^1.0.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/interpret/-/interpret-1.4.0.tgz#665ab8bc4da27a774a40584e812e3e0fa45b1a1e"
-  integrity sha512-agE4QfB2Lkp9uICn7BAqoscw4SZP9kTE2hxiFI3jBPmXJfdqiahTbUuKGsMoN2GtqL9AxhYioAcVvgsb1HvRbA==
-
 is-arrayish@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/is-arrayish/-/is-arrayish-0.2.1.tgz#77c99840527aa8ecb1a8ba697b80645a7a926a9d"
@@ -3083,13 +2993,6 @@ is-core-module@^2.2.0, is-core-module@^2.8.1:
   version "2.8.1"
   resolved "https://registry.yarnpkg.com/is-core-module/-/is-core-module-2.8.1.tgz#f59fdfca701d5879d0a6b100a40aa1560ce27211"
   integrity sha512-SdNCUs284hr40hFTFP6l0IfZ/RSrMXF3qgoRHd3/79unUTvrFO/JoXwkGm+5J/Oe3E/b5GsnG330uUNgRpu1PA==
-  dependencies:
-    has "^1.0.3"
-
-is-core-module@^2.9.0:
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/is-core-module/-/is-core-module-2.10.0.tgz#9012ede0a91c69587e647514e1d5277019e728ed"
-  integrity sha512-Erxj2n/LDAZ7H8WNJXd9tw38GYM3dv8rk8Zcs+jJuxYTW7sozH+SS8NtrSjVL1/vpLvWi1hxy96IzjJ3EHTJJg==
   dependencies:
     has "^1.0.3"
 
@@ -4059,14 +3962,14 @@ min-document@^2.19.0:
   dependencies:
     dom-walk "^0.1.0"
 
-minimatch@^3.0.4, minimatch@^3.1.1:
+minimatch@^3.0.4:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.1.2.tgz#19cd194bfd3e428f049a70817c038d89ab4be35b"
   integrity sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==
   dependencies:
     brace-expansion "^1.1.7"
 
-minimist@^1.2.0, minimist@^1.2.3, minimist@^1.2.6:
+minimist@^1.2.0, minimist@^1.2.3:
   version "1.2.7"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.7.tgz#daa1c4d91f507390437c6a8bc01078e7000c4d18"
   integrity sha512-bzfL1YUZsP41gmu/qjrEk0Q6i2ix/cVeAhbCbqH9u3zYutS1cLg00qhrD0M2MVdCcx4Sc0UpP2eBWo9rotpq6g==
@@ -4719,13 +4622,6 @@ readable-stream@^3.1.1, readable-stream@^3.4.0:
     string_decoder "^1.1.1"
     util-deprecate "^1.0.1"
 
-rechoir@^0.6.2:
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/rechoir/-/rechoir-0.6.2.tgz#85204b54dba82d5742e28c96756ef43af50e3384"
-  integrity sha512-HFM8rkZ+i3zrV+4LQjwQ0W+ez98pApMGM3HUrN04j3CqzPOzl9nmP15Y8YXNm8QHGv/eacOVEjqhmWpkRV0NAw==
-  dependencies:
-    resolve "^1.1.6"
-
 reflect.ownkeys@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/reflect.ownkeys/-/reflect.ownkeys-0.2.0.tgz#749aceec7f3fdf8b63f927a04809e90c5c0b3460"
@@ -4785,15 +4681,6 @@ resolve.exports@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/resolve.exports/-/resolve.exports-1.1.0.tgz#5ce842b94b05146c0e03076985d1d0e7e48c90c9"
   integrity sha512-J1l+Zxxp4XK3LUDZ9m60LRJF/mAe4z6a4xyabPHk7pvK5t35dACV32iIjJDFeWZFfZlO29w6SZ67knR0tHzJtQ==
-
-resolve@^1.1.6:
-  version "1.22.1"
-  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.22.1.tgz#27cb2ebb53f91abb49470a928bba7558066ac177"
-  integrity sha512-nBpuuYuY5jFsli/JIs1oldw6fOQCBioohqWZg/2hiaOybXOft4lonv85uDOKXdf8rhyK159cxU5cDcK/NKk8zw==
-  dependencies:
-    is-core-module "^2.9.0"
-    path-parse "^1.0.7"
-    supports-preserve-symlinks-flag "^1.0.0"
 
 resolve@^1.12.0, resolve@^1.20.0:
   version "1.22.0"
@@ -4956,15 +4843,6 @@ shebang-regex@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-3.0.0.tgz#ae16f1644d873ecad843b0307b143362d4c42172"
   integrity sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==
-
-shelljs@^0.8.5:
-  version "0.8.5"
-  resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.8.5.tgz#de055408d8361bed66c669d2f000538ced8ee20c"
-  integrity sha512-TiwcRcrkhHvbrZbnRcFYMLl30Dfov3HKqzp5tO5b4pt6G/SezKcYhmDg15zXVBswHmctSAQKznqNW2LO5tTDow==
-  dependencies:
-    glob "^7.0.0"
-    interpret "^1.0.0"
-    rechoir "^0.6.2"
 
 side-channel@^1.0.4:
   version "1.0.4"
