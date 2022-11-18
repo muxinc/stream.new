@@ -8,7 +8,7 @@ export function middleware(request: NextRequest): NextResponse {
   const cookieFromRequest = request.cookies[COOKIE_KEY];
 
   if (!cookieFromRequest) {
-    const selectedForExperiment = Math.random() <= 0.2;
+    const selectedForExperiment = Math.random() <= 0.5;
 
     if (selectedForExperiment) {
       response.cookie(COOKIE_KEY, "true");
