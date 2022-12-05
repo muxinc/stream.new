@@ -4029,7 +4029,7 @@ makeerror@1.0.12:
   dependencies:
     tmpl "1.0.5"
 
-media-chrome@0.16.0:
+media-chrome@0.16.0, media-chrome@^0.16.0:
   version "0.16.0"
   resolved "https://registry.yarnpkg.com/media-chrome/-/media-chrome-0.16.0.tgz#500a8c80bc2f4da2128ff203ccb612a1c53ee517"
   integrity sha512-QCa4f2DHcr8UuTenXGtPSE8313uz5wRiZVvc5iAepmgupF/b4QDiIJyXByt8WBgJWps+Up/qWC4hvNMPsbva2w==
