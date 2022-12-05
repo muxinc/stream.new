@@ -62,8 +62,10 @@ const WinampPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoad
           <div></div>
           <div></div>
         </div>
-        {/** @ts-ignore */}
-        <marquee scrolldelay="200">Media Chrome, it really whips the llama's ass!</marquee>
+        {/* eslint-disable */}
+        {/* @ts-ignore */}
+        <marquee scrolldelay="200">Media Chrome, it really whips the llama&apos;s ass!</marquee>
+        {/* eslint-enable */}
         <div className="kbps">192</div>
         <div className="khz">44</div>
         <MediaPlayButton
