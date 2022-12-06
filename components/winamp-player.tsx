@@ -127,6 +127,31 @@ const WinampPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoad
         
           image-rendering: pixelated;
         }
+        .video-container {
+
+        }
+        .winamp-player {
+          transform-origin: top center;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+        }
+        @media (min-width: 415px) {
+          .winamp-player {
+            transform: scale(1.25);
+          }
+        }
+        @media (min-width: 500px) {
+          .winamp-player {
+            transform: scale(1.5);
+          }
+        }
+        @media (min-width: 768px) {
+          .winamp-player {
+            transform: scale(2);
+          }
+        }
         .winamp-player :global(media-time-range),
         .winamp-player :global(media-time-range:active),
         .winamp-player :global(media-time-range:hover) {
