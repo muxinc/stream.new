@@ -17,100 +17,99 @@ const WinampPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoad
   }, []);
 
   return (
-    // Followup: Figure out why TS error occurs here but not in demo nextjs app (CJP)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    /** @ts-ignore */
     <>
-      <div className="wrapper">
-        <div className="controls">
-          <MediaSeekBackwardButton mediaController="controller" className="media-seek-backward-button">
-            <div slot="backward"></div>
-          </MediaSeekBackwardButton>
-          <MediaPlayButton className="play" mediaController="controller">
-            <div slot="play"></div>
-            <div slot="pause"></div>
-          </MediaPlayButton>
-          <MediaPlayButton className="pause" mediaController="controller">
-            <div slot="play"></div>
-            <div slot="pause"></div>
-          </MediaPlayButton>
-          <MediaPlayButton className="stop" mediaController="controller">
-            <div slot="play"></div>
-            <div slot="pause"></div>
-          </MediaPlayButton>
-          <MediaSeekForwardButton mediaController="controller">
-            <div slot="forward"></div>
-          </MediaSeekForwardButton>
-          <MediaFullscreenButton mediaController="controller">
-            <div slot="enter"></div>
-          </MediaFullscreenButton>
-        </div>
-        <MediaTimeDisplay mediaController="controller"></MediaTimeDisplay>
-        <MediaTimeRange mediaController="controller"></MediaTimeRange>
-        <MediaVolumeRange mediaController="controller"></MediaVolumeRange>
-        <div className="titlebar"></div>
-        <div className="display"></div>
-        <div className="eq"></div>
-        <div className="pl"></div>
-        <div className="loop"></div>
-        <MediaCaptionsButton mediaController="controller">
-          <div slot="on"></div>
-          <div slot="off"></div>
-        </MediaCaptionsButton>
-        <div className="balance"></div>
-        <div className="monoster">
-          <div></div>
-          <div></div>
-        </div>
-        {/* eslint-disable */}
-        {/* @ts-ignore */}
-        <marquee scrolldelay="200">Media Chrome, it really whips the llama&apos;s ass!</marquee>
-        {/* eslint-enable */}
-        <div className="kbps">192</div>
-        <div className="khz">44</div>
-        <MediaPlayButton
-          mediaController="controller"
-          className="play-pause-indicator"
-        >
-          <div slot="play"></div>
-          <div slot="pause"></div>
-        </MediaPlayButton>
-        <MediaPlayButton mediaController="controller" className="vu-meter">
-          <div slot="play"></div>
-          <div slot="pause"></div>
-        </MediaPlayButton>
-      </div>
-
-      <div className="window">
-        <div className="top">
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-        <div className="center">
-          <div className="center-left"></div>
-          <div className="center-middle">
-            <div style={{ width: "100%", height: "100%", background: "green" }}>
-              <MediaController id="controller">
-                <video
-                  playsInline
-                  slot="media"
-                  src={`https://stream.mux.com/${playbackId}/high.mp4`}
-                >
-                  <track
-                    label="English"
-                    kind="captions"
-                    srcLang="en"
-                    default
-                    src="./en-cc.vtt"
-                  />
-                </video>
-              </MediaController>
-            </div>
+      <div className="winamp-player">
+        <div className="wrapper">
+          <div className="controls">
+            <MediaSeekBackwardButton mediaController="controller" className="media-seek-backward-button">
+              <div slot="backward"></div>
+            </MediaSeekBackwardButton>
+            <MediaPlayButton className="play" mediaController="controller">
+              <div slot="play"></div>
+              <div slot="pause"></div>
+            </MediaPlayButton>
+            <MediaPlayButton className="pause" mediaController="controller">
+              <div slot="play"></div>
+              <div slot="pause"></div>
+            </MediaPlayButton>
+            <MediaPlayButton className="stop" mediaController="controller">
+              <div slot="play"></div>
+              <div slot="pause"></div>
+            </MediaPlayButton>
+            <MediaSeekForwardButton mediaController="controller">
+              <div slot="forward"></div>
+            </MediaSeekForwardButton>
+            <MediaFullscreenButton mediaController="controller">
+              <div slot="enter"></div>
+            </MediaFullscreenButton>
           </div>
-          <div className="center-right"></div>
+          <MediaTimeDisplay mediaController="controller"></MediaTimeDisplay>
+          <MediaTimeRange mediaController="controller"></MediaTimeRange>
+          <MediaVolumeRange mediaController="controller"></MediaVolumeRange>
+          <div className="titlebar"></div>
+          <div className="display"></div>
+          <div className="eq"></div>
+          <div className="pl"></div>
+          <div className="loop"></div>
+          <MediaCaptionsButton mediaController="controller">
+            <div slot="on"></div>
+            <div slot="off"></div>
+          </MediaCaptionsButton>
+          <div className="balance"></div>
+          <div className="monoster">
+            <div></div>
+            <div></div>
+          </div>
+          {/* eslint-disable */}
+          {/* @ts-ignore */}
+          <marquee scrolldelay="200">Media Chrome, it really whips the llama&apos;s ass!</marquee>
+          {/* eslint-enable */}
+          <div className="kbps">192</div>
+          <div className="khz">44</div>
+          <MediaPlayButton
+            mediaController="controller"
+            className="play-pause-indicator"
+          >
+            <div slot="play"></div>
+            <div slot="pause"></div>
+          </MediaPlayButton>
+          <MediaPlayButton mediaController="controller" className="vu-meter">
+            <div slot="play"></div>
+            <div slot="pause"></div>
+          </MediaPlayButton>
         </div>
-        <div className="bottom"></div>
+
+        <div className="window">
+          <div className="top">
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+          <div className="center">
+            <div className="center-left"></div>
+            <div className="center-middle">
+              <div style={{ width: "100%", height: "100%", background: "green" }}>
+                <MediaController id="controller">
+                  <video
+                    playsInline
+                    slot="media"
+                    src={`https://stream.mux.com/${playbackId}/high.mp4`}
+                  >
+                    <track
+                      label="English"
+                      kind="captions"
+                      srcLang="en"
+                      default
+                      src="./en-cc.vtt"
+                    />
+                  </video>
+                </MediaController>
+              </div>
+            </div>
+            <div className="center-right"></div>
+          </div>
+          <div className="bottom"></div>
+        </div>
       </div>
       <style jsx>{`
         :global(:root) {
@@ -125,27 +124,27 @@ const WinampPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoad
         
           image-rendering: pixelated;
         }
-        media-time-range,
-        media-time-range:active,
-        media-time-range:hover {
+        .winamp-player :global(media-time-range),
+        .winamp-player :global(media-time-range:active),
+        .winamp-player :global(media-time-range:hover) {
           --media-range-thumb-width: 28px;
           --media-range-thumb-height: 10px;
           --media-range-thumb-border-radius: 0;
           --media-range-thumb-background: 58px 0 url(/winamp-player/POSBAR.BMP);
         }
 
-        media-time-range,
-        media-time-range:active,
-        media-time-range:hover {
+        .winamp-player :global(media-time-range),
+        .winamp-player :global(media-time-range:active),
+        .winamp-player :global(media-time-range:hover) {
           --media-range-thumb-width: 28px;
           --media-range-thumb-height: 10px;
           --media-range-thumb-border-radius: 0;
           --media-range-thumb-background: 58px 0 url(/winamp-player/POSBAR.BMP);
         }
         
-        media-volume-range,
-        media-volume-range:active,
-        media-volume-range:hover {
+        .winamp-player :global(media-volume-range),
+        .winamp-player :global(media-volume-range:active),
+        .winamp-player :global(media-volume-range:hover) {
           --media-range-thumb-width: 14px;
           --media-range-thumb-height: 10px;
           --media-range-thumb-border-radius: 0;
@@ -180,7 +179,7 @@ const WinampPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoad
           display: flex;
         }
         
-        .media-seek-backward-button {
+        .winamp-player :global(media-seek-backward-button) {
           display: block;
           overflow: hidden;
           padding: 0;
@@ -188,19 +187,19 @@ const WinampPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoad
           height: 18px;
         }
         
-        .media-seek-backward-button div[slot="backward"] {
+        .winamp-player :global(media-seek-backward-button div[slot="backward"]) {
           width: 23px;
           height: 18px;
           background: 136px 0 url(/winamp-player/CBUTTONS.BMP);
         }
         
-        .media-seek-backward-button:active div[slot="backward"] {
+        .winamp-player :global(media-seek-backward-button:active div[slot="backward"]) {
           width: 23px;
           height: 18px;
           background: 136px 18px url(/winamp-player/CBUTTONS.BMP);
         }
         
-        media-play-button {
+        .winamp-player :global(media-play-button) {
           display: block;
           overflow: hidden;
           padding: 0;
@@ -208,79 +207,79 @@ const WinampPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoad
           height: 18px;
         }
         
-        media-play-button.play div[slot="play"] {
+        .winamp-player :global(media-play-button.play div[slot="play"]) {
           width: 23px;
           height: 18px;
           background: 114px 0 url(/winamp-player/CBUTTONS.BMP);
         }
         
-        media-play-button.play div[slot="pause"] {
+        .winamp-player :global(media-play-button.play div[slot="pause"]) {
           width: 23px;
           height: 18px;
           background: 114px 0 url(/winamp-player/CBUTTONS.BMP);
         }
         
-        media-play-button.play:active div[slot="play"] {
+        .winamp-player :global(media-play-button.play:active div[slot="play"]) {
           width: 23px;
           height: 18px;
           background: 114px 18px url(/winamp-player/CBUTTONS.BMP);
         }
         
-        media-play-button.play:active div[slot="pause"] {
+        .winamp-player :global(media-play-button.play:active div[slot="pause"]) {
           width: 23px;
           height: 18px;
           background: 114px 18px url(/winamp-player/CBUTTONS.BMP);
         }
         
-        media-play-button.pause div[slot="pause"] {
+        .winamp-player :global(media-play-button.pause div[slot="pause"]) {
           width: 23px;
           height: 18px;
           background: 91px 0 url(/winamp-player/CBUTTONS.BMP);
         }
         
-        media-play-button.pause div[slot="play"] {
+        .winamp-player :global(media-play-button.pause div[slot="play"]) {
           width: 23px;
           height: 18px;
           background: 91px 0 url(/winamp-player/CBUTTONS.BMP);
         }
         
-        media-play-button.pause:active div[slot="play"] {
+        .winamp-player :global(media-play-button.pause:active div[slot="play"]) {
           width: 23px;
           height: 18px;
           background: 91px 18px url(/winamp-player/CBUTTONS.BMP);
         }
         
-        media-play-button.pause:active div[slot="pause"] {
+        .winamp-player :global(media-play-button.pause:active div[slot="pause"]) {
           width: 23px;
           height: 18px;
           background: 91px 18px url(/winamp-player/CBUTTONS.BMP);
         }
         
-        media-play-button.stop div[slot="pause"] {
+        .winamp-player :global(media-play-button.stop div[slot="pause"]) {
           width: 23px;
           height: 18px;
           background: 68px 0 url(/winamp-player/CBUTTONS.BMP);
         }
         
-        media-play-button.stop div[slot="play"] {
+        .winamp-player :global(media-play-button.stop div[slot="play"]) {
           width: 23px;
           height: 18px;
           background: 68px 0 url(/winamp-player/CBUTTONS.BMP);
         }
         
-        media-play-button.stop:active div[slot="play"] {
+        .winamp-player :global(media-play-button.stop:active div[slot="play"]) {
           width: 23px;
           height: 18px;
           background: 68px 18px url(/winamp-player/CBUTTONS.BMP);
         }
         
-        media-play-button.stop:active div[slot="pause"] {
+        .winamp-player :global(media-play-button.stop:active div[slot="pause"]) {
           width: 23px;
           height: 18px;
           background: 68px 18px url(/winamp-player/CBUTTONS.BMP);
         }
         
-        media-seek-forward-button {
+        .winamp-player :global(media-seek-forward-button) {
           display: block;
           overflow: hidden;
           padding: 0;
@@ -288,19 +287,19 @@ const WinampPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoad
           height: 18px;
         }
         
-        media-seek-forward-button div[slot="forward"] {
+        .winamp-player :global(media-seek-forward-button div[slot="forward"]) {
           width: 23px;
           height: 18px;
           background: 45px 0 url(/winamp-player/CBUTTONS.BMP);
         }
         
-        media-seek-forward-button:active div[slot="forward"] {
+        .winamp-player :global(media-seek-forward-button:active div[slot="forward"]) {
           width: 23px;
           height: 18px;
           background: 45px 18px url(/winamp-player/CBUTTONS.BMP);
         }
         
-        media-fullscreen-button {
+        .winamp-player :global(media-fullscreen-button) {
           display: block;
           overflow: hidden;
           padding: 0;
@@ -310,19 +309,19 @@ const WinampPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoad
           height: 16px;
         }
         
-        media-fullscreen-button div[slot="enter"] {
+        .winamp-player :global(media-fullscreen-button div[slot="enter"]) {
           width: 23px;
           height: 16px;
           background: 22px 0 url(/winamp-player/CBUTTONS.BMP);
         }
         
-        media-fullscreen-button:active div[slot="enter"] {
+        .winamp-player :global(media-fullscreen-button:active div[slot="enter"]) {
           width: 23px;
           height: 16px;
           background: 22px 20px url(/winamp-player/CBUTTONS.BMP);
         }
         
-        media-time-display {
+        .winamp-player :global(media-time-display) {
           position: absolute;
           background: black;
           line-height: 20px;
@@ -337,7 +336,7 @@ const WinampPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoad
           -webkit-font-smoothing: none;
         }
         
-        media-time-range {
+        .winamp-player :global(media-time-range) {
           position: absolute;
           top: 71px;
           left: 17px;
@@ -347,11 +346,11 @@ const WinampPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoad
           padding: 0;
         }
         
-        media-time-range::part(preview-box) {
+        .winamp-player :global(media-time-range::part(preview-box)) {
           display: none;
         }
         
-        media-volume-range {
+        .winamp-player :global(media-volume-range) {
           position: absolute;
           top: 58px;
           left: 108px;
@@ -380,13 +379,13 @@ const WinampPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoad
           display: flex;
         }
         
-        .monoster :first-child {
+        .monoster div:first-child {
           width: 24px;
           height: 13px;
           background: 24px 13px url(/winamp-player/MONOSTER.BMP);
         }
         
-        .monoster :last-child {
+        .monoster div:last-child {
           width: 26px;
           height: 13px;
           background: 0px 25px url(/winamp-player/MONOSTER.BMP);
@@ -432,7 +431,7 @@ const WinampPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoad
           -webkit-font-smoothing: none;
         }
         
-        media-play-button.play-pause-indicator {
+        .winamp-player :global(media-play-button.play-pause-indicator) {
           display: block;
           overflow: hidden;
           background: none;
@@ -444,19 +443,19 @@ const WinampPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoad
           height: 9px;
         }
         
-        media-play-button.play-pause-indicator div[slot="play"] {
+        .winamp-player :global(media-play-button.play-pause-indicator div[slot="play"]) {
           width: 9px;
           height: 9px;
           background: -18px 0 url(/winamp-player/PLAYPAUS.BMP);
         }
         
-        media-play-button.play-pause-indicator div[slot="pause"] {
+        .winamp-player :global(media-play-button.play-pause-indicator div[slot="pause"]) {
           width: 9px;
           height: 9px;
           background: 0 0 url(/winamp-player/PLAYPAUS.BMP);
         }
         
-        media-play-button.vu-meter {
+        .winamp-player :global(media-play-button.vu-meter) {
           display: block;
           overflow: hidden;
           background: none;
@@ -468,13 +467,13 @@ const WinampPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoad
           height: 22px;
         }
         
-        media-play-button.vu-meter div[slot="play"] {
+        .winamp-player :global(media-play-button.vu-meter div[slot="play"]) {
           width: 88px;
           height: 22px;
           background: none;
         }
         
-        media-play-button.vu-meter div[slot="pause"] {
+        .winamp-player :global(media-play-button.vu-meter div[slot="pause"]) {
           width: 88px;
           height: 22px;
           background: 0 0 url(/winamp-player/VU.gif);
@@ -519,7 +518,7 @@ const WinampPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoad
           background-image: url(/winamp-player/SHUFREP.BMP);
         }
         
-        media-captions-button {
+        .winamp-player :global(media-captions-button) {
           position: absolute;
           left: 165px;
           top: 89px;
@@ -529,8 +528,8 @@ const WinampPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoad
           overflow: hidden;
         }
         
-        media-captions-button div[slot="on"],
-        media-captions-button div[slot="off"] {
+        .winamp-player :global(media-captions-button div[slot="on"]),
+        .winamp-player :global(media-captions-button div[slot="off"]) {
           width: 46px;
           height: 14px;
           background-image: url(/winamp-player/SHUFREP.BMP);
@@ -626,7 +625,7 @@ const WinampPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoad
           overflow: hidden;
         }
         
-        .window .center .center-middle media-controller {
+        .window .center .center-middle :global(media-controller) {
           display: block;
           width: 100%;
           height: 100%;
