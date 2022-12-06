@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import MuxVideo from '@mux/mux-video-react';
 import { MUX_DATA_CUSTOM_DOMAIN } from '../constants';
 
 import { MediaController, MediaSeekBackwardButton, MediaPlayButton, MediaSeekForwardButton, MediaFullscreenButton, MediaTimeDisplay, MediaTimeRange, MediaVolumeRange, MediaCaptionsButton } from "media-chrome/dist/react";
@@ -90,19 +91,21 @@ const WinampPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoad
             <div className="center-middle">
               <div style={{ width: "100%", height: "100%", background: "green" }}>
                 <MediaController id="controller">
-                  <video
-                    playsInline
+                  <MuxVideo
                     slot="media"
-                    src={`https://stream.mux.com/${playbackId}/high.mp4`}
-                  >
-                    <track
-                      label="English"
-                      kind="captions"
-                      srcLang="en"
-                      default
-                      src="./en-cc.vtt"
-                    />
-                  </video>
+                    beaconCollectionDomain={MUX_DATA_CUSTOM_DOMAIN}
+                    playbackId={playbackId}
+                    poster={poster}
+                    startTime={currentTime}
+                    envKey={process.env.NEXT_PUBLIC_MUX_ENV_KEY}
+                    streamType="on-demand"
+                    style={{ maxWidth: '100%', maxHeight: '100%', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
+                    metadata={{
+                      video_id: playbackId,
+                      video_title: playbackId,
+                      player_name: 'Winamp player',
+                    }}
+                  />
                 </MediaController>
               </div>
             </div>
