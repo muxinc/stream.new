@@ -614,7 +614,7 @@ const WinampPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoad
           background-image: url(/winamp-player/GEN.BMP), url(/winamp-player/GEN.BMP);
           background-position: 150px -57px, 0 -42px;
           background-repeat: no-repeat, no-repeat;
-          height: 14px;
+          height: 13px;
           position: relative;
         }
         
