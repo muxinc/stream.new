@@ -511,11 +511,6 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@github/template-parts@^0.5.3":
-  version "0.5.3"
-  resolved "https://registry.yarnpkg.com/@github/template-parts/-/template-parts-0.5.3.tgz#5b2bcccfe0658d9a63549ae82488c0136d4ddb62"
-  integrity sha512-Jw7gNq1zIwd17gTmtD/h+kTpSsue/fRGiqso42+A36AYMVlkXxmQ3UB+lInE8+4KPSxaOIvMMLD90LQjFlLz5A==
-
 "@google-cloud/promisify@^2.0.0":
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/@google-cloud/promisify/-/promisify-2.0.4.tgz#9d8705ecb2baa41b6b2673f3a8e9b7b7e1abc52a"
@@ -815,59 +810,58 @@
     esdoc-ecmascript-proposal-plugin "^1.0.0"
     jsonwebtoken "^8.5.1"
 
-"@mux/mux-player-react@^1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@mux/mux-player-react/-/mux-player-react-1.4.0.tgz#4ae2c9977433fc21fffa40f526ca7b64bc38accd"
-  integrity sha512-6FZKVRGnaiFTxNDdyO/z3fhSrGsJ7Lz7OdRb4ZaJpcJvUqqfihEUR/dvTYBchll/skAAmgZRB5PuMz+zgj8aBg==
+"@mux/mux-player-react@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@mux/mux-player-react/-/mux-player-react-1.5.0.tgz#20398adb9d42eb5abf8a54f174072508ead2bf6e"
+  integrity sha512-7CYzbTShLhiU+VNAYhR21B7FMl+ReTOt+cYwgF/yNKMMmOrd2+waev+JUPo83i3ckDAvgOjeDaJwEQc3pXmFlg==
   dependencies:
-    "@mux/mux-player" "1.4.0"
-    "@mux/playback-core" "0.14.0"
+    "@mux/mux-player" "1.5.0"
+    "@mux/playback-core" "0.15.0"
     prop-types "^15.7.2"
 
-"@mux/mux-player@1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@mux/mux-player/-/mux-player-1.4.0.tgz#35b534c212b7bce234eeecf58b4a380449b3c0c9"
-  integrity sha512-HDKkl54ITrrTVgkLBM378V3f8agBpnxd0IuTfKaGycM/sxuPZF8VnOHBBwZ+XauzpFk+oolD+cuTe6amGqVkKw==
+"@mux/mux-player@1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@mux/mux-player/-/mux-player-1.5.0.tgz#15e5026ed9ba6513c34b8a6c91e2ccf0df0d7eec"
+  integrity sha512-bVBoa68Q/W0XAJXV9fWukBpS101QVx+sEPhGdYgh5KUuAmChza/63f5Xvwd8mDazE8WFptaff+nAPfqbRw9jmQ==
   dependencies:
-    "@github/template-parts" "^0.5.3"
-    "@mux/mux-video" "0.11.0"
-    "@mux/playback-core" "0.14.0"
-    media-chrome "0.16.0"
+    "@mux/mux-video" "0.12.0"
+    "@mux/playback-core" "0.15.0"
+    media-chrome "0.16.2"
 
-"@mux/mux-uploader-react@^1.0.0-beta.2":
-  version "1.0.0-beta.2"
-  resolved "https://registry.yarnpkg.com/@mux/mux-uploader-react/-/mux-uploader-react-1.0.0-beta.2.tgz#8ab7c0af71c22105922b99691266b8137e4a39bb"
-  integrity sha512-Th/uZzMqKIc8tp1vwj99Rhmj9EkQnc4k53l41TZzBl3WXG9Ml6fTGn80GWS7MQyRI0T6nKDgOKrNEITBzKyryg==
+"@mux/mux-uploader-react@^1.0.0-beta.3":
+  version "1.0.0-beta.3"
+  resolved "https://registry.yarnpkg.com/@mux/mux-uploader-react/-/mux-uploader-react-1.0.0-beta.3.tgz#937f85e7da6180d4a66308d133296b1596fbbc63"
+  integrity sha512-1qKmRv0d6QEdctL2vWQyfQLjmTSfUksYXU+2Msqs9/yS6Hb+DnRpKxU6oYozTD/inj57G3rk6HggnfhnGDVJhg==
   dependencies:
-    "@mux/mux-uploader" "1.0.0-beta.2"
+    "@mux/mux-uploader" "1.0.0-beta.3"
     prop-types "^15.7.2"
 
-"@mux/mux-uploader@1.0.0-beta.2":
-  version "1.0.0-beta.2"
-  resolved "https://registry.yarnpkg.com/@mux/mux-uploader/-/mux-uploader-1.0.0-beta.2.tgz#5fa72c5ae15096cd6e0ad81eaebc841c208911f4"
-  integrity sha512-oTur+8t+nmlWzMHCngOZ8ZOupY4wwZB1siB2g1HfsIlA+6SwPo3FIKIl+puRq/HMgMhVdAjWh2qJqFUCXfF9Gg==
+"@mux/mux-uploader@1.0.0-beta.3":
+  version "1.0.0-beta.3"
+  resolved "https://registry.yarnpkg.com/@mux/mux-uploader/-/mux-uploader-1.0.0-beta.3.tgz#214d636c27f103bd04933d9d361c6f1bc8fc57fc"
+  integrity sha512-5NZn2cX9QzicbU3pXRpIslnfnPR+RFZeWGG83gjVAjsdU7J5aaD1/50eQRfTGnglE5v04+sSJmKzZpahE6vVtg==
   dependencies:
-    "@mux/upchunk" "^2.6.0"
+    "@mux/upchunk" "^3.0.0"
 
-"@mux/mux-video-react@^0.7.1":
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/@mux/mux-video-react/-/mux-video-react-0.7.1.tgz#d3cca49dcc8aac2763b2702d08ef33c1db2ef48a"
-  integrity sha512-QkUvUolT981JpeUHXNDQ3RL4ns1xwicrtBwdcyF9JHBgtBH4P38bsOC2GxEkuQXPTqgKzLNcqL0tgIPtzWXALQ==
+"@mux/mux-video-react@^0.7.2":
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/@mux/mux-video-react/-/mux-video-react-0.7.2.tgz#338ef82ac4387d99619c8de69fbf308680360f83"
+  integrity sha512-PUBRYF12A25Vu6/JC1B+5e1Mdo50jk4SaGujmhNGK5T5wqb5mllNWwB+2gyL+ksVv9bZM2vSLBulO/6FsAf0JA==
   dependencies:
-    "@mux/playback-core" "0.14.0"
+    "@mux/playback-core" "0.15.0"
     prop-types "^15.7.2"
 
-"@mux/mux-video@0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@mux/mux-video/-/mux-video-0.11.0.tgz#d28ee8f3d655c9780da548c4f39aa5bcb17cb9ce"
-  integrity sha512-Se7ULA1NV/0riD8LBA3gc/wNcOE40WM51C51FeLEIKMNuObeFyWua+xVkX8WpNKfl44vommI4wbQeamkIxOwHA==
+"@mux/mux-video@0.12.0":
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/@mux/mux-video/-/mux-video-0.12.0.tgz#21e0798c057cd6ac3bfbd5c93c26a77508f8f11d"
+  integrity sha512-Nr5McFX0fxV+qnIKOf554wNm2f1YdIy8fJxg48E69QBnMxN8dhWAZrsuFm/UJwFyDpsl7T/CbCDp6JmOwgBEUg==
   dependencies:
-    "@mux/playback-core" "0.14.0"
+    "@mux/playback-core" "0.15.0"
 
-"@mux/playback-core@0.14.0":
-  version "0.14.0"
-  resolved "https://registry.yarnpkg.com/@mux/playback-core/-/playback-core-0.14.0.tgz#62a74b83dadcc97a02a5dfa96fa62ba50ace4026"
-  integrity sha512-sE2vMI704DF+bnWhGspy9LY8MYl/Rbh+h6x3AwXI9G6zRRr0noiQ2b2dIbPNKopKouVTI2impytY27nYpR97Rw==
+"@mux/playback-core@0.15.0":
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/@mux/playback-core/-/playback-core-0.15.0.tgz#bee02abf9eba569d49b6505fe1d70525586c6f62"
+  integrity sha512-xBYd4ci8RYFGJUUAw3uX/DH4UUTzwb2FPePK8L5U+Q7SSPjQp/KiHzElJwEaAXT2Cv1H2s794nOblPTXHER/bw==
   dependencies:
     hls.js "1.2.3"
     mux-embed "^4.14.0"
@@ -876,6 +870,14 @@
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/@mux/upchunk/-/upchunk-2.6.0.tgz#076b1186c3b859e44a3293514b28d8ef8162ee21"
   integrity sha512-r7nMbgsjjVudjzhRwV8pfhamMrKyBvEXERSj3Fngy9EPwukXK6e1A5wMeFCvsL7mBGGLYQp9HmSDkhoiyq8phw==
+  dependencies:
+    event-target-shim "^6.0.2"
+    xhr "^2.6.0"
+
+"@mux/upchunk@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@mux/upchunk/-/upchunk-3.0.0.tgz#657d88241e24776b9b9c53365ded3b70cf60c4c8"
+  integrity sha512-Aan5CzCcQSjVBOa2KxyMZiQVvh+D6vfnfcM4JXayQCTQ1bipK8jukmuXwC/ipd8IzBVAVyaLmXMuDX4LAk5mXA==
   dependencies:
     event-target-shim "^6.0.2"
     xhr "^2.6.0"
@@ -4029,7 +4031,12 @@ makeerror@1.0.12:
   dependencies:
     tmpl "1.0.5"
 
-media-chrome@0.16.0, media-chrome@^0.16.0:
+media-chrome@0.16.2:
+  version "0.16.2"
+  resolved "https://registry.yarnpkg.com/media-chrome/-/media-chrome-0.16.2.tgz#45d9f5c8557a36d8d31a3244ab16b3ca550dc82b"
+  integrity sha512-2oNkmoJ+MPqGfQzs7U3ds9kzxRdhcO90T70Wo6s3QnzpdvCgi68T6XLIdep+JvVLgkO6+L0UuqfXK3H9L/uBaw==
+
+media-chrome@^0.16.0:
   version "0.16.0"
   resolved "https://registry.yarnpkg.com/media-chrome/-/media-chrome-0.16.0.tgz#500a8c80bc2f4da2128ff203ccb612a1c53ee517"
   integrity sha512-QCa4f2DHcr8UuTenXGtPSE8313uz5wRiZVvc5iAepmgupF/b4QDiIJyXByt8WBgJWps+Up/qWC4hvNMPsbva2w==
