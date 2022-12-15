@@ -810,19 +810,19 @@
     esdoc-ecmascript-proposal-plugin "^1.0.0"
     jsonwebtoken "^8.5.1"
 
-"@mux/mux-player-react@^1.5.0":
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/@mux/mux-player-react/-/mux-player-react-1.5.0.tgz#20398adb9d42eb5abf8a54f174072508ead2bf6e"
-  integrity sha512-7CYzbTShLhiU+VNAYhR21B7FMl+ReTOt+cYwgF/yNKMMmOrd2+waev+JUPo83i3ckDAvgOjeDaJwEQc3pXmFlg==
+"@mux/mux-player-react@^1.5.1":
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/@mux/mux-player-react/-/mux-player-react-1.5.1.tgz#7571fcccc08766360f70124107257ffdc65e0d9a"
+  integrity sha512-6VdNOSyi4aBLWL2oFayQQJ/LnVfl2bitTOLRKHziCRUD8SYIczodD43YVCyrSaHREmrUz6Fn9Q5+b8N2WBp+Sw==
   dependencies:
-    "@mux/mux-player" "1.5.0"
+    "@mux/mux-player" "1.5.1"
     "@mux/playback-core" "0.15.0"
     prop-types "^15.7.2"
 
-"@mux/mux-player@1.5.0":
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/@mux/mux-player/-/mux-player-1.5.0.tgz#15e5026ed9ba6513c34b8a6c91e2ccf0df0d7eec"
-  integrity sha512-bVBoa68Q/W0XAJXV9fWukBpS101QVx+sEPhGdYgh5KUuAmChza/63f5Xvwd8mDazE8WFptaff+nAPfqbRw9jmQ==
+"@mux/mux-player@1.5.1":
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/@mux/mux-player/-/mux-player-1.5.1.tgz#39275b05e3bdcba70145ef0ae4c67438c4296772"
+  integrity sha512-aLqeVLzT/bmcMDSOQ3Fu+sjhBczUPki0bMhpLyZEMUfN40lIhsyMgYZnx1JI8M3gVL+zzISx2nJ8G45a0bZF+Q==
   dependencies:
     "@mux/mux-video" "0.12.0"
     "@mux/playback-core" "0.15.0"
