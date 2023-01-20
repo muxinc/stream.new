@@ -46,7 +46,7 @@ const MuxPlayerInternal: React.FC<Props> = ({ forwardedRef, playbackId, poster, 
       metadata={{
         video_id: playbackId,
         video_title: playbackId,
-        player_name: 'Mux Player',
+        player_name: 'Mux Player stream.new',
         experiment_name: `preferMse: ${preferMse}`,
       }}
     />
