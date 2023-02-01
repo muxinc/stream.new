@@ -173,7 +173,8 @@ const Index: React.FC<Props> = () => {
               lineHeight: '33px',
             }} 
             dynamicChunkSize={isDynamicChunkSizeSet}
-            id="uploader" endpoint={createUpload} type="bar" status />
+            id="uploader" 
+            endpoint={createUpload} />
         {!isUploading ? (
           <>
             <div className="cta-record">
