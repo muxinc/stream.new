@@ -156,25 +156,20 @@ const Index: React.FC<Props> = () => {
           {!isUploading ? (
             <div className="drop-notice">
               <h2>↓ Drag & drop a video file anywhere</h2>
-          </div>
+            </div>
           ) : null}
           <MuxUploader 
             onUploadStart={handleUpload}
             onChunkAttempt={handleChunkAttempt}
             onChunkSuccess={handleChunkSuccess}
             onSuccess={handleSuccess}
-            style={{ 
-              '--button-border-radius': '50px',
-              '--button-hover-background': '#222',
-              '--button-border': '2px solid #000',
-              '--button-padding': '20px 20px',
-              fontSize: isUploading ? '4vw': '26px', // TO-DO: Either overflows on large screens (8vw) or too small on small screens (4vw). (TD).
-              fontFamily: 'Akkurat',
-              lineHeight: '33px',
-            }} 
             dynamicChunkSize={isDynamicChunkSizeSet}
             id="uploader" 
-            endpoint={createUpload} />
+            endpoint={createUpload}
+            style={{ fontSize: isUploading ? '4vw': '26px' }}
+          >
+            <Button className={isUploading ? 'hidden' : '' } slot="file-select">Upload video</Button>
+          </MuxUploader>
         {!isUploading ? (
           <>
             <div className="cta-record">
@@ -222,7 +217,8 @@ const Index: React.FC<Props> = () => {
           display: none;
         }
         .cta-record {
-          display: none;
+          display: block;
+          margin-top: 15px;
         }
 
         @media only screen and (min-width: ${breakpoints.md}px) {
@@ -244,10 +240,6 @@ const Index: React.FC<Props> = () => {
           }
           .cta-text-desktop {
             display: inline-block;
-          }
-          .cta-record {
-            display: block;
-            margin-top: 30px;
           }
         }
       `}
