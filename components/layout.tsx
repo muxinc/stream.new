@@ -366,6 +366,10 @@ const Layout: React.FC<Props> = ({
             border-radius: 5px;
           }
 
+          .hidden {
+            display: none;
+          }
+
           select:hover {
             opacity: 0.75;
           }

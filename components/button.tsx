@@ -5,6 +5,8 @@ type Props = {
   onClick?: () => void;
   href?: string;
   disabled?: boolean;
+  className?: string;
+  slot?: string;
   otherProps?: unknown;
   fullW?: boolean;
   type?: "button" | "submit" | "reset" | undefined;
