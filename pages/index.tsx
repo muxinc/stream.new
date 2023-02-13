@@ -220,11 +220,14 @@ const Index: React.FC<Props> = () => {
           display: none;
         }
         .cta-record {
-          display: block;
-          margin-top: 15px;
+          display: none;
         }
 
         @media only screen and (min-width: ${breakpoints.md}px) {
+          .cta-record {
+            display: block;
+            margin-top: 15px;
+          }
           .drop-notice {
             display: block;
             text-align: right;
