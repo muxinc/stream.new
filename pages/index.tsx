@@ -158,13 +158,14 @@ const Index: React.FC<Props> = () => {
               <h2>↓ Drag & drop a video file anywhere</h2>
             </div>
           ) : null}
-          <MuxUploader 
+          <MuxUploader
+            id="uploader"
+            noDrop
             onUploadStart={handleUpload}
             onChunkAttempt={handleChunkAttempt}
             onChunkSuccess={handleChunkSuccess}
             onSuccess={handleSuccess}
             dynamicChunkSize={isDynamicChunkSizeSet}
-            id="uploader" 
             endpoint={createUpload}
             style={{ fontSize: isUploading ? '4vw': '26px' }}
           >

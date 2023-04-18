@@ -12,10 +12,21 @@ const DragOverlay: React.FC<Props> = ({ children, dragActive }) => {
 
   return (
     <>
-      {/* TO-DO: Allow adjusting text styles with overlay. CSS vars? Bake into package CSS styles? (TD). */}
       <MuxUploaderDrop overlay overlayText="Upload to stream.new" mux-uploader="uploader">
         {children}
       </MuxUploaderDrop>
+      <style jsx global>{`
+        mux-uploader-drop {
+          padding: 0;
+          border: 0;
+          display: inline;
+        }
+        mux-uploader-drop::part(heading),
+        mux-uploader-drop::part(separator) {
+          display: none;
+        }
+      `}
+      </style>
     </>
   );
 };
