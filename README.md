@@ -1,9 +1,9 @@
 <p align="center">
-<a  href="https://github.com/muxinc/stream.new">
-    <img src="images/mux_logo_color.png" alt="Mux Logo" height="150">
-</a>
+  <a href="https://mux.com/">
+    <img src="https://avatars.githubusercontent.com/u/16199997?s=200&v=4" alt="Mux Logo">
+    <h1 align="center">stream.new</h1>
+  </a>
 </p>
-  <h1 align="center">Stream.new</h1>
 <div align="center">
     <a href="https://github.com/muxinc/stream.new/stargazers"><img src="https://img.shields.io/github/stars/muxinc/stream.new" alt="Stars Badge"/></a>
     <a href="https://github.com/muxinc/stream.new/network/members"><img src="https://img.shields.io/github/forks/muxinc/stream.new" alt="Forks Badge"/></a>
