@@ -1,9 +1,13 @@
 <p align="center">
-<a  href="https://github.com/muxinc/stream.new">
-    <img src="images/mux_logo_color.png" alt="Mux Logo" height="150">
-</a>
+  <a href="https://mux.com/">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/360826/233653989-11cd8603-c20f-4008-8bf7-dc15b743c52b.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/360826/233653583-50dda726-cbe7-4182-a113-059a91ae83e6.svg">
+      <img alt="Mux Logo" src="https://user-images.githubusercontent.com/360826/233653583-50dda726-cbe7-4182-a113-059a91ae83e6.svg">
+    </picture>
+    <h1 align="center">stream.new</h1>
+  </a>
 </p>
-  <h1 align="center">Stream.new</h1>
 <div align="center">
     <a href="https://github.com/muxinc/stream.new/stargazers"><img src="https://img.shields.io/github/stars/muxinc/stream.new" alt="Stars Badge"/></a>
     <a href="https://github.com/muxinc/stream.new/network/members"><img src="https://img.shields.io/github/forks/muxinc/stream.new" alt="Forks Badge"/></a>
