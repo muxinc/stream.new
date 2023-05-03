@@ -35,7 +35,8 @@ module.exports = {
       2,
       {
         "ignore": [
-          "jsx"
+          "jsx",
+          "global"
         ]
       }
     ]
