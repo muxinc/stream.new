@@ -30,6 +30,15 @@ module.exports = {
     'jsx-a11y/anchor-is-valid': 'off',
     'jsx-a11y/media-has-caption': 'off',
     'import/prefer-default-export': 'off',
-    'semi': 'warn'
+    'semi': 'warn',
+    "react/no-unknown-property": [
+      2,
+      {
+        "ignore": [
+          "jsx",
+          "global"
+        ]
+      }
+    ]
   },
 };

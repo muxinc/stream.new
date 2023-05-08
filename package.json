@@ -16,7 +16,7 @@
     "@mux/blurhash": "^0.1.2",
     "@mux/mux-node": "^7.0.0",
     "@mux/mux-player-react": "1.11.0",
-    "@mux/mux-uploader-react": "^1.0.0-beta.6",
+    "@mux/mux-uploader-react": "0.1.0-canary.243-b7e8abf",
     "@mux/mux-video-react": "0.7.11",
     "@mux/upchunk": "^3.0.2",
     "@types/probe-image-size": "^7.0.0",
