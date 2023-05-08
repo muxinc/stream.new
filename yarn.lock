@@ -828,18 +828,18 @@
     "@mux/playback-core" "0.18.0"
     media-chrome "0.20.3"
 
-"@mux/mux-uploader-react@0.1.0-canary.240-9c62cf5":
-  version "0.1.0-canary.240-9c62cf5"
-  resolved "https://registry.yarnpkg.com/@mux/mux-uploader-react/-/mux-uploader-react-0.1.0-canary.240-9c62cf5.tgz#99d49ebfe89402d68b35526106394ccf5b9c7641"
-  integrity sha512-BeKh3cfsnN6THmj2dyUzcEY/7U3Q3OEsko0Fhb5+gw2slwJjv/1bGLbbfueA4DfFckaM+DJ20v675OpV2RitWw==
+"@mux/mux-uploader-react@0.1.0-canary.243-b7e8abf":
+  version "0.1.0-canary.243-b7e8abf"
+  resolved "https://registry.yarnpkg.com/@mux/mux-uploader-react/-/mux-uploader-react-0.1.0-canary.243-b7e8abf.tgz#d153b629253679ef57480383405053f79733e680"
+  integrity sha512-d1PfcEaA6TCy2GAMI/JcbJQx+jcryRcrg5ZzdqkAZGXDni7NI1mxyNYk365CXm0m5utJUo3FzW5zI2eN8Ukhcw==
   dependencies:
-    "@mux/mux-uploader" "0.1.0-canary.239-9c62cf5"
+    "@mux/mux-uploader" "0.1.0-canary.242-b7e8abf"
     prop-types "^15.7.2"
 
-"@mux/mux-uploader@0.1.0-canary.239-9c62cf5":
-  version "0.1.0-canary.239-9c62cf5"
-  resolved "https://registry.yarnpkg.com/@mux/mux-uploader/-/mux-uploader-0.1.0-canary.239-9c62cf5.tgz#4ab895d0b0677396f137ca78aed5e294d06cb6d1"
-  integrity sha512-g0Mg07RViOj39BwMxJFoHB3S2RUUsjjFSgDJ2+vVHbV+7SuIlSUhmz2O/6LoicwI3sTOHdCVJZcQ/eMVS+r+RQ==
+"@mux/mux-uploader@0.1.0-canary.242-b7e8abf":
+  version "0.1.0-canary.242-b7e8abf"
+  resolved "https://registry.yarnpkg.com/@mux/mux-uploader/-/mux-uploader-0.1.0-canary.242-b7e8abf.tgz#3d5a3ca6871f286bad523a3fd7e091cbd4e68f03"
+  integrity sha512-urYUjnITmgwQZNoy5LhL0HPoJPg2F8dn8iBev/UMizkL678oYb3YXFHNdNFD75dJ03kXryfMTHNgPgH80k83qA==
   dependencies:
     "@mux/upchunk" "3.0.2"
 

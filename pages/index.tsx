@@ -251,6 +251,12 @@ const Index: React.FC<Props> = () => {
         }
       `}
       </style>
+      <style jsx global>{`
+        mux-uploader::part(progress-percentage) {
+          align-items: flex-start;
+        }
+      `}
+      </style>
     </Layout>
   );
 };
