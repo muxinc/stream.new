@@ -19,7 +19,8 @@ const DragOverlay: React.FC<Props> = ({ children, dragActive }) => {
         mux-uploader-drop {
           padding: 0;
           border: 0;
-          display: inline;
+          position: absolute;
+          inset: 0;
         }
         mux-uploader-drop::part(heading),
         mux-uploader-drop::part(separator) {
