@@ -41,7 +41,7 @@ const MuxPlayerInternal: React.FC<Props> = ({ forwardedRef, playbackId, poster, 
       streamType="on-demand"
       primaryColor={color}
       placeholder={blurHashBase64}
-      style={{ aspectRatio: `${aspectRatio}`, maxWidth: '100%', maxHeight: '100%', width: 'auto', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
+      style={{ aspectRatio: `${aspectRatio}`, maxWidth: '100%', maxHeight: '100%', width: 'auto', display: 'block', marginLeft: 'auto', marginRight: 'auto', height: '100%' }}
       preferPlayback={preferMse ? 'mse' : 'native'}
       metadata={{
         video_id: playbackId,
