@@ -15,10 +15,14 @@ type AsteriskProps = {
 const AsteriskLink: React.FC<AsteriskProps> = ({ spinning }) => {
   return (
     <>
-      <Link href="/"><a><Asterisk /></a></Link>
+      <Link href="/">
+        <a title="Home">
+          <Asterisk />
+        </a>
+      </Link>
       <style jsx>{`
         a {
-          animation: ${ spinning ? 'rotation 4s linear infinite' : 'none'};
+          animation: ${spinning ? 'rotation 4s linear infinite' : 'none'};
           width: 46px;
           height: 46px;
           display: block;
