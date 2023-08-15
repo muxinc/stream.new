@@ -1,24 +1,34 @@
 import { useState, useEffect } from 'react';
 import MuxPlayer from '@mux/mux-player-react/lazy';
+import Theme2023 from '@mux/mux-player-react/themes/2023';
 import type MuxPlayerElement from '@mux/mux-player';
 import { MUX_DATA_CUSTOM_DOMAIN } from '../constants';
 
 type Props = {
-  playbackId: string
-  color?: string
-  poster: string
-  currentTime?: number
-  blurHashBase64?: string
-  aspectRatio: number
-  onLoaded: () => void
-  onError: (error: ErrorEvent) => void
+  playbackId: string;
+  color?: string;
+  poster: string;
+  currentTime?: number;
+  blurHashBase64?: string;
+  aspectRatio: number;
+  onLoaded: () => void;
+  onError: (error: ErrorEvent) => void;
   forwardedRef: React.ForwardedRef<MuxPlayerElement>;
 };
 
-const MuxPlayerInternal: React.FC<Props> = ({ forwardedRef, playbackId, poster, currentTime, color, blurHashBase64, onLoaded, aspectRatio}) => {
+const MuxPlayerInternal: React.FC<Props> = ({
+  forwardedRef,
+  playbackId,
+  poster,
+  currentTime,
+  color,
+  blurHashBase64,
+  onLoaded,
+  aspectRatio,
+}) => {
   const [
-    preferMse, 
-    _setPreferMse // eslint-disable-line @typescript-eslint/no-unused-vars
+    preferMse,
+    _setPreferMse, // eslint-disable-line @typescript-eslint/no-unused-vars
   ] = useState(Math.random() < 0.5);
 
   useEffect(() => {
@@ -26,30 +36,45 @@ const MuxPlayerInternal: React.FC<Props> = ({ forwardedRef, playbackId, poster, 
   }, []);
 
   const onError = (err: ErrorEvent) => {
-    console.warn('Got an onError from Mux Player, the Player UI should be showing an error', err);
+    console.warn(
+      'Got an onError from Mux Player, the Player UI should be showing an error',
+      err
+    );
   };
 
   return (
-    <MuxPlayer
-      ref={forwardedRef}
-      beaconCollectionDomain={MUX_DATA_CUSTOM_DOMAIN}
-      playbackId={playbackId}
-      onError={(err) => onError(err as ErrorEvent)}
-      poster={poster}
-      startTime={currentTime}
-      envKey={process.env.NEXT_PUBLIC_MUX_ENV_KEY}
-      streamType="on-demand"
-      primaryColor={color}
-      placeholder={blurHashBase64}
-      style={{ aspectRatio: `${aspectRatio}`, maxWidth: '100%', maxHeight: '100%', width: 'auto', display: 'block', marginLeft: 'auto', marginRight: 'auto', height: '100%' }}
-      preferPlayback={preferMse ? 'mse' : 'native'}
-      metadata={{
-        video_id: playbackId,
-        video_title: playbackId,
-        player_name: 'stream.new',
-        experiment_name: `preferMse: ${preferMse}`,
-      }}
-    />
+    <>
+      <MuxPlayer
+        ref={forwardedRef}
+        beaconCollectionDomain={MUX_DATA_CUSTOM_DOMAIN}
+        playbackId={playbackId}
+        onError={(err) => onError(err as ErrorEvent)}
+        poster={poster}
+        startTime={currentTime}
+        envKey={process.env.NEXT_PUBLIC_MUX_ENV_KEY}
+        streamType="on-demand"
+        primaryColor={color}
+        placeholder={blurHashBase64}
+        style={{
+          aspectRatio: `${aspectRatio}`,
+          maxWidth: '100%',
+          maxHeight: '100%',
+          width: 'auto',
+          display: 'block',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          height: '100%',
+        }}
+        preferPlayback={preferMse ? 'mse' : 'native'}
+        metadata={{
+          video_id: playbackId,
+          video_title: playbackId,
+          player_name: 'stream.new',
+          experiment_name: `preferMse: ${preferMse}`,
+        }}
+        theme={Theme2023}
+      />
+    </>
   );
 };
 
