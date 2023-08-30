@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Router from 'next/router';
-import * as UpChunk from '@mux/upchunk';
+import { UpChunk } from '@mux/upchunk';
 import useSwr from 'swr';
 import Layout from './layout';
 import Button from './button';
