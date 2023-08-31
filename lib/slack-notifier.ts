@@ -118,7 +118,7 @@ export const sendSlackAssetReady = async ({ playbackId, assetId, duration, googl
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `*Moderation scores (Hive) - | score is 0-1:*\n ${JSON.stringify(hiveScores)}`,
+        text: `*Moderation scores (Hive) | score is 0-1:*\n ${JSON.stringify(hiveScores)}`,
       }
     });
   }
