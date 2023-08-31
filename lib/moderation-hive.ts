@@ -98,7 +98,7 @@ export function mergeAnnotations (outputs: HiveOutput[]): HiveModerationResult {
     violent: violentScores.length ? Math.max(...violentScores) : undefined,
   };
 
-  return { taskIds, scores: combined };
+  return { taskIds: taskIds, scores: combined };
 }
 
 export async function getScores ({ playbackId, duration }: { playbackId: string, duration: number }): Promise<HiveModerationResult|undefined> {
