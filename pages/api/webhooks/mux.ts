@@ -60,12 +60,14 @@ export default async function muxWebhookHandler (req: NextApiRequest, res: NextA
         const duration = data.duration;
 
         const googleScores = await moderationGoogle ({ playbackId, duration });
-        const hiveScores = await moderationHive ({ playbackId, duration });
+        const hiveResult = await moderationHive ({ playbackId, duration });
+        const hiveScores = hiveResult?.scores;
+        const hiveTaskIds = hiveResult?.taskIds;
 
         const didAutoDelete = hiveScores ? (await autoDelete({ assetId, playbackId, hiveScores })) : false;
 
         if (didAutoDelete) {
-          await sendSlackAutoDeleteMessage({ assetId, duration, hiveScores });
+          await sendSlackAutoDeleteMessage({ assetId, duration, hiveScores, hiveTaskIds });
           res.json({ message: 'thanks Mux, I autodeleted this asset because it was bad' });
         } else {
           await sendSlackAssetReady({
@@ -74,6 +76,7 @@ export default async function muxWebhookHandler (req: NextApiRequest, res: NextA
             duration,
             googleScores,
             hiveScores,
+            hiveTaskIds,
           });
           res.json({ message: 'thanks Mux, I notified myself about this' });
         }

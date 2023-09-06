@@ -48,9 +48,9 @@ test('gets a combined score for 3 files', async () => {
   const scopeUrl5 = nockNsfwScore({ adult: 0.0389421, suggestive: 0.00482, veryBloody: 0.456 });
   const scores = await getScores({ playbackId: '123', duration: 30 });
 
-  expect(scores?.adult).toEqual(0.992512);
-  expect(scores?.suggestive).toEqual(0.79251);
-  expect(scores?.violent).toEqual(0.456);
+  expect(scores?.scores.adult).toEqual(0.992512);
+  expect(scores?.scores.suggestive).toEqual(0.79251);
+  expect(scores?.scores.violent).toEqual(0.456);
   expect(scopeUrl1.isDone()).toEqual(true);
   expect(scopeUrl2.isDone()).toEqual(true);
   expect(scopeUrl3.isDone()).toEqual(true);

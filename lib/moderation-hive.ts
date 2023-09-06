@@ -18,6 +18,7 @@ type HiveClass = {
 };
 
 type HiveOutput = {
+  taskId: string;
   time: number,
   classes: HiveClass[],
 }
@@ -29,8 +30,14 @@ type HiveResponse = {
 }
 
 type HiveResult = {
+  id: string;
   code: number;
   status: HiveResponse[];
+}
+
+type HiveModerationResult = {
+  taskIds: string[];
+  scores: ModerationScores;
 }
 
 async function fetchOutputForUrl (url: string): Promise<HiveOutput|null> {
@@ -53,19 +60,22 @@ async function fetchOutputForUrl (url: string): Promise<HiveOutput|null> {
     return null;
   }
 
-  return result.status[0].response.output[0];
+  return { ...result.status[0].response.output[0], taskId: result.id };
 }
 
 function roundedScore (score: number) {
   return +score.toFixed(6);
 }
 
-export function mergeAnnotations (outputs: HiveOutput[]): ModerationScores {
+export function mergeAnnotations (outputs: HiveOutput[]): HiveModerationResult {
   const adultScores: number[] = [];
   const suggestiveScores: number[] = [];
   const violentScores: number[] = [];
+  const taskIds: string[] = [];
 
   outputs.forEach((output) => {
+    taskIds.push(output.taskId);
+
     const nsfwScore = (output.classes.find((cls => cls.class === "general_nsfw")) as HiveClass).score;
     if (nsfwScore) {
       adultScores.push(roundedScore(nsfwScore));
@@ -88,10 +98,10 @@ export function mergeAnnotations (outputs: HiveOutput[]): ModerationScores {
     violent: violentScores.length ? Math.max(...violentScores) : undefined,
   };
 
-  return combined;
+  return { taskIds: taskIds, scores: combined };
 }
 
-export async function getScores ({ playbackId, duration }: { playbackId: string, duration: number }): Promise<ModerationScores|undefined> {
+export async function getScores ({ playbackId, duration }: { playbackId: string, duration: number }): Promise<HiveModerationResult|undefined> {
   if (!isEnabled()) {
     console.log('Skipping moderation-hive, no key enabled');
     return undefined;

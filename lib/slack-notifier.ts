@@ -95,7 +95,7 @@ const baseBlocks = ({ playbackId, assetId, duration }: {playbackId: string, asse
     ],
   }]);
 
-export const sendSlackAssetReady = async ({ playbackId, assetId, duration, googleScores, hiveScores }: {playbackId: string, assetId: string, duration: number, googleScores?: ModerationScores, hiveScores?: ModerationScores }): Promise<null> => {
+export const sendSlackAssetReady = async ({ playbackId, assetId, duration, googleScores, hiveScores, hiveTaskIds }: {playbackId: string, assetId: string, duration: number, googleScores?: ModerationScores, hiveScores?: ModerationScores, hiveTaskIds?: string[] }): Promise<null> => {
   if (!slackWebhook) {
     console.log('No slack webhook configured'); // eslint-disable-line no-console
     return null;
@@ -119,6 +119,16 @@ export const sendSlackAssetReady = async ({ playbackId, assetId, duration, googl
       text: {
         type: 'mrkdwn',
         text: `*Moderation scores (Hive) | score is 0-1:*\n ${JSON.stringify(hiveScores)}`,
+      }
+    });
+  }
+
+  if (hiveTaskIds) {
+    blocks.push({
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `*Hive task IDs:*\n ${JSON.stringify(hiveTaskIds)}`,
       }
     });
   }
@@ -152,7 +162,7 @@ export const sendSlackAssetReady = async ({ playbackId, assetId, duration, googl
   return null;
 };
 
-export const sendSlackAutoDeleteMessage = async ({ assetId, duration, hiveScores }: { assetId: string, duration: number, hiveScores?: ModerationScores }): Promise<null> => {
+export const sendSlackAutoDeleteMessage = async ({ assetId, duration, hiveScores, hiveTaskIds }: { assetId: string, duration: number, hiveScores?: ModerationScores, hiveTaskIds?: string[] }): Promise<null> => {
   if (!slackWebhook) {
     console.log('No slack webhook configured'); // eslint-disable-line no-console
     return null;
@@ -160,7 +170,7 @@ export const sendSlackAutoDeleteMessage = async ({ assetId, duration, hiveScores
 
   await got.post(slackWebhook, {
     json: {
-      text: `Auto-deleted by moderator: ${assetId} duration: ${duration}. ${JSON.stringify(hiveScores)}`,
+      text: `Auto-deleted by moderator: ${assetId} duration: ${duration}. ${JSON.stringify(hiveScores)}. Task IDs: ${JSON.stringify(hiveTaskIds)}`,
       icon_emoji: 'female-police-officer',
     },
   });
