@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import MuxPlayer from '@mux/mux-player-react/lazy';
-import ThemeGerwig from '@mux/mux-player-react/themes/gerwig';
 import type MuxPlayerElement from '@mux/mux-player';
 import { MUX_DATA_CUSTOM_DOMAIN } from '../constants';
 
@@ -72,7 +71,6 @@ const MuxPlayerInternal: React.FC<Props> = ({
           player_name: 'stream.new',
           experiment_name: `preferMse: ${preferMse}`,
         }}
-        theme={ThemeGerwig}
       />
     </>
   );
