@@ -1,7 +1,7 @@
 import { ForwardedRef, forwardRef } from 'react';
 import { HTMLVideoElementWithPlyr, PlayerElement } from '../types';
 import type MuxPlayerElement from '@mux/mux-player';
-import { PLYR_TYPE, MUX_PLAYER_TYPE, MUX_VIDEO_TYPE, WINAMP_PLAYER_TYPE } from '../constants';
+import { PLYR_TYPE, MUX_PLAYER_TYPE, MUX_PLAYER_CLASSIC_TYPE, MUX_VIDEO_TYPE, WINAMP_PLAYER_TYPE } from '../constants';
 import dynamic from 'next/dynamic';
 import Script from 'next/script';
 
@@ -14,6 +14,7 @@ import Script from 'next/script';
  */
 const PlyrPlayer = dynamic(() => import('./plyr-player'));
 const MuxPlayer = dynamic(() => import('./mux-player'));
+const MuxPlayerClassic = dynamic(() => import('./mux-player-classic'));
 const MuxVideo = dynamic(() => import('./mux-video'));
 const WinampPlayer = dynamic(() => import('./winamp-player'));
 
@@ -32,11 +33,14 @@ type Props = {
 
 
 const PlayerLoader = forwardRef<PlayerElement, Props>(({ playbackId, poster, currentTime, aspectRatio, playerType, color, blurHashBase64, onLoaded, onError }, ref) => {
+  const isAMuxPlayer = () => [MUX_PLAYER_CLASSIC_TYPE, MUX_PLAYER_TYPE].includes(playerType);
+
   return (
     <>
       <div className='video-container'>
         {playerType === PLYR_TYPE && <PlyrPlayer forwardedRef={ref as ForwardedRef<HTMLVideoElementWithPlyr>} aspectRatio={aspectRatio} playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
         {playerType === MUX_PLAYER_TYPE && <MuxPlayer forwardedRef={ref as ForwardedRef<MuxPlayerElement>} playbackId={playbackId} aspectRatio={aspectRatio} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} blurHashBase64={blurHashBase64} color={color} />}
+        {playerType === MUX_PLAYER_CLASSIC_TYPE && <MuxPlayerClassic forwardedRef={ref as ForwardedRef<MuxPlayerElement>} playbackId={playbackId} aspectRatio={aspectRatio} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} blurHashBase64={blurHashBase64} color={color} />}
         {playerType === MUX_VIDEO_TYPE && <MuxVideo playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
         {playerType === WINAMP_PLAYER_TYPE && <WinampPlayer playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
       </div>
@@ -51,7 +55,7 @@ const PlayerLoader = forwardRef<PlayerElement, Props>(({ playbackId, poster, cur
         }
       `}
       </style>
-      {playerType === MUX_PLAYER_TYPE && <Script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1" />}
+      {isAMuxPlayer() && <Script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1" />}
     </>
   );
 });
