@@ -674,18 +674,18 @@
     jsonwebtoken "^8.5.1"
 
 "@mux/mux-player-react@^2.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@mux/mux-player-react/-/mux-player-react-2.0.0.tgz#256c65a3d3681e278eac1089e25d706e54f1a6cf"
-  integrity sha512-P++vo94S/phmKd+U0crtykioHtA8VLgA9RJjy8nL7TbrUkvNEXphJWihqQitonxhbJk6PGYAt6eC2mPh2zOjfg==
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@mux/mux-player-react/-/mux-player-react-2.0.1.tgz#fe9c788feeefc0ea389de10fa3def6448931ce80"
+  integrity sha512-fTNWtNAEynURbiY8ejlsR4mSK+3qPgFYzRVecdyzffLBlE7OVnHp8us/wnaGW9I2xRmPWnWnYqAoxFo2Tp6qwQ==
   dependencies:
-    "@mux/mux-player" "2.0.0"
+    "@mux/mux-player" "2.0.1"
     "@mux/playback-core" "0.20.2"
     prop-types "^15.7.2"
 
-"@mux/mux-player@2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@mux/mux-player/-/mux-player-2.0.0.tgz#f8118a4da471db08dcd1ad447b0507184053d290"
-  integrity sha512-Wmznt5Kvhd941IRm5jlP9sk9OmqjL8qxVTtfLngVeT9kVEKZtmnSKbitLK1I/ywmI76fDTn8Z2OGfGpSv62HnA==
+"@mux/mux-player@2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@mux/mux-player/-/mux-player-2.0.1.tgz#2643eab9aed35d5bc26c63345af5867c6afc1b7d"
+  integrity sha512-jNFdBArHW6jBiJlpZTUE/pvSZPNFDFknlZNwKZe1aAymMbr2UfptMuUk3fnfln5F8OdWxUE4Qn6MP3xKUl0P0w==
   dependencies:
     "@mux/mux-video" "0.16.5"
     "@mux/playback-core" "0.20.2"
@@ -3903,10 +3903,15 @@ media-chrome@^1.4.3:
   resolved "https://registry.yarnpkg.com/media-chrome/-/media-chrome-1.4.3.tgz#133564991d33eb3a5d9eeaa2d3208250392e5590"
   integrity sha512-VpFqCOu2FLULW6TX4sluo44AolJXryHxr85UBdO+IuOltgYPuf7Lgp1F3OqJeRIeO8874d5mri/6xmI22CO9yA==
 
-media-tracks@0.2.3, media-tracks@>=0.2.3:
+media-tracks@0.2.3:
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/media-tracks/-/media-tracks-0.2.3.tgz#ba9a23c45e1ee1be2acdd580f985d25b9036fff9"
   integrity sha512-h5HRl1tIyeV+aF59FAmHmxChmdM/Ewf/twpxZkRme1ny46owD24uTA0BmRuPoO+uzvE0lx9ZIkZj1TbXi2VCng==
+
+media-tracks@>=0.2.3:
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/media-tracks/-/media-tracks-0.2.4.tgz#aee3bd69bdc8f246b44af5245f7b0a68d4c94540"
+  integrity sha512-P/TbDCYTFH5gxpQ6r99iabXOwjsFwzKRgK7wiwo64Ii6nHXYhHtwEP7A7ufmEKxkNCoHc4j3Z2hvs+lXL4wPeQ==
 
 merge-stream@^2.0.0:
   version "2.0.0"
