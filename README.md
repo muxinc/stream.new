@@ -46,10 +46,10 @@
         <li><a href="#step-2-set-up-environment-variables">Step 2. Set Up Environment Variables</a></li>
         <li><a href="#step-3-deploy-on-vercel">Step 3. Deploy on Vercel</a></li>
         <li><a href="#step-4-optional-slackbot-moderator">Step 4. (Optional) Slackbot Moderator</a></li>
-        <li><a 
+        <li><a
         href="#step-5-optional-add-automatic-content-analysis-to-slackbot-moderator-google-vision-api"
         >Step 5. (Optional) Add automatic content analysis to Slackbot Moderator (Google Vision API)</a></li>
-        <li><a 
+        <li><a
         href="#step-6-optional-add-automatic-content-analysis-to-slackbot-moderator-hive-ai"
         >Step 6. (Optional) Add automatic content analysis to Slackbot Moderator Hive AI</a></li>
       </ul>
@@ -249,6 +249,14 @@ Each dimension will have a score from 0-1 with a precision of 6 decimal places. 
 <div align="center">
   <img src="images/moderation-score-slack.png" width="80%" alt="Slackbot Moderation Message"></img>
 </div>
+
+## Step 7 (optional) Add [SwarmCloud](https://swarmcloud.net/) P2P plugin to save bandwidth
+
+Follow these steps to integrate SwarmCloud:
+
+1. First, you will need to set up an account at [SwarmCloud Dashboard](https://oms.cdnbye.com), choose the zone of Europe since it's the default tracker zone.
+
+1. Click on the Website Management button in the sidebar and input your domain.
 
 # Hidden playback features via query params:
 

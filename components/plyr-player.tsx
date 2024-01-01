@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import Plyr from 'plyr';
 import 'plyr/dist/plyr.css';
 import Hls from 'hls.js';
+import P2pEngineHls from 'swarmcloud-hls';
+import type { P2pConfig } from 'swarmcloud-hls';
 import mux from 'mux-embed';
 
 import logger from '../lib/logger';
@@ -20,9 +22,10 @@ type Props = {
   onLoaded: () => void
   onError: (error: ErrorEvent) => void;
   forwardedRef: React.ForwardedRef<HTMLVideoElementWithPlyr>;
+  p2pConfig?: P2pConfig;
 };
 
-const PlyrPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoaded, onError, forwardedRef, aspectRatio }) => {
+const PlyrPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoaded, onError, forwardedRef, aspectRatio, p2pConfig = {} }) => {
   const videoRef = useRef<HTMLVideoElementWithPlyr>(null);
   const metaRef = useCombinedRefs(forwardedRef, videoRef);
   const playerRef = useRef<Plyr | null>(null);
@@ -34,6 +37,7 @@ const PlyrPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoaded
     const video = videoRef.current;
     const src = `${getStreamBaseUrl()}/${playbackId}.m3u8`;
     let hls: Hls | null;
+    let engine: P2pEngineHls;
     hls = null;
     if (video) {
       video.addEventListener('error', videoError);
@@ -54,6 +58,8 @@ const PlyrPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoaded
       } else if (Hls.isSupported()) {
         // This will run in all other modern browsers
         hls = new Hls();
+        p2pConfig.hlsjsInstance = hls;        // set hlsjs instance to SDK
+        engine = new P2pEngineHls(p2pConfig);
         hls.loadSource(src);
         hls.attachMedia(video);
         hls.on(Hls.Events.ERROR, function (event, data) {
@@ -90,6 +96,9 @@ const PlyrPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoaded
       }
       if (hls) {
         hls.destroy();
+      }
+      if (engine) {
+        engine.destroy();
       }
       if (playerRef.current) {
         playerRef.current.destroy();

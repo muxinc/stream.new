@@ -3,6 +3,8 @@ import MuxPlayer from '@mux/mux-player-react/lazy';
 import ThemeClassic from '@mux/mux-player-react/themes/classic';
 import type MuxPlayerElement from '@mux/mux-player';
 import { MUX_DATA_CUSTOM_DOMAIN } from '../constants';
+import P2pEngineHls from 'swarmcloud-hls';
+import type { P2pConfig } from 'swarmcloud-hls';
 
 type Props = {
   playbackId: string;
@@ -14,6 +16,7 @@ type Props = {
   onLoaded: () => void;
   onError: (error: ErrorEvent) => void;
   forwardedRef: React.ForwardedRef<MuxPlayerElement>;
+  p2pConfig?: P2pConfig;
 };
 
 const MuxPlayerInternal: React.FC<Props> = ({
@@ -25,6 +28,7 @@ const MuxPlayerInternal: React.FC<Props> = ({
   blurHashBase64,
   onLoaded,
   aspectRatio,
+  p2pConfig = {},
 }) => {
   const [
     preferMse,
@@ -42,9 +46,20 @@ const MuxPlayerInternal: React.FC<Props> = ({
     );
   };
 
+  const onLoadStart = (e: Event) => {
+    const player = e.target;
+    if (P2pEngineHls.isSupported() && (player as any)._hls) {
+      new P2pEngineHls({
+        hlsjsInstance: (player as any)._hls,
+        ...p2pConfig
+      });
+    }
+  };
+
   return (
     <>
       <MuxPlayer
+        onLoadStart={(e) => {onLoadStart(e)}}
         ref={forwardedRef}
         beaconCollectionDomain={MUX_DATA_CUSTOM_DOMAIN}
         playbackId={playbackId}
