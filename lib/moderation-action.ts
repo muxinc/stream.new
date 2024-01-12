@@ -3,7 +3,7 @@ import Mux from '@mux/mux-node';
 import { RequestError } from 'got';
 import got from './got-client';
 
-const { Video } = new Mux();
+const mux = new Mux();
 
 const ADULT_SCORE_THRESHHOLD = 0.95;
 const VIOLENCE_SCORE_THRESHHOLD = 0.85;
@@ -36,7 +36,7 @@ function shouldAutoDeleteContent(hiveScores?: ModerationScores): boolean {
 
 export async function autoDelete({ assetId, playbackId, hiveScores }: { assetId: string, playbackId: string, hiveScores: ModerationScores }): Promise<boolean> {
   if (shouldAutoDeleteContent(hiveScores)) {
-    await Video.Assets.deletePlaybackId(assetId, playbackId);
+    await mux.video.assets.deletePlaybackId(assetId, playbackId);
     await saveDeletionRecordInAirtable({ assetId, notes: JSON.stringify(hiveScores) });
 
     return true;

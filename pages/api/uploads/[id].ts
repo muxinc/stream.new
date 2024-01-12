@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Mux from '@mux/mux-node';
 
-const { Video } = new Mux();
+const mux = new Mux();
 
 export default async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   const { method } = req;
@@ -9,7 +9,7 @@ export default async (req: NextApiRequest, res: NextApiResponse): Promise<void> 
   switch (method) {
     case 'GET':
       try {
-        const upload = await Video.Uploads.get(req.query.id as string);
+        const upload = await mux.video.uploads.retrieve(req.query.id as string);
         res.json({
           upload: {
             status: upload.status,

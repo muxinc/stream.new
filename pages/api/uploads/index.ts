@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Mux from '@mux/mux-node';
 
-const { Video } = new Mux();
+const mux = new Mux();
 
 export default async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   const { method } = req;
@@ -9,9 +9,9 @@ export default async (req: NextApiRequest, res: NextApiResponse): Promise<void> 
   switch (method) {
     case 'POST':
       try {
-        const upload = await Video.Uploads.create({
-          new_asset_settings: { playback_policy: 'public' },
-          cors_origin: '*',
+        const upload = await mux.video.uploads.create({
+          new_asset_settings: { playback_policy: ['public'] },
+          cors_origin: '*'
         });
         res.json({
           id: upload.id,
