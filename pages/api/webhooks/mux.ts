@@ -11,7 +11,7 @@ const webhookSignatureSecret = process.env.MUX_WEBHOOK_SIGNATURE_SECRET;
 const verifyWebhookSignature = (rawBody: string | Buffer, req: NextApiRequest) => {
   if (webhookSignatureSecret) {
     // this will raise an error if signature is not valid
-    Mux.Webhooks.verifyHeader(rawBody, req.headers['mux-signature'] as string, webhookSignatureSecret);
+    Mux.Webhooks.prototype.verifySignature(Buffer.isBuffer(rawBody) ? rawBody.toString('utf8') : rawBody, req.headers, webhookSignatureSecret)
   } else {
     console.log('Skipping webhook sig verification because no secret is configured'); // eslint-disable-line no-console
   }
