@@ -37,7 +37,7 @@ export default async function assetHandler (req: NextApiRequest, res: NextApiRes
       }
 
       try {
-        await mux.video.assets.del(req.query.id as string);
+        await mux.video.assets.delete(req.query.id as string);
         res.status(200).end(`Deleted ${req.query.id}`);
       } catch (e) {
         res.statusCode = 500;
