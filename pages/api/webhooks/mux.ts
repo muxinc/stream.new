@@ -7,11 +7,12 @@ import { getScores as moderationHive } from '../../../lib/moderation-hive';
 import { autoDelete } from '../../../lib/moderation-action';
 
 const webhookSignatureSecret = process.env.MUX_WEBHOOK_SIGNATURE_SECRET;
+const mux = new Mux();
 
 const verifyWebhookSignature = (rawBody: string | Buffer, req: NextApiRequest) => {
   if (webhookSignatureSecret) {
     // this will raise an error if signature is not valid
-    Mux.Webhooks.prototype.verifySignature(Buffer.isBuffer(rawBody) ? rawBody.toString('utf8') : rawBody, req.headers, webhookSignatureSecret)
+    mux.webhooks.verifySignature(Buffer.isBuffer(rawBody) ? rawBody.toString('utf8') : rawBody, req.headers, webhookSignatureSecret)
   } else {
     console.log('Skipping webhook sig verification because no secret is configured'); // eslint-disable-line no-console
   }
