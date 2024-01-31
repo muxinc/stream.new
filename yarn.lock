@@ -273,10 +273,6 @@
   version "7.17.2"
   resolved "https://registry.yarnpkg.com/@babel/helpers/-/helpers-7.17.2.tgz#23f0a0746c8e287773ccd27c14be428891f63417"
   integrity sha512-0Qu7RLR1dILozr/6M0xgj+DFPmi6Bnulgm9M8BVa9ZCWxDqlSnqt3cf8IDPB5m45sVXUZ0kuQAgUrdSFFH79fQ==
-  dependencies:
-    "@babel/template" "^7.16.7"
-    "@babel/traverse" "^7.17.0"
-    "@babel/types" "^7.17.0"
 
 "@babel/helpers@^7.17.8":
   version "7.17.8"
@@ -803,10 +799,10 @@
     blurhash "^1.1.5"
     sharp "^0.30.7"
 
-"@mux/mux-node@8.0.0-canary.3":
-  version "8.0.0-canary.3"
-  resolved "https://registry.yarnpkg.com/@mux/mux-node/-/mux-node-8.0.0-canary.3.tgz#4a9f3419472d1f19270d1939582ac582c595d1cb"
-  integrity sha512-kHvKur++QCcCF+M53xJXdU9E/IJdj8saYdnlAXsp2ZrS2xMIiRRHrSKTHhVFPC+MeXpgwEZbh1C6kSgDXm45yw==
+"@mux/mux-node@8.0.0-canary.4":
+  version "8.0.0-canary.4"
+  resolved "https://registry.yarnpkg.com/@mux/mux-node/-/mux-node-8.0.0-canary.4.tgz#4888ec874516a74f6a6c55acc68cba08be65b537"
+  integrity sha512-KfSyJwH3wVQdwcc9i2+Gg35+UKex60p1mR2OV7YE7il94x06qRqkfEN+gn/MRi8pBXQtqynzx2Y2Whsk7572Hw==
   dependencies:
     "@types/node" "^18.11.18"
     "@types/node-fetch" "^2.6.4"
@@ -1513,10 +1509,6 @@ array.prototype.find@^2.1.1:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/array.prototype.find/-/array.prototype.find-2.1.2.tgz#6abbd0c2573925d8094f7d23112306af8c16d534"
   integrity sha512-00S1O4ewO95OmmJW7EesWfQlrCrLEL8kZ40w3+GkLX2yTt0m2ggcePPa2uHPJ9KUmJvwRq+lCV9bD8Yim23x/Q==
-  dependencies:
-    call-bind "^1.0.2"
-    define-properties "^1.1.3"
-    es-abstract "^1.19.0"
 
 array.prototype.flat@^1.2.3:
   version "1.2.5"
@@ -2845,9 +2837,6 @@ get-symbol-description@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/get-symbol-description/-/get-symbol-description-1.0.0.tgz#7fdb81c900101fbd564dd5f1a30af5aadc1e58d6"
   integrity sha512-2EmdH1YvIQiZpltCNgkuiUnyukzxM/R6NDJX31Ke3BG1Nq5b0S2PhX59UKi9vZpPDQVdqn+1IcaAwnzTT5vCjw==
-  dependencies:
-    call-bind "^1.0.2"
-    get-intrinsic "^1.1.1"
 
 github-from-package@0.0.0:
   version "0.0.0"
