@@ -8,7 +8,7 @@ type Props = {
   color?: string;
   poster: string;
   currentTime?: number;
-  blurHashBase64?: string;
+  blurDataURL?: string;
   aspectRatio: number;
   onLoaded: () => void;
   onError: (error: ErrorEvent) => void;
@@ -21,7 +21,7 @@ const MuxPlayerInternal: React.FC<Props> = ({
   poster,
   currentTime,
   color,
-  blurHashBase64,
+  blurDataURL,
   onLoaded,
   aspectRatio,
 }) => {
@@ -53,7 +53,7 @@ const MuxPlayerInternal: React.FC<Props> = ({
         envKey={process.env.NEXT_PUBLIC_MUX_ENV_KEY}
         streamType="on-demand"
         accentColor={color}
-        placeholder={blurHashBase64}
+        placeholder={blurDataURL}
         style={{
           aspectRatio: `${aspectRatio}`,
           maxWidth: '100%',
