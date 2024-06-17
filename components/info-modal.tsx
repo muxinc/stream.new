@@ -8,7 +8,7 @@ const InfoModal: React.FC<Props> = ({ close }) => {
     <div className="container">
       <div className="wrapper">
         <h1>This is an <a href={OPEN_SOURCE_URL}>open source</a> project from <a href={MUX_HOME_PAGE_URL}>Mux</a>, the video streaming API.</h1>
-        <Link href="/terms"><a><h1>Read the terms</h1></a></Link>
+        <Link href="/terms"><h1>Read the terms</h1></Link>
       </div>
       <footer>
         <div className="footer-link"><a role="presentation" onClick={close}>Close</a></div>
