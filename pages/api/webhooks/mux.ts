@@ -108,5 +108,5 @@ export default async function muxWebhookHandler (req: NextApiRequest, res: NextA
     } default:
         res.setHeader('Allow', ['POST']);
         res.status(405).end(`Method ${method} Not Allowed`);
-  };
+  }
 }
