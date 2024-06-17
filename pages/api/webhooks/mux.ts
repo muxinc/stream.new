@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { unstable_after as after } from 'next/server';
 import Mux from '@mux/mux-node';
 import { buffer } from 'micro';
 import { sendSlackAssetReady, sendSlackAutoDeleteMessage } from '../../../lib/slack-notifier';
@@ -8,6 +9,7 @@ import { autoDelete } from '../../../lib/moderation-action';
 
 const webhookSignatureSecret = process.env.MUX_WEBHOOK_SIGNATURE_SECRET;
 const mux = new Mux();
+const MAX_MODERATION_ATTEMPTS = 5;
 
 const verifyWebhookSignature = (rawBody: string | Buffer, req: NextApiRequest) => {
   if (webhookSignatureSecret) {
@@ -35,6 +37,42 @@ export const config = {
   },
 };
 
+const handleWebhook = async function (assetId: string, playbackId: string, duration: number, attempt: number) {
+  if (attempt >= MAX_MODERATION_ATTEMPTS) {
+    // Should maybe consider storing that this failed somewhere, but for now just give up
+    return;
+  }
+
+  try {
+    doModeration(assetId, playbackId, duration);
+  } catch (e) {
+    console.error('Error handling webhook', e); // eslint-disable-line no-console
+    handleWebhook(assetId, playbackId, duration, ++attempt);
+  }
+};
+
+const doModeration = async function (assetId: string, playbackId: string, duration: number) {
+  const googleScores = await moderationGoogle ({ playbackId, duration });
+  const hiveResult = await moderationHive ({ playbackId, duration });
+  const hiveScores = hiveResult?.scores;
+  const hiveTaskIds = hiveResult?.taskIds;
+
+  const didAutoDelete = hiveScores ? (await autoDelete({ assetId, playbackId, hiveScores })) : false;
+
+  if (didAutoDelete) {
+    await sendSlackAutoDeleteMessage({ assetId, duration, hiveScores, hiveTaskIds });
+  } else {
+    await sendSlackAssetReady({
+      assetId,
+      playbackId,
+      duration,
+      googleScores,
+      hiveScores,
+      hiveTaskIds,
+    });
+  }
+};
+
 export default async function muxWebhookHandler (req: NextApiRequest, res: NextApiResponse): Promise<void> {
   const { method } = req;
 
@@ -55,40 +93,20 @@ export default async function muxWebhookHandler (req: NextApiRequest, res: NextA
         res.json({ message: 'thanks Mux' });
         return;
       }
-      try {
+
+      // Kick off moderation after we respond with a 200
+      after(async () => {
         const assetId = data.id;
         const playbackId = data.playback_ids && data.playback_ids[0] && data.playback_ids[0].id;
         const duration = data.duration;
+  
+        await handleWebhook(assetId, playbackId, duration, 0);
+      });
 
-        const googleScores = await moderationGoogle ({ playbackId, duration });
-        const hiveResult = await moderationHive ({ playbackId, duration });
-        const hiveScores = hiveResult?.scores;
-        const hiveTaskIds = hiveResult?.taskIds;
-
-        const didAutoDelete = hiveScores ? (await autoDelete({ assetId, playbackId, hiveScores })) : false;
-
-        if (didAutoDelete) {
-          await sendSlackAutoDeleteMessage({ assetId, duration, hiveScores, hiveTaskIds });
-          res.json({ message: 'thanks Mux, I autodeleted this asset because it was bad' });
-        } else {
-          await sendSlackAssetReady({
-            assetId,
-            playbackId,
-            duration,
-            googleScores,
-            hiveScores,
-            hiveTaskIds,
-          });
-          res.json({ message: 'thanks Mux, I notified myself about this' });
-        }
-      } catch (e) {
-        res.statusCode = 500;
-        console.error('Request error', e); // eslint-disable-line no-console
-        res.json({ error: 'Error handling webhook' });
-      }
-      break;
+      res.json({ message: 'thanks Mux, I\' working on it' });
+      return;
     } default:
-      res.setHeader('Allow', ['POST']);
-      res.status(405).end(`Method ${method} Not Allowed`);
-  }
+        res.setHeader('Allow', ['POST']);
+        res.status(405).end(`Method ${method} Not Allowed`);
+  };
 }
