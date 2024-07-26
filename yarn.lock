@@ -822,77 +822,69 @@
     qs "^6.10.3"
     web-streams-polyfill "^3.2.1"
 
-"@mux/mux-player-react@^2.4.0":
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/@mux/mux-player-react/-/mux-player-react-2.4.0.tgz#6e974732376230261802546daebc828ec4e91420"
-  integrity sha512-N0zHfNYXo9eNHLlYcHydLDFHk8TQpt4Psi2MyjIn7o8IR2dDsTHNxF5nxVTAMtCx7owohePgXa8g5nvXMixORQ==
+"@mux/mux-player-react@^2.8.1":
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/@mux/mux-player-react/-/mux-player-react-2.8.1.tgz#93cac31c7b9cb58ac8e51a6d657aa889c8501b68"
+  integrity sha512-J8JHzcaWCvZOZjcxTL0nQvR6F1a8L592vREImix82vCk0en8BycMF0iAM2ApSBhImAAl9o5n5jGnkq54fV0nbg==
   dependencies:
-    "@mux/mux-player" "2.4.0"
-    "@mux/playback-core" "0.22.3"
+    "@mux/mux-player" "2.8.1"
+    "@mux/playback-core" "0.25.0"
     prop-types "^15.7.2"
 
-"@mux/mux-player@2.4.0":
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/@mux/mux-player/-/mux-player-2.4.0.tgz#6157bbde4f2dcc79f6c07caf37aa6ca893478448"
-  integrity sha512-6F6RvXyIWwYtwh29+bmoqa5Nd1z31wGafeKtIds0BYP+PdVYRSRhQ16B8tajUb0+yeCVbqyvBnITEUoAZ0zuIQ==
+"@mux/mux-player@2.8.1":
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/@mux/mux-player/-/mux-player-2.8.1.tgz#89f21caf27b4c659307403760ec5220da55de0c8"
+  integrity sha512-k92o6170+MtJBnMMy07E/QZjFDJoMyEErWlVza8odt8igdKQSjlpmE9zU2hynB04x9F9XT1KqdP9oP4LasJlZg==
   dependencies:
-    "@mux/mux-video" "0.17.4"
-    "@mux/playback-core" "0.22.3"
-    media-chrome "~3.1.1"
+    "@mux/mux-video" "0.20.0"
+    "@mux/playback-core" "0.25.0"
+    media-chrome "~3.2.5"
 
-"@mux/mux-uploader-react@^1.0.0-beta.15":
-  version "1.0.0-beta.15"
-  resolved "https://registry.yarnpkg.com/@mux/mux-uploader-react/-/mux-uploader-react-1.0.0-beta.15.tgz#3b4ba91969cfdd19e1b0888a20c4ce66bb7578ee"
-  integrity sha512-hayWKyNy6abFMo0iCLcdJ2AYdYslzOlUXYj2XZA0M9vVGzzLXCSKctPxuRLCD6cZTZEwXxjH8RfTaJNQfca1Gw==
+"@mux/mux-uploader-react@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@mux/mux-uploader-react/-/mux-uploader-react-1.0.0.tgz#839ca3c8ab82042c4c31f9e48a0ae34ed427deb0"
+  integrity sha512-2PAv58jOKrfHCpys7EOOJjwg/C/yNP3ZhjlPGTNb2R0ZXhxGhYKST6CtaUeYYzN9etgU8fG/fK6LEnEwaD40Kg==
   dependencies:
-    "@mux/mux-uploader" "1.0.0-beta.15"
+    "@mux/mux-uploader" "1.0.0"
     prop-types "^15.7.2"
 
-"@mux/mux-uploader@1.0.0-beta.15":
-  version "1.0.0-beta.15"
-  resolved "https://registry.yarnpkg.com/@mux/mux-uploader/-/mux-uploader-1.0.0-beta.15.tgz#494ad9655a13491c78f95e530b0070f0043c6afc"
-  integrity sha512-BCOtvEgUd+8aVgnwvTcJc2oJBFdWBJ3FbylOsLZFNUnG3GKScrdDRagAtMvaf4LYPGYP+ttn6B/h9VnaGqeioQ==
+"@mux/mux-uploader@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@mux/mux-uploader/-/mux-uploader-1.0.0.tgz#576c53fc1f0cb714e3a3de8b2aa51e002615f550"
+  integrity sha512-hSS4gm40S8tu/OcT+q6zsK9Z5tCt+10FU4UYaaryVrrEIlD6fW+TDFT9Dp5kdj9AFBzmJloLlTs0S+hmxdxthA==
   dependencies:
-    "@mux/upchunk" "^3.3.0"
+    "@mux/upchunk" "^3.4.0"
 
-"@mux/mux-video-react@^0.8.4":
-  version "0.8.4"
-  resolved "https://registry.yarnpkg.com/@mux/mux-video-react/-/mux-video-react-0.8.4.tgz#323af15f9d3c50de3be907839d44c2a9eabf56cc"
-  integrity sha512-XzvHL9pVJ/R/xr/5ev/45kOQWLNmBY4bT0MWtUTg92LNMoZ9Nw/QZQSH/suLH/grLgcUNMJTh24M0BWhhrIJlg==
+"@mux/mux-video-react@^0.11.1":
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/@mux/mux-video-react/-/mux-video-react-0.11.1.tgz#67a5a2b41e5a0c82bd26308dfe92e34f009e3902"
+  integrity sha512-Nsg6ySzH/53a4Ai5b4gf5X0peBtLrg+e9uHhdnI9MJ1m4oc9KDQQ6emFdIHlHqaAYZVu0iiP9y2+PUEVzDmCBw==
   dependencies:
-    "@mux/playback-core" "0.22.3"
+    "@mux/playback-core" "0.25.0"
     prop-types "^15.7.2"
 
-"@mux/mux-video@0.17.4":
-  version "0.17.4"
-  resolved "https://registry.yarnpkg.com/@mux/mux-video/-/mux-video-0.17.4.tgz#00f3daf0751a53aaecd073dfa9ff168fba000d80"
-  integrity sha512-ePTL+Kxtw03OmCQ6y34A8tTdK4ctsHPzuOY7etCFldhdAMTomwxSacdNwa8BpZ23umkXHp+FQXPyJQIfv4G++Q==
+"@mux/mux-video@0.20.0":
+  version "0.20.0"
+  resolved "https://registry.yarnpkg.com/@mux/mux-video/-/mux-video-0.20.0.tgz#54d5b85749556525bf7ca8568973489ab9e97efe"
+  integrity sha512-KFfsy3MVwd3QiTdkm65JTUA+XZ3OKqaEp5FLAiHYHnl+3fffZhM14Kqd8HhDFVoDEtGAOiMmXV0DPa3/f/IFlg==
   dependencies:
-    "@mux/playback-core" "0.22.3"
-    castable-video "~1.0.6"
-    custom-media-element "~1.2.3"
-    media-tracks "~0.3.0"
+    "@mux/playback-core" "0.25.0"
+    castable-video "~1.0.9"
+    custom-media-element "~1.3.1"
+    media-tracks "~0.3.2"
 
-"@mux/playback-core@0.22.3":
-  version "0.22.3"
-  resolved "https://registry.yarnpkg.com/@mux/playback-core/-/playback-core-0.22.3.tgz#114574ba3a2966b3593276c45740208968d01eae"
-  integrity sha512-IZBMMhUKsEtSrxb8XyhfJVzI9g6Ca0poCDrJQy9hCV3+DmgfFPDLSxZZvtSglH5CsmFPHL+hOFD/qn9ewCmAOA==
+"@mux/playback-core@0.25.0":
+  version "0.25.0"
+  resolved "https://registry.yarnpkg.com/@mux/playback-core/-/playback-core-0.25.0.tgz#df0d7c1b8552168391b4e3acc2aa3842a87f65ba"
+  integrity sha512-4sqHZ6uKrt8WC6hywHDQihgU0oyy84PTKe9LVzLUI6WXx7nFUeS9nMUPgkGRzlW5xZOXxKiZVAOSMx9AhzMouQ==
   dependencies:
-    hls.js "~1.4.13"
-    mux-embed "~4.30.0"
+    hls.js "~1.5.11"
+    mux-embed "~5.2.0"
 
-"@mux/upchunk@^3.3.0":
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/@mux/upchunk/-/upchunk-3.3.0.tgz#931193625f7a089b63922aae7f25dd464c88cc28"
-  integrity sha512-2vM9PvHGpEzhXeAOAYAg22d3m8RC0DTDdWj/tSHaYWS1uHBMoqDyG2r86YmTCTZQNoK949sMfRWmKKQhwRTqBw==
-  dependencies:
-    event-target-shim "^6.0.2"
-    xhr "^2.6.0"
-
-"@mux/upchunk@^3.3.2":
-  version "3.3.2"
-  resolved "https://registry.yarnpkg.com/@mux/upchunk/-/upchunk-3.3.2.tgz#4d398e1806cadb1f8a69a5418c2962323d726e25"
-  integrity sha512-/k7tVgA2gGafao5/mKvnL/I9T9IKKWnY8sBLOU8a0x0qObJoI/f2/FbhLWP4LuNrVd9ZrOFyOLfiudJe3ME+mg==
+"@mux/upchunk@^3.4.0":
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/@mux/upchunk/-/upchunk-3.4.0.tgz#e683b8c9daa1552b207063599aefeaa312744ea0"
+  integrity sha512-ZaX4u6xRhmgB4UAmw0lvO0LB1LddbRgSILkjRDnk1F4QDtkCOuY9nOh550TNI7uKYcf6HZQax7QXst6EkpjiyQ==
   dependencies:
     event-target-shim "^6.0.2"
     xhr "^2.6.0"
@@ -1794,12 +1786,12 @@ caniuse-lite@^1.0.30001283, caniuse-lite@^1.0.30001286:
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001312.tgz#e11eba4b87e24d22697dae05455d5aea28550d5f"
   integrity sha512-Wiz1Psk2MEK0pX3rUzWaunLTZzqS2JYZFzNKqAiJGiuxIjRPLgV6+VDPOg6lQOUxmDwhTlh198JsTTi8Hzw6aQ==
 
-castable-video@~1.0.6:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/castable-video/-/castable-video-1.0.6.tgz#eae0d3d2283567a5308efaa45f38d108138c6402"
-  integrity sha512-Ykw2uL4ZQnqX0j9KF9ksbDpyc8I53mFMswCKW9yV5TrwpWkdNqRHLlcU85W30BIw61fgDjgm0Xh5G0rbcmv23g==
+castable-video@~1.0.9:
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/castable-video/-/castable-video-1.0.10.tgz#503cba7927e3bedb2b1c38707cc194aee1ae3e22"
+  integrity sha512-tJgUv+8/zE191y8EKojvB0eKIyKA9obIttd6Wpdm6x2qBmuwZ7wDgzVCSmf5cN2v9jBiuu0s7O5poz8a8cFX/w==
   dependencies:
-    custom-media-element "~1.2.2"
+    custom-media-element "~1.3.2"
 
 chalk@^2.0.0, chalk@^2.4.2:
   version "2.4.2"
@@ -2036,15 +2028,10 @@ custom-event-polyfill@^1.0.7:
   resolved "https://registry.yarnpkg.com/custom-event-polyfill/-/custom-event-polyfill-1.0.7.tgz#9bc993ddda937c1a30ccd335614c6c58c4f87aee"
   integrity sha512-TDDkd5DkaZxZFM8p+1I3yAlvM3rSr1wbrOliG4yJiwinMZN8z/iGL7BTlDkrJcYTmgUSb4ywVCc3ZaUtOtC76w==
 
-custom-media-element@~1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/custom-media-element/-/custom-media-element-1.2.2.tgz#048e23509004149d20a46bf773495bb905edd0c5"
-  integrity sha512-tI+NjVRS485QlSxHeM3JIjdEZSJMLOZVp41/vvWukDmIkZSoYG9gLYl9GFZGBpY42UbRVo1eMlF7XkI/IiDHzQ==
-
-custom-media-element@~1.2.3:
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/custom-media-element/-/custom-media-element-1.2.3.tgz#43ea828bea7d6b334530da1d031739250bab900c"
-  integrity sha512-xr9Hbrslkjm1fapJP5hL98pySeZmNepBSefQS/XTxynamqPTfRBK5MnhReMOiAj8xvJApVPrVnlYxIrknay8jg==
+custom-media-element@~1.3.1, custom-media-element@~1.3.2:
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/custom-media-element/-/custom-media-element-1.3.2.tgz#392c8e2910ebaa3c405c49a49ca51586329946bd"
+  integrity sha512-nDyMobZgoAVqz7mA8rsn7i1/6bjH6N9ab2Ge7LyyNxrvxAq7zQJPg8i3u2VH7wEB+Y1T1+C3/h1G774/D+ZLag==
 
 damerau-levenshtein@^1.0.7:
   version "1.0.8"
@@ -3030,15 +3017,10 @@ hls.js@*:
   resolved "https://registry.yarnpkg.com/hls.js/-/hls.js-1.2.4.tgz#761d7f700c3da5c1701257c24c1db7ababea14eb"
   integrity sha512-yC3K79Kzq1W+OgjT12JxKMDXv9DbfvulppxmPBl7D04SaTyd2IwWk5eNASQV1mUaPlKbjr16yI9292qpSGo0ig==
 
-hls.js@^1.4.14:
-  version "1.5.7"
-  resolved "https://registry.yarnpkg.com/hls.js/-/hls.js-1.5.7.tgz#e069e78fe962a422d16aa17a2bfc2f1e2321089d"
-  integrity sha512-Hnyf7ojTBtXHeOW1/t6wCBJSiK1WpoKF9yg7juxldDx8u3iswrkPt2wbOA/1NiwU4j27DSIVoIEJRAhcdMef/A==
-
-hls.js@~1.4.13:
-  version "1.4.14"
-  resolved "https://registry.yarnpkg.com/hls.js/-/hls.js-1.4.14.tgz#a48a34a1fbcd4c3451b82a78a02fb8ad8a8812e0"
-  integrity sha512-UppQjyvPVclg+6t2KY/Rv03h0+bA5u6zwqVoz4LAC/L0fgYmIaCD7ZCrwe8WI1Gv01be1XL0QFsRbSdIHV/Wbw==
+hls.js@~1.5.11:
+  version "1.5.13"
+  resolved "https://registry.yarnpkg.com/hls.js/-/hls.js-1.5.13.tgz#27bf1c9b91c433e25e7a84635fe7491bb5988d93"
+  integrity sha512-xRgKo84nsC7clEvSfIdgn/Tc0NOT+d7vdiL/wvkLO+0k0juc26NRBPPG1SfB8pd5bHXIjMW/F5VM8VYYkOYYdw==
 
 html-element-map@^1.2.0:
   version "1.3.1"
@@ -4081,15 +4063,15 @@ md5@^2.3.0:
     crypt "0.0.2"
     is-buffer "~1.1.6"
 
-media-chrome@^3.1.1, media-chrome@~3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/media-chrome/-/media-chrome-3.1.1.tgz#3f40fed33ea66a0787a400fd989f27e2d125bc7e"
-  integrity sha512-EqofPNX7Eq1dv9ixuRo51Wv/Wo3P4PIPjY4iM1jGqu/Jyond8BqdigQKdhxPM2rH9SohdUXZvUWS1OJ1xMO6Ww==
+media-chrome@^3.2.5, media-chrome@~3.2.5:
+  version "3.2.5"
+  resolved "https://registry.yarnpkg.com/media-chrome/-/media-chrome-3.2.5.tgz#657722a216e3c0f877d9522fce7425e25da7e137"
+  integrity sha512-tTsgS7x77Bn4p/wca/Si/7A+Q3z9DzKq0SOkroQvrNMXBVyQasMayDcsKg5Ur5NGsymZfttnJi7tXvVr/tPj8g==
 
-media-tracks@~0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/media-tracks/-/media-tracks-0.3.0.tgz#0f16a611268ceb1139800634be97c58ce9d7e45c"
-  integrity sha512-kicD8eOFwe6nD7jn7iM/0yuLzWuo6abWHURYwY7NhxL1dBif+lt0on4rLTs6VhKwAEE/BjT3wr+0vn1w8SBpag==
+media-tracks@~0.3.2:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/media-tracks/-/media-tracks-0.3.3.tgz#cca72bd791dcb76cd6427dfa6b2baa25601ea192"
+  integrity sha512-9P2FuUHnZZ3iji+2RQk7Zkh5AmZTnOG5fODACnjhCVveX1McY3jmCRHofIEI+yTBqplz7LXy48c7fQ3Uigp88w==
 
 merge-stream@^2.0.0:
   version "2.0.0"
@@ -4194,10 +4176,10 @@ ms@^2.0.0, ms@^2.1.1:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.3.tgz#574c8138ce1d2b5861f0b44579dbadd60c6615b2"
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
 
-mux-embed@^4.30.0, mux-embed@~4.30.0:
-  version "4.30.0"
-  resolved "https://registry.yarnpkg.com/mux-embed/-/mux-embed-4.30.0.tgz#3820109e153df75d6dc139a9b4d60482dfe9860f"
-  integrity sha512-XAgAp4CEvsiZL26GbruzeG1g33OWyrzuskDMavXUxDufTxS0/AxAhwoTTRqEzEJS9vnZa/X9R2GV3xRX1XMp2w==
+mux-embed@~5.2.0:
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/mux-embed/-/mux-embed-5.2.1.tgz#b2f1d8e7653d7386ff298beabbdf5d4940707baf"
+  integrity sha512-NukHw91xeEVDBeXVDBpi2BvXNix7gSuvdtyvOph5yR/ROn1hHbTlcYWoKQyCyJX9frsF00UROEul+S8wPzU3aQ==
 
 nanoid@^3.1.30:
   version "3.3.0"
