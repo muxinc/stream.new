@@ -33,8 +33,8 @@ const PlyrPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoaded
   useEffect(() => {
     const video = videoRef.current;
     const src = `${getStreamBaseUrl()}/${playbackId}.m3u8`;
-    let hls: Hls | null;
-    hls = null;
+    let hls: Hls | undefined;
+    hls = undefined;
     if (video) {
       video.addEventListener('error', videoError);
       playerRef.current = new Plyr(video, {
