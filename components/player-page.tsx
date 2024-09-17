@@ -18,7 +18,7 @@ type PageProps = Props & {
 
 const META_TITLE = 'View this video created on stream.new';
 
-const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, poster, playerType, blurHashBase64, aspectRatio }) => {
+const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, poster, playerType, blurDataURL, aspectRatio }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [tryToLoadPlayer, setTryToLoadPlayer] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -145,7 +145,7 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
         <div className="wrapper">
           {(tryToLoadPlayer && aspectRatio && !openReport) && (
             <PlayerLoader
-              blurHashBase64={blurHashBase64}
+              blurDataURL={blurDataURL}
               color={color}
               playbackId={playbackId}
               poster={poster}

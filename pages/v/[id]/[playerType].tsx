@@ -25,7 +25,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-const PlayerTypePage: React.FC<PlayerTypePageProps> = ({ playbackId, playerType, videoExists, shareUrl, poster, blurHashBase64, aspectRatio }) => {
+const PlayerTypePage: React.FC<PlayerTypePageProps> = ({ playbackId, playerType, videoExists, shareUrl, poster, blurDataURL, aspectRatio }) => {
   return (
     <PlayerPage
       playbackId={playbackId}
@@ -33,7 +33,7 @@ const PlayerTypePage: React.FC<PlayerTypePageProps> = ({ playbackId, playerType,
       shareUrl={shareUrl}
       poster={poster}
       aspectRatio={aspectRatio}
-      blurHashBase64={blurHashBase64}
+      blurDataURL={blurDataURL}
       playerType={playerType}
     />
   );
