@@ -51,7 +51,6 @@ const MuxPlayerInternal: React.FC<Props> = ({
         poster={poster}
         startTime={currentTime}
         envKey={process.env.NEXT_PUBLIC_MUX_ENV_KEY}
-        streamType="on-demand"
         accentColor={color}
         placeholder={blurHashBase64}
         style={{
