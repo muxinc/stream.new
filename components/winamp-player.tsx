@@ -41,7 +41,7 @@ const WinampPlayer: React.FC<Props> = ({
               mediaController="controller"
               className="media-seek-backward-button"
             >
-              <div slot="icon" className="backward-icon"></div>
+              <div slot="icon"></div>
             </MediaSeekBackwardButton>
             <MediaPlayButton className="play" mediaController="controller">
               <div slot="play"></div>
@@ -56,7 +56,7 @@ const WinampPlayer: React.FC<Props> = ({
               <div slot="pause"></div>
             </MediaPlayButton>
             <MediaSeekForwardButton mediaController="controller">
-              <div slot="icon" className="forward-icon"></div>
+              <div slot="icon"></div>
             </MediaSeekForwardButton>
             <MediaFullscreenButton mediaController="controller">
               <div slot="enter"></div>
@@ -249,14 +249,14 @@ const WinampPlayer: React.FC<Props> = ({
           }
 
           .winamp-player
-            :global(media-seek-backward-button .backward-icon) {
+            :global(media-seek-backward-button div[slot='icon']) {
             width: 23px;
             height: 18px;
             background: 136px 0 url(/winamp-player/CBUTTONS.BMP);
           }
 
           .winamp-player
-            :global(media-seek-backward-button:active div[slot='backward']) {
+            :global(media-seek-backward-button:active div[slot='icon']) {
             width: 23px;
             height: 18px;
             background: 136px 18px url(/winamp-player/CBUTTONS.BMP);
@@ -357,14 +357,14 @@ const WinampPlayer: React.FC<Props> = ({
           }
 
           .winamp-player
-            :global(media-seek-forward-button .forward-icon) {
+            :global(media-seek-forward-button div[slot='icon']) {
             width: 23px;
             height: 18px;
             background: 45px 0 url(/winamp-player/CBUTTONS.BMP);
           }
 
           .winamp-player
-            :global(media-seek-forward-button:active div[slot='forward']) {
+            :global(media-seek-forward-button:active div[slot='icon']) {
             width: 23px;
             height: 18px;
             background: 45px 18px url(/winamp-player/CBUTTONS.BMP);
