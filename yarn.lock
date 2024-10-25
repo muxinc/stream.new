@@ -841,18 +841,18 @@
     media-chrome "~4.2.1"
     player.style "^0.0.8"
 
-"@mux/mux-uploader-react@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@mux/mux-uploader-react/-/mux-uploader-react-1.0.0.tgz#839ca3c8ab82042c4c31f9e48a0ae34ed427deb0"
-  integrity sha512-2PAv58jOKrfHCpys7EOOJjwg/C/yNP3ZhjlPGTNb2R0ZXhxGhYKST6CtaUeYYzN9etgU8fG/fK6LEnEwaD40Kg==
+"@mux/mux-uploader-react@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@mux/mux-uploader-react/-/mux-uploader-react-1.0.3.tgz#876fa9b3e93444b749a591d95b035e2371065310"
+  integrity sha512-5SOu8aMRXWHA9iFKkUUg7JMJSlDrNt7HfDOE3cUHVK0jPo9xRLrhFi0pULXvT7Y5yDwlZwzY4ERjMk4LbIpoSw==
   dependencies:
-    "@mux/mux-uploader" "1.0.0"
+    "@mux/mux-uploader" "1.0.2"
     prop-types "^15.7.2"
 
-"@mux/mux-uploader@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@mux/mux-uploader/-/mux-uploader-1.0.0.tgz#576c53fc1f0cb714e3a3de8b2aa51e002615f550"
-  integrity sha512-hSS4gm40S8tu/OcT+q6zsK9Z5tCt+10FU4UYaaryVrrEIlD6fW+TDFT9Dp5kdj9AFBzmJloLlTs0S+hmxdxthA==
+"@mux/mux-uploader@1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@mux/mux-uploader/-/mux-uploader-1.0.2.tgz#a21d5875bb4640d37e2896428a7e914626a2c9ae"
+  integrity sha512-qhGlrnYBDFXlV1j9FwzkScOBpciJzmvJjiCh6MYpGvAHVNMnTz+FUJkpdeTO31wuiE7szavOkb2fjE5LUoHBww==
   dependencies:
     "@mux/upchunk" "^3.4.0"
 
@@ -4182,15 +4182,10 @@ ms@^2.0.0, ms@^2.1.1:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.3.tgz#574c8138ce1d2b5861f0b44579dbadd60c6615b2"
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
 
-mux-embed@^5.3.1:
+mux-embed@^5.3.1, mux-embed@^5.3.3:
   version "5.3.3"
   resolved "https://registry.yarnpkg.com/mux-embed/-/mux-embed-5.3.3.tgz#2fd65edadb9a4a0e0101e000c721b87fe9a07644"
   integrity sha512-jG+nECEsCQMzXWUkHI4+XfK856AwQPkjxpfi5Rnmc36k8YzjHGxy1GdQcDJpgNHJpz1HoL4Xdrz1bqBZ7t9NCQ==
-
-mux-embed@~5.2.0:
-  version "5.2.1"
-  resolved "https://registry.yarnpkg.com/mux-embed/-/mux-embed-5.2.1.tgz#b2f1d8e7653d7386ff298beabbdf5d4940707baf"
-  integrity sha512-NukHw91xeEVDBeXVDBpi2BvXNix7gSuvdtyvOph5yR/ROn1hHbTlcYWoKQyCyJX9frsF00UROEul+S8wPzU3aQ==
 
 nanoid@^3.1.30:
   version "3.3.0"
