@@ -1,11 +1,12 @@
-import { getImageDimensions } from "./image-dimensions";
-import muxBlurHash from "@mux/blurhash";
-import { getImageBaseUrl, getStreamBaseUrl } from "./urlutils";
-import { HOST_URL } from "../constants";
-import type { PlayerTypes } from "../constants";
+import { getImageDimensions } from './image-dimensions';
+// @ts-expect-error no types yet
+import { createBlurUp } from '@mux/blurup';
+import { getImageBaseUrl, getStreamBaseUrl } from './urlutils';
+import { HOST_URL } from '../constants';
+import type { PlayerTypes } from '../constants';
 
 export type Props = {
-  blurHashBase64?: string;
+  blurDataURL?: string;
   playbackId: string;
   shareUrl: string;
   poster: string;
@@ -27,19 +28,19 @@ export async function getPropsFromPlaybackId(
   const poster = `${getImageBaseUrl()}/${playbackId}/thumbnail.jpg`;
   const shareUrl = `${HOST_URL}/v/${playbackId}`;
   const dimensions = await getImageDimensions(playbackId);
-  let blurHashBase64;
+  let blurDataURL;
   try {
-    blurHashBase64 = (await muxBlurHash(playbackId)).blurHashBase64;
+    blurDataURL = (await createBlurUp(playbackId, {})).blurDataURL;
   } catch (e) {
-    console.error('Error fetching blurhash', e);
+    console.error('Error fetching blurup', e);
   }
   const videoExists = await getVideoExistsAsync(playbackId);
   const props: Props = {
-    blurHashBase64,
+    blurDataURL,
     playbackId,
     shareUrl,
     poster,
-    videoExists
+    videoExists,
   };
   if (dimensions?.aspectRatio) {
     props.aspectRatio = dimensions.aspectRatio;

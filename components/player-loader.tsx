@@ -19,7 +19,7 @@ const MuxVideo = dynamic(() => import('./mux-video'));
 const WinampPlayer = dynamic(() => import('./winamp-player'));
 
 type Props = {
-  blurHashBase64?: string;
+  blurDataURL?: string;
   playbackId: string;
   poster: string;
   color?: string;
@@ -32,15 +32,15 @@ type Props = {
 
 
 
-const PlayerLoader = forwardRef<PlayerElement, Props>(({ playbackId, poster, currentTime, aspectRatio, playerType, color, blurHashBase64, onLoaded, onError }, ref) => {
+const PlayerLoader = forwardRef<PlayerElement, Props>(({ playbackId, poster, currentTime, aspectRatio, playerType, color, blurDataURL, onLoaded, onError }, ref) => {
   const isAMuxPlayer = () => [MUX_PLAYER_CLASSIC_TYPE, MUX_PLAYER_TYPE].includes(playerType);
 
   return (
     <>
       <div className='video-container'>
         {playerType === PLYR_TYPE && <PlyrPlayer forwardedRef={ref as ForwardedRef<HTMLVideoElementWithPlyr>} aspectRatio={aspectRatio} playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
-        {playerType === MUX_PLAYER_TYPE && <MuxPlayer forwardedRef={ref as ForwardedRef<MuxPlayerElement>} playbackId={playbackId} aspectRatio={aspectRatio} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} blurHashBase64={blurHashBase64} color={color} />}
-        {playerType === MUX_PLAYER_CLASSIC_TYPE && <MuxPlayerClassic forwardedRef={ref as ForwardedRef<MuxPlayerElement>} playbackId={playbackId} aspectRatio={aspectRatio} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} blurHashBase64={blurHashBase64} color={color} />}
+        {playerType === MUX_PLAYER_TYPE && <MuxPlayer forwardedRef={ref as ForwardedRef<MuxPlayerElement>} playbackId={playbackId} aspectRatio={aspectRatio} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} blurDataURL={blurDataURL} color={color} />}
+        {playerType === MUX_PLAYER_CLASSIC_TYPE && <MuxPlayerClassic forwardedRef={ref as ForwardedRef<MuxPlayerElement>} playbackId={playbackId} aspectRatio={aspectRatio} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} blurDataURL={blurDataURL} color={color} />}
         {playerType === MUX_VIDEO_TYPE && <MuxVideo playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
         {playerType === WINAMP_PLAYER_TYPE && <WinampPlayer playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
       </div>
