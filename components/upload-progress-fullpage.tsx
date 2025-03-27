@@ -71,7 +71,6 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
       };
 
       upChunk.on('attempt', ({ detail }) => {
-        console.log(detail);
         uploadAnalytics.chunks[detail.chunkNumber] = {
           size: detail.chunkSize,
           uploadStarted: Date.now(),
@@ -100,7 +99,6 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
       });
 
       upChunk.on('success', () => {
-        console.log("OMG", currentUploadIdRef.current);
         reportUploadTelemetry({
           ...uploadAnalytics,
           uploadId: currentUploadIdRef.current,
