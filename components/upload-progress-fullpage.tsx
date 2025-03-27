@@ -5,24 +5,10 @@ import useSwr from 'swr';
 import Layout from './layout';
 import Button from './button';
 import Cookies from 'js-cookie';
+import { reportUploadTelemetry, UploadTelemetry } from '../lib/telemetry';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 const MAX_VIDEO_DURATION_MIN = 60;
-
-type ChunkInfo = {
-  size: number;
-  uploadStarted: number;
-  uploadFinished?: number;
-}
-
-type UploadTelemetry = {
-  fileSize: number;
-  uploadStarted: number;
-  uploadFinished?: number;
-  chunkSize: number;
-  dynamicChunkSize: boolean;
-  chunks: ChunkInfo[];
-};
 
 type Props = {
   file: File;
@@ -32,6 +18,8 @@ type Props = {
 const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadId, setUploadId] = useState('');
+   // Add this ref to store the current upload ID
+   const currentUploadIdRef = useRef('');
   const [progress, setProgress] = useState(0);
   const [isPreparing, setIsPreparing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -46,18 +34,15 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
 
   const createUpload = async () => {
     try {
-      return fetch('/api/uploads', {
-        method: 'POST',
-      })
-        .then((res) => res.json())
-        .then(({ id, url }) => {
-          setUploadId(id);
-          return url;
-        });
+      const res = await fetch('/api/uploads', { method: 'POST' });
+      const { id, url } = await res.json();
+      setUploadId(id);
+      currentUploadIdRef.current = id; // Store the current upload ID in the ref
+      return url;
     } catch (e) {
       console.error('Error in createUpload', e); // eslint-disable-line no-console
       setErrorMessage('Error creating upload');
-      return Promise.reject(e);
+      return e;
     }
   };
 
@@ -86,6 +71,7 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
       };
 
       upChunk.on('attempt', ({ detail }) => {
+        console.log(detail);
         uploadAnalytics.chunks[detail.chunkNumber] = {
           size: detail.chunkSize,
           uploadStarted: Date.now(),
@@ -100,6 +86,13 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
 
       upChunk.on('error', (err) => {
         setErrorMessage(err.detail);
+        reportUploadTelemetry({
+          ...uploadAnalytics,
+          uploadId: currentUploadIdRef.current,
+          uploadFinished: Date.now(),
+          uploadErrored: true,
+          message: err.detail,
+        });
       });
 
       upChunk.on('progress', (progressEvt) => {
@@ -107,19 +100,12 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
       });
 
       upChunk.on('success', () => {
-        uploadAnalytics.uploadFinished = Date.now();
-
-        fetch('/api/telemetry', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            type: 'upload',
-            data: uploadAnalytics,
-          })
+        console.log("OMG", currentUploadIdRef.current);
+        reportUploadTelemetry({
+          ...uploadAnalytics,
+          uploadId: currentUploadIdRef.current,
+          uploadFinished: Date.now(),
         });
-
         setIsPreparing(true);
       });
     } catch (err) {
