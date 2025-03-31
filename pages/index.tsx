@@ -8,25 +8,11 @@ import Link from 'next/link';
 import Button from '../components/button';
 import Layout from '../components/layout';
 import { breakpoints } from '../style-vars';
+import { reportUploadTelemetry, UploadTelemetry, ChunkInfo } from '../lib/telemetry';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 type Props = null;
-
-type ChunkInfo = {
-  size: number;
-  uploadStarted: number;
-  uploadFinished?: number;
-}
-
-type UploadTelemetry = {
-  fileSize: number;
-  uploadStarted: number;
-  uploadFinished?: number;
-  dynamicChunkSize?: boolean;
-  chunkSize: number;
-  chunks: ChunkInfo[];
-};
 
 const Index: React.FC<Props> = () => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -45,18 +31,14 @@ const Index: React.FC<Props> = () => {
 
   const createUpload = async () => {
     try {
-      return fetch('/api/uploads', {
-        method: 'POST',
-      })
-        .then((res) => res.json())
-        .then(({ id, url }) => {
-          setUploadId(id);
-          return url;
-        });
+      const res = await fetch('/api/uploads', { method: 'POST' });
+      const { id, url } = await res.json();
+      setUploadId(id);
+      return url;
     } catch (e) {
       console.error('Error in createUpload', e);
       setErrorMessage('Error creating upload.');
-      return Promise.reject(e);
+      return e;
     }
   };
 
@@ -99,22 +81,25 @@ const Index: React.FC<Props> = () => {
   };
 
   const handleSuccess: MuxUploaderProps['onSuccess'] = () => {
-    const finalAnalytics = {...uploadAnalytics};
-    finalAnalytics.uploadFinished = Date.now();
-
-    fetch('/api/telemetry', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        type: 'upload',
-        data: finalAnalytics,
-      })
+    reportUploadTelemetry({
+      ...uploadAnalytics,
+      uploadFinished: Date.now(),
+      uploadId,
     });
-
     setIsPreparing(true);
   };
+
+  const handleUploadError: MuxUploaderProps['onUploadError'] = ({ detail }) => {
+    setIsUploading(false);
+    reportUploadTelemetry({
+      ...uploadAnalytics,
+      uploadId,
+      uploadFinished: Date.now(),
+      uploadErrored: true,
+      message: detail.message,
+    });
+  };
+
 
   const [isDynamicChunkSizeSet, setIsDynamicChunkSizeSet] = useState(false);
   useEffect(() => {
@@ -165,6 +150,7 @@ const Index: React.FC<Props> = () => {
             onChunkAttempt={handleChunkAttempt}
             onChunkSuccess={handleChunkSuccess}
             onSuccess={handleSuccess}
+            onUploadError={handleUploadError}
             dynamicChunkSize={isDynamicChunkSizeSet}
             endpoint={createUpload}
             style={{ fontSize: isUploading ? '4vw': '26px' }}
