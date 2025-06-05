@@ -9,6 +9,12 @@
     "lint": "yarn eslint . --ext .js,.jsx,.ts,.tsx",
     "format": "yarn lint",
     "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:coverage:watch": "jest --coverage --watch",
+    "test:coverage:ci": "jest --coverage --ci --watchAll=false --passWithNoTests",
+    "coverage:open": "open coverage/lcov-report/index.html",
+    "coverage:serve": "npx http-server coverage/lcov-report -p 8080 -o",
     "tsc": "tsc"
   },
   "dependencies": {
