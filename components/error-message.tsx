@@ -3,7 +3,7 @@ type Props = { message: string };
 const ErrorMessage: React.FC<Props> = ({ message }) => {
   return (
     <>
-      <div className="message">{message || 'Unknown error'}</div>
+      <div className="message" data-testid="error-message">{message || 'Unknown error'}</div>
       <style jsx>{`
         .message {
           color: #650303;

@@ -1,24 +1,24 @@
 type Props = {
-  audioLevel: number,
-  isMuted: boolean,
-  muteAudioTrack: (mute: boolean) => void
+  audioLevel?: number,
+  isMuted?: boolean,
+  muteAudioTrack?: (mute: boolean) => void
 };
 
-const AudioBars: React.FC<Props> = ({ audioLevel, isMuted, muteAudioTrack }) => {
+const AudioBars: React.FC<Props> = ({ audioLevel = 0, isMuted = false, muteAudioTrack }) => {
   const audioLevelThresholds = [0, 5, 10, 15, 20, 25];
 
-  const toggleMuted = () => muteAudioTrack(!isMuted);
+  const toggleMuted = () => muteAudioTrack && muteAudioTrack(!isMuted);
 
   return (
     <>
       <div className="audio-levels">
         <div className='mute-action'><a role="button" tabIndex={0} onKeyDown={toggleMuted} onClick={toggleMuted}>{isMuted ? 'Unmute audio' : 'Mute audio'}</a></div>
-        <div className={`level ${audioLevel > audioLevelThresholds[0] ? 'active' : ''}`} />
-        <div className={`level ${audioLevel > audioLevelThresholds[1] ? 'active' : ''}`} />
-        <div className={`level ${audioLevel > audioLevelThresholds[2] ? 'active' : ''}`} />
-        <div className={`level ${audioLevel > audioLevelThresholds[3] ? 'active' : ''}`} />
-        <div className={`level ${audioLevel > audioLevelThresholds[4] ? 'active' : ''}`} />
-        <div className={`level ${audioLevel > audioLevelThresholds[5] ? 'active' : ''}`} />
+        <div className={`level ${audioLevel > audioLevelThresholds[0] ? 'active' : ''}`} data-testid="audio-level-0" />
+        <div className={`level ${audioLevel > audioLevelThresholds[1] ? 'active' : ''}`} data-testid="audio-level-1" />
+        <div className={`level ${audioLevel > audioLevelThresholds[2] ? 'active' : ''}`} data-testid="audio-level-2" />
+        <div className={`level ${audioLevel > audioLevelThresholds[3] ? 'active' : ''}`} data-testid="audio-level-3" />
+        <div className={`level ${audioLevel > audioLevelThresholds[4] ? 'active' : ''}`} data-testid="audio-level-4" />
+        <div className={`level ${audioLevel > audioLevelThresholds[5] ? 'active' : ''}`} data-testid="audio-level-5" />
         <style jsx>{`
           .mute-action {
             margin-right: 10px;

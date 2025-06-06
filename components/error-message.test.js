@@ -1,34 +1,35 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 import ErrorMessage from './error-message';
 
 describe('ErrorMessage', () => {
   it('renders error message text', () => {
-    const wrapper = shallow(<ErrorMessage message="Something went wrong" />);
-    expect(wrapper.text()).toContain('Something went wrong');
+    render(<ErrorMessage message="Something went wrong" />);
+    expect(screen.getByText('Something went wrong')).toBeInTheDocument();
   });
 
   it('renders with default styling', () => {
-    const wrapper = shallow(<ErrorMessage message="Error" />);
-    expect(wrapper.find('div.message').exists()).toBe(true);
+    render(<ErrorMessage message="Error" />);
+    expect(screen.getByTestId('error-message')).toBeInTheDocument();
+    expect(screen.getByTestId('error-message')).toHaveClass('message');
   });
 
   it('handles empty message', () => {
-    const wrapper = shallow(<ErrorMessage message="" />);
-    expect(wrapper.find('div.message').exists()).toBe(true);
-    expect(wrapper.text()).toContain('Unknown error');
+    render(<ErrorMessage message="" />);
+    expect(screen.getByTestId('error-message')).toBeInTheDocument();
+    expect(screen.getByText('Unknown error')).toBeInTheDocument();
   });
 
   it('renders default error for undefined message', () => {
-    const wrapper = shallow(<ErrorMessage />);
-    expect(wrapper.find('div.message').exists()).toBe(true);
-    expect(wrapper.text()).toContain('Unknown error');
+    render(<ErrorMessage />);
+    expect(screen.getByTestId('error-message')).toBeInTheDocument();
+    expect(screen.getByText('Unknown error')).toBeInTheDocument();
   });
 
   it('applies correct CSS classes', () => {
-    const wrapper = shallow(<ErrorMessage message="Test error" />);
-    expect(wrapper.find('.message')).toHaveLength(1);
-    // styled-jsx may not render style elements in shallow rendering
-    expect(wrapper.exists()).toBe(true);
+    render(<ErrorMessage message="Test error" />);
+    const messageElement = screen.getByTestId('error-message');
+    expect(messageElement).toHaveClass('message');
+    expect(messageElement).toBeInTheDocument();
   });
 });

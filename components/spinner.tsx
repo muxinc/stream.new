@@ -6,7 +6,7 @@ type Props = {
 const Spinner: React.FC<Props> = ({ size = 6, color = '#999' }) => {
   return (
     <>
-      <div className="spinner" />
+      <div className="spinner" data-testid="spinner" />
       <style jsx>{`
         .spinner,
         .spinner:after {

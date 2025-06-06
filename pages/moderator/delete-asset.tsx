@@ -68,3 +68,9 @@ const DeleteAsset: React.FC<Props> = () => {
 };
 
 export default DeleteAsset;
+
+export async function getServerSideProps() {
+  return {
+    props: {},
+  };
+}

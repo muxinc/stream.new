@@ -1,12 +1,17 @@
-import { shallow } from 'enzyme';
+import React from 'react';
+import { render, screen } from '@testing-library/react';
 import AudioBars from './audio-bars';
 
 test('should render the right number of bars', () => {
-  const wrapper = shallow(<AudioBars />);
-  expect(wrapper.find('.level').length).toEqual(6);
+  render(<AudioBars />);
+  const bars = screen.getAllByTestId(/audio-level-/);
+  expect(bars).toHaveLength(6);
 });
 
 test('should render 3 active bars when the audio level is 11', () => {
-  const wrapper = shallow(<AudioBars audioLevel={11} />);
-  expect(wrapper.find('.level.active').length).toEqual(3);
+  render(<AudioBars audioLevel={11} />);
+  const activeBars = screen.getAllByTestId(/audio-level-/).filter(bar => 
+    bar.classList.contains('active')
+  );
+  expect(activeBars).toHaveLength(3);
 });

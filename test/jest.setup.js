@@ -1,5 +1,25 @@
 // Global Jest setup file
 
+// TextEncoder/TextDecoder polyfills for jsdom environment
+const { TextEncoder, TextDecoder } = require('util');
+global.TextEncoder = global.TextEncoder || TextEncoder;
+global.TextDecoder = global.TextDecoder || TextDecoder;
+
+// Stream polyfills for jsdom environment
+try {
+  const { ReadableStream, WritableStream, TransformStream } = require('stream/web');
+  global.ReadableStream = global.ReadableStream || ReadableStream;
+  global.WritableStream = global.WritableStream || WritableStream;
+  global.TransformStream = global.TransformStream || TransformStream;
+} catch (e) {
+  // Fallback for older Node versions or environments
+  if (!global.ReadableStream) {
+    global.ReadableStream = class ReadableStream {};
+    global.WritableStream = class WritableStream {};
+    global.TransformStream = class TransformStream {};
+  }
+}
+
 // Only set up DOM-specific mocks in jsdom environment
 if (typeof window !== 'undefined') {
   // Mock window.matchMedia

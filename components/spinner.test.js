@@ -1,32 +1,32 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 import Spinner from './spinner';
 
 describe('Spinner', () => {
   it('renders spinner element', () => {
-    const wrapper = shallow(<Spinner />);
-    expect(wrapper.find('div.spinner')).toHaveLength(1);
+    render(<Spinner />);
+    expect(screen.getByTestId('spinner')).toBeInTheDocument();
   });
 
   it('applies default classes', () => {
-    const wrapper = shallow(<Spinner />);
-    expect(wrapper.find('div.spinner')).toHaveLength(1);
-    // Check that the component renders properly
-    expect(wrapper.exists()).toBe(true);
+    render(<Spinner />);
+    const spinner = screen.getByTestId('spinner');
+    expect(spinner).toBeInTheDocument();
+    expect(spinner).toHaveClass('spinner');
   });
 
   it('renders with custom props', () => {
-    const wrapper = shallow(<Spinner size={8} color="#ff0000" />);
-    expect(wrapper.find('div.spinner')).toHaveLength(1);
-    // Check that the component renders with props
-    expect(wrapper.exists()).toBe(true);
+    render(<Spinner size={8} color="#ff0000" />);
+    const spinner = screen.getByTestId('spinner');
+    expect(spinner).toBeInTheDocument();
+    expect(spinner).toHaveClass('spinner');
   });
 
   it('handles different sizes', () => {
-    const smallWrapper = shallow(<Spinner size={4} />);
-    const largeWrapper = shallow(<Spinner size={10} />);
+    const { rerender } = render(<Spinner size={4} />);
+    expect(screen.getByTestId('spinner')).toBeInTheDocument();
     
-    expect(smallWrapper.find('div.spinner')).toHaveLength(1);
-    expect(largeWrapper.find('div.spinner')).toHaveLength(1);
+    rerender(<Spinner size={10} />);
+    expect(screen.getByTestId('spinner')).toBeInTheDocument();
   });
 });

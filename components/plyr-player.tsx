@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import Plyr from 'plyr';
 import 'plyr/dist/plyr.css';
 import Hls from 'hls.js';
 import mux from 'mux-embed';
@@ -37,51 +36,56 @@ const PlyrPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoaded
     hls = undefined;
     if (video) {
       video.addEventListener('error', videoError);
-      playerRef.current = new Plyr(video, {
-        previewThumbnails: { enabled: true, src: `${getImageBaseUrl()}/${playbackId}/storyboard.vtt` },
-        storage: { enabled: false },
-        fullscreen: {
-          iosNative: true
-        },
-        captions: { active: true, language: 'auto', update: true }
-      });
-
-      playerRef.current.on('ready', () => onLoaded());
-
-      if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        // This will run in safari, where HLS is supported natively
-        video.src = src;
-      } else if (Hls.isSupported()) {
-        // This will run in all other modern browsers
-        hls = new Hls();
-        hls.loadSource(src);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.ERROR, function (event, data) {
-          if (data.fatal) {
-            logger.error('hls.js fatal error');
-            videoError(new ErrorEvent('HLS.js fatal error'));
-          }
-        });
-      } else {
-        console.error( // eslint-disable-line no-console
-          'This is an old browser that does not support MSE https://developer.mozilla.org/en-US/docs/Web/API/Media_Source_Extensions_API',
-        );
-      }
-
-      if (typeof mux !== 'undefined' && process.env.NEXT_PUBLIC_MUX_ENV_KEY) {
-        mux.monitor(video, {
-          hlsjs: hls,
-          Hls,
-          beaconCollectionDomain: MUX_DATA_CUSTOM_DOMAIN,
-          data: {
-            env_key: process.env.NEXT_PUBLIC_MUX_ENV_KEY,
-            player_name: 'Plyr',
-            video_id: playbackId,
-            video_title: playbackId,
-            player_init_time: playerInitTime,
+      
+      // Dynamic import of Plyr to avoid SSR issues
+      import('plyr').then((PlyrModule) => {
+        const Plyr = PlyrModule.default;
+        playerRef.current = new Plyr(video, {
+          previewThumbnails: { enabled: true, src: `${getImageBaseUrl()}/${playbackId}/storyboard.vtt` },
+          storage: { enabled: false },
+          fullscreen: {
+            iosNative: true
           },
+          captions: { active: true, language: 'auto', update: true }
         });
-      }
+
+        playerRef.current.on('ready', () => onLoaded());
+
+        if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          // This will run in safari, where HLS is supported natively
+          video.src = src;
+        } else if (Hls.isSupported()) {
+          // This will run in all other modern browsers
+          hls = new Hls();
+          hls.loadSource(src);
+          hls.attachMedia(video);
+          hls.on(Hls.Events.ERROR, function (event, data) {
+            if (data.fatal) {
+              logger.error('hls.js fatal error');
+              videoError(new ErrorEvent('HLS.js fatal error'));
+            }
+          });
+        } else {
+          console.error( // eslint-disable-line no-console
+            'This is an old browser that does not support MSE https://developer.mozilla.org/en-US/docs/Web/API/Media_Source_Extensions_API',
+          );
+        }
+
+        if (typeof mux !== 'undefined' && process.env.NEXT_PUBLIC_MUX_ENV_KEY) {
+          mux.monitor(video, {
+            hlsjs: hls,
+            Hls,
+            beaconCollectionDomain: MUX_DATA_CUSTOM_DOMAIN,
+            data: {
+              env_key: process.env.NEXT_PUBLIC_MUX_ENV_KEY,
+              player_name: 'Plyr',
+              video_id: playbackId,
+              video_title: playbackId,
+              player_init_time: playerInitTime,
+            },
+          });
+        }
+      });
     }
 
     return () => {
