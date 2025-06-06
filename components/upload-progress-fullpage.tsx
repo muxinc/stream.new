@@ -183,7 +183,7 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
         </div>
       ) : (
         <div className="percent">
-          <h1>{progress ? `${progress}` : '0'}</h1>
+          <h1>Uploading: {progress ? `${progress}%` : '0%'}</h1>
         </div>
       )}
       <style jsx>
