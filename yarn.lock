@@ -2298,10 +2298,10 @@ custom-event-polyfill@^1.0.7:
   resolved "https://registry.npmjs.org/custom-event-polyfill/-/custom-event-polyfill-1.0.7.tgz"
   integrity sha512-TDDkd5DkaZxZFM8p+1I3yAlvM3rSr1wbrOliG4yJiwinMZN8z/iGL7BTlDkrJcYTmgUSb4ywVCc3ZaUtOtC76w==
 
-custom-media-element@~1.4.2, custom-media-element@~1.4.3:
-  version "1.4.3"
-  resolved "https://registry.npmjs.org/custom-media-element/-/custom-media-element-1.4.3.tgz"
-  integrity sha512-6DAQAC9VfpdUEc684Kr1Uvw+49vKUY3+hAQcBrqMNL577PeA8eM8YgpOmbySoTZ517EIqSVFrXH2nu8gqFJS4g==
+custom-media-element@^1.4.4, custom-media-element@~1.4.2, custom-media-element@~1.4.3:
+  version "1.4.4"
+  resolved "https://registry.npmjs.org/custom-media-element/-/custom-media-element-1.4.4.tgz"
+  integrity sha512-y9iMXNeRm0Tt+567KJ/zJZR6UEqbpettWbfGaSpLpGJu6kSak6koMnwCF53a4FlqIdi9iRbsspj9IY266egAfQ==
 
 damerau-levenshtein@^1.0.8:
   version "1.0.8"
@@ -3474,10 +3474,24 @@ hasown@^2.0.2:
   dependencies:
     function-bind "^1.1.2"
 
+hls-video-element@^1.5.3:
+  version "1.5.3"
+  resolved "https://registry.npmjs.org/hls-video-element/-/hls-video-element-1.5.3.tgz"
+  integrity sha512-pBIL3nwUY3iE8gCbB4kuwEsrWsNyYybaX8dXOCWcB2QXc658772feyLFMAVCwj0eaSL5RER0nJnj9pGlPMUT4w==
+  dependencies:
+    custom-media-element "^1.4.4"
+    hls.js "^1.6.2"
+    media-tracks "^0.3.3"
+
 hls.js@*, hls.js@~1.5.11, hls.js@~1.5.19, hls.js@~1.5.20:
   version "1.5.20"
   resolved "https://registry.npmjs.org/hls.js/-/hls.js-1.5.20.tgz"
   integrity sha512-uu0VXUK52JhihhnN/MVVo1lvqNNuhoxkonqgO3IpjvQiGpJBdIXMGkofjQb/j9zvV7a1SW8U9g1FslWx/1HOiQ==
+
+hls.js@^1.6.2:
+  version "1.6.5"
+  resolved "https://registry.npmjs.org/hls.js/-/hls.js-1.6.5.tgz"
+  integrity sha512-KMn5n7JBK+olC342740hDPHnGWfE8FiHtGMOdJPfUjRdARTWj9OB+8c13fnsf9sk1VtpuU2fKSgUjHvg4rNbzQ==
 
 html-encoding-sniffer@^2.0.1:
   version "2.0.1"
@@ -4647,7 +4661,7 @@ media-chrome@~4.9.1:
     "@vercel/edge" "^1.2.1"
     ce-la-react "^0.1.3"
 
-media-tracks@~0.3.3:
+media-tracks@^0.3.3, media-tracks@~0.3.3:
   version "0.3.3"
   resolved "https://registry.npmjs.org/media-tracks/-/media-tracks-0.3.3.tgz"
   integrity sha512-9P2FuUHnZZ3iji+2RQk7Zkh5AmZTnOG5fODACnjhCVveX1McY3jmCRHofIEI+yTBqplz7LXy48c7fQ3Uigp88w==
