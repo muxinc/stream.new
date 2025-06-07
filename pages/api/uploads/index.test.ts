@@ -91,6 +91,33 @@ describe('Uploads API', () => {
     expect(jsonMock).toHaveBeenCalledWith(mockUpload);
   });
 
+  it('should configure generated subtitles correctly', async () => {
+    const mockUpload = {
+      id: 'test-upload-id',
+      url: 'https://test-upload-url.com'
+    };
+    mockCreate.mockResolvedValueOnce(mockUpload);
+
+    await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
+
+    expect(mockCreate).toHaveBeenCalledWith({
+      new_asset_settings: { 
+        playback_policy: ['public'],
+        inputs: [
+          {
+            generated_subtitles: [
+              {
+                language_code: 'en',
+                name: 'English (Auto-generated)'
+              }
+            ]
+          }
+        ]
+      },
+      cors_origin: '*'
+    });
+  });
+
   it('should handle unknown errors', async () => {
     mockCreate.mockRejectedValueOnce(new Error('Unknown error'));
 

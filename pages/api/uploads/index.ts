@@ -10,7 +10,19 @@ export default async (req: NextApiRequest, res: NextApiResponse): Promise<void> 
     case 'POST':
       try {
         const upload = await mux.video.uploads.create({
-          new_asset_settings: { playback_policy: ['public'] },
+          new_asset_settings: { 
+            playback_policy: ['public'],
+            inputs: [
+              {
+                generated_subtitles: [
+                  {
+                    language_code: 'en',
+                    name: 'English (Auto-generated)'
+                  }
+                ]
+              }
+            ]
+          },
           cors_origin: '*'
         });
         res.status(200).json({
