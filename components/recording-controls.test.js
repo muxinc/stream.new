@@ -1,12 +1,7 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { render, screen, fireEvent } from '@testing-library/react';
 import RecordingControls from './recording-controls';
 import { RecordState } from '../types';
-
-// Mock the Button component
-jest.mock('./button', () => ({ children, onClick, disabled, type }) => (
-  <button onClick={onClick} disabled={disabled} type={type}>{children}</button>
-));
 
 describe('RecordingControls', () => {
   const defaultProps = {
@@ -25,24 +20,18 @@ describe('RecordingControls', () => {
   });
 
   it('renders control buttons', () => {
-    const wrapper = shallow(<RecordingControls {...defaultProps} />);
-    // Check for the container div and that component renders
-    expect(wrapper.find('div.container')).toHaveLength(1);
-    expect(wrapper.exists()).toBe(true);
+    render(<RecordingControls {...defaultProps} />);
+    expect(screen.getByRole('button', { name: 'Start recording' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Submit' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Reset' })).toBeInTheDocument();
   });
 
   it('handles start recording', () => {
-    const wrapper = shallow(<RecordingControls {...defaultProps} />);
+    render(<RecordingControls {...defaultProps} />);
     
-    const buttons = wrapper.find('button');
-    const startButton = buttons.findWhere(button => 
-      button.text().includes('Start recording')
-    );
-    
-    if (startButton.exists()) {
-      startButton.simulate('click');
-      expect(defaultProps.startRecording).toHaveBeenCalled();
-    }
+    const startButton = screen.getByRole('button', { name: 'Start recording' });
+    fireEvent.click(startButton);
+    expect(defaultProps.startRecording).toHaveBeenCalled();
   });
 
   it('handles stop recording', () => {
@@ -50,29 +39,19 @@ describe('RecordingControls', () => {
       ...defaultProps,
       recordState: RecordState.RECORDING,
     };
-    const wrapper = shallow(<RecordingControls {...props} />);
+    render(<RecordingControls {...props} />);
     
-    const buttons = wrapper.find('button');
-    const stopButton = buttons.findWhere(button => 
-      button.text().includes('Stop recording')
-    );
-    
-    if (stopButton.exists()) {
-      stopButton.simulate('click');
-      expect(defaultProps.stopRecording).toHaveBeenCalled();
-    }
+    const stopButton = screen.getByRole('button', { name: 'Stop recording' });
+    fireEvent.click(stopButton);
+    expect(defaultProps.stopRecording).toHaveBeenCalled();
   });
 
   it('shows different states based on recording status', () => {
-    const recordingWrapper = shallow(
-      <RecordingControls {...defaultProps} recordState={RecordState.RECORDING} />
-    );
-    const idleWrapper = shallow(
-      <RecordingControls {...defaultProps} recordState={RecordState.IDLE} />
-    );
+    const { rerender } = render(<RecordingControls {...defaultProps} recordState={RecordState.IDLE} />);
+    expect(screen.getByRole('button', { name: 'Start recording' })).toBeInTheDocument();
     
-    expect(recordingWrapper.exists()).toBe(true);
-    expect(idleWrapper.exists()).toBe(true);
+    rerender(<RecordingControls {...defaultProps} recordState={RecordState.RECORDING} />);
+    expect(screen.getByRole('button', { name: 'Stop recording' })).toBeInTheDocument();
   });
 
   it('handles submit when reviewing', () => {
@@ -80,17 +59,11 @@ describe('RecordingControls', () => {
       ...defaultProps,
       isReviewing: true,
     };
-    const wrapper = shallow(<RecordingControls {...props} />);
+    render(<RecordingControls {...props} />);
     
-    const buttons = wrapper.find('button');
-    const submitButton = buttons.findWhere(button => 
-      button.text().includes('Submit')
-    );
-    
-    if (submitButton.exists()) {
-      submitButton.simulate('click');
-      expect(defaultProps.submitRecording).toHaveBeenCalled();
-    }
+    const submitButton = screen.getByRole('button', { name: 'Submit' });
+    fireEvent.click(submitButton);
+    expect(defaultProps.submitRecording).toHaveBeenCalled();
   });
 
   it('shows loading state', () => {
@@ -99,10 +72,9 @@ describe('RecordingControls', () => {
       isLoadingPreview: true,
       isReviewing: true,
     };
-    const wrapper = shallow(<RecordingControls {...props} />);
+    render(<RecordingControls {...props} />);
     
-    // Check that component renders with loading state
-    expect(wrapper.exists()).toBe(true);
-    expect(wrapper.find('div.container')).toHaveLength(1);
+    expect(screen.getByRole('button', { name: 'Loading preview...' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Reset' })).toBeInTheDocument();
   });
 });

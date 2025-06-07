@@ -110,7 +110,7 @@ const PlyrPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoaded
 
   return (
     <>
-      <video ref={metaRef} poster={poster} controls playsInline />
+      <video ref={metaRef} poster={poster} controls playsInline data-testid="plyr-video" />
       <style jsx>{`
         :global(:root) {
           --plyr-color-main: #1b1b1b;

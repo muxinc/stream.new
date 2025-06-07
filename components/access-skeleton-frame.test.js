@@ -1,10 +1,14 @@
-import { shallow } from 'enzyme';
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import AccessSkeletonFrame from './access-skeleton-frame';
-import Button from './button';
 
-test('should render', () => {
+test('should render and handle button click', () => {
   const onClick = jest.fn();
-  const wrapper = shallow(<AccessSkeletonFrame onClick={onClick} />);
-  wrapper.find(Button).simulate('click');
-  expect(onClick.mock.calls.length).toEqual(1);
+  render(<AccessSkeletonFrame onClick={onClick} text="Click me" />);
+  
+  const button = screen.getByRole('button', { name: 'Click me' });
+  expect(button).toBeInTheDocument();
+  
+  fireEvent.click(button);
+  expect(onClick).toHaveBeenCalledTimes(1);
 });

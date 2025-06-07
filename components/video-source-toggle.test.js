@@ -1,5 +1,5 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { render, screen, fireEvent } from '@testing-library/react';
 import VideoSourceToggle from './video-source-toggle';
 
 describe('VideoSourceToggle', () => {
@@ -10,40 +10,36 @@ describe('VideoSourceToggle', () => {
   });
 
   it('renders toggle options', () => {
-    const wrapper = shallow(<VideoSourceToggle activeSource="camera" onChange={mockOnChange} />);
-    expect(wrapper.find('button').length).toBe(2);
+    render(<VideoSourceToggle activeSource="camera" onChange={mockOnChange} />);
+    expect(screen.getByRole('button', { name: 'Camera' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Screenshare' })).toBeInTheDocument();
   });
 
   it('handles source selection', () => {
-    const wrapper = shallow(
-      <VideoSourceToggle activeSource="camera" onChange={mockOnChange} />
-    );
+    render(<VideoSourceToggle activeSource="camera" onChange={mockOnChange} />);
     
-    const cameraButton = wrapper.find('button').first();
-    cameraButton.simulate('click');
+    const cameraButton = screen.getByRole('button', { name: 'Camera' });
+    fireEvent.click(cameraButton);
     expect(mockOnChange).toHaveBeenCalledWith('camera');
   });
 
   it('displays source labels', () => {
-    const wrapper = shallow(<VideoSourceToggle activeSource="camera" onChange={mockOnChange} />);
-    const text = wrapper.text();
-    expect(text).toContain('Camera');
-    expect(text).toContain('Screenshare');
+    render(<VideoSourceToggle activeSource="camera" onChange={mockOnChange} />);
+    expect(screen.getByText('Camera')).toBeInTheDocument();
+    expect(screen.getByText('Screenshare')).toBeInTheDocument();
   });
 
   it('applies selected state correctly', () => {
-    const wrapper = shallow(<VideoSourceToggle activeSource="camera" onChange={mockOnChange} />);
-    const cameraButton = wrapper.find('button').first();
-    expect(cameraButton.hasClass('active')).toBe(true);
+    render(<VideoSourceToggle activeSource="camera" onChange={mockOnChange} />);
+    const cameraButton = screen.getByRole('button', { name: 'Camera' });
+    expect(cameraButton).toHaveClass('active');
   });
 
   it('handles screen source selection', () => {
-    const wrapper = shallow(
-      <VideoSourceToggle activeSource="screen" onChange={mockOnChange} />
-    );
+    render(<VideoSourceToggle activeSource="screen" onChange={mockOnChange} />);
     
-    const screenButton = wrapper.find('button').at(1);
-    screenButton.simulate('click');
+    const screenButton = screen.getByRole('button', { name: 'Screenshare' });
+    fireEvent.click(screenButton);
     expect(mockOnChange).toHaveBeenCalledWith('screen');
   });
 });

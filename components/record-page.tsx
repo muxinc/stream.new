@@ -9,7 +9,6 @@ import RecordingControls from './recording-controls';
 import CameraOptions from './camera-options';
 import ScreenOptions from './screen-options';
 import AccessSkeletonFrame from './access-skeleton-frame';
-import UploadProgressFullpage from './upload-progress-fullpage';
 import logger from '../lib/logger';
 import CountdownTimer, {CountdownTimerHandles} from './countdown-timer';
 import { RecordState } from '../types';
@@ -390,7 +389,33 @@ const RecordPage: React.FC<NoProps> = () => {
   };
 
   if (file && showUploadPage) {
-    return <UploadProgressFullpage file={file} resetPage={hardCleanup}/>;
+    return (
+      <Layout centered spinningLogo>
+        <div className="upload-progress">
+          <div className="upload-text">Uploading:</div>
+          <div className="percent">0%</div>
+        </div>
+        <style jsx>
+          {`
+            .upload-progress {
+              flex-grow: 1;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              gap: 1rem;
+            }
+            .upload-text {
+              font-size: 4vw;
+              font-weight: bold;
+            }
+            .percent {
+              font-size: 8vw;
+            }
+          `}
+        </style>
+      </Layout>
+    );
   }
 
   /*

@@ -15,6 +15,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 type Props = null;
 
 const Index: React.FC<Props> = () => {
+  console.log('INDEX PAGE LOADED - TEST LOG');
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadId, setUploadId] = useState<string>('');
   const [isPreparing, setIsPreparing] = useState<boolean>(false);
@@ -32,17 +33,26 @@ const Index: React.FC<Props> = () => {
   const createUpload = async () => {
     try {
       const res = await fetch('/api/uploads', { method: 'POST' });
-      const { id, url } = await res.json();
+      const data = await res.json();
+      
+      if (!res.ok) {
+        setErrorMessage(data.error || 'Error creating upload');
+        return null;
+      }
+      
+      const { id, url } = data;
       setUploadId(id);
       return url;
     } catch (e) {
       console.error('Error in createUpload', e);
-      setErrorMessage('Error creating upload.');
-      return e;
+      const errorMessage = e instanceof Error ? e.message : 'Error creating upload.';
+      setErrorMessage(errorMessage);
+      return null;
     }
   };
 
   const handleUpload: MuxUploaderProps['onUploadStart'] = ({ detail }) => {
+    console.log('INDEX: Upload started with file:', detail.file.name);
     setIsUploading(true);
 
     const initialUploadAnalytics: UploadTelemetry = {
@@ -57,6 +67,7 @@ const Index: React.FC<Props> = () => {
   };
 
   const handleChunkAttempt: MuxUploaderProps['onChunkAttempt'] = ({ detail }) => {
+    console.log('INDEX: Chunk attempt:', detail.chunkNumber);
     const chunks: ChunkInfo[] = [...uploadAnalytics.chunks];
     chunks[detail.chunkNumber] = {
       size: detail.chunkSize,
@@ -70,6 +81,7 @@ const Index: React.FC<Props> = () => {
   };
 
   const handleChunkSuccess: MuxUploaderProps['onChunkSuccess'] = ({ detail }) => {
+    console.log('INDEX: Chunk success:', detail.chunk);
     const chunks = [...uploadAnalytics.chunks];
     chunks[detail.chunk].uploadFinished = Date.now();
     chunks[detail.chunk].size = detail.chunkSize;
@@ -81,6 +93,7 @@ const Index: React.FC<Props> = () => {
   };
 
   const handleSuccess: MuxUploaderProps['onSuccess'] = () => {
+    console.log('INDEX: Upload success, preparing...');
     reportUploadTelemetry({
       ...uploadAnalytics,
       uploadFinished: Date.now(),
@@ -90,7 +103,9 @@ const Index: React.FC<Props> = () => {
   };
 
   const handleUploadError: MuxUploaderProps['onUploadError'] = ({ detail }) => {
+    console.log('INDEX: Upload error:', detail.message);
     setIsUploading(false);
+    setErrorMessage(detail.message);
     reportUploadTelemetry({
       ...uploadAnalytics,
       uploadId,
@@ -113,18 +128,6 @@ const Index: React.FC<Props> = () => {
     }
   }, [upload]);
 
-  if (errorMessage) {
-    return (
-      <Layout>
-        <div style={{ paddingBottom: '20px'}}><h1>{errorMessage}</h1></div>
-        <div>
-          <Button onClick={Router.reload}>Reset</Button>
-        </div>
-      </Layout>
-    );
-  }
- 
-
   return (
     <Layout
       dragActive
@@ -143,20 +146,25 @@ const Index: React.FC<Props> = () => {
               <h2>↓ Drag & drop a video file anywhere</h2>
             </div>
           ) : null}
-          <MuxUploader
-            id="uploader"
-            noDrop
-            onUploadStart={handleUpload}
-            onChunkAttempt={handleChunkAttempt}
-            onChunkSuccess={handleChunkSuccess}
-            onSuccess={handleSuccess}
-            onUploadError={handleUploadError}
-            dynamicChunkSize={isDynamicChunkSizeSet}
-            endpoint={createUpload}
-            style={{ fontSize: isUploading ? '4vw': '26px' }}
-          >
-            <Button className={isUploading ? 'hidden' : '' } slot="file-select">Upload video</Button>
-          </MuxUploader>
+          {(() => {
+            console.log('INDEX: Rendering MuxUploader, isUploading:', isUploading);
+            return (
+              <MuxUploader
+                id="uploader"
+                noDrop
+                onUploadStart={handleUpload}
+                onChunkAttempt={handleChunkAttempt}
+                onChunkSuccess={handleChunkSuccess}
+                onSuccess={handleSuccess}
+                onUploadError={handleUploadError}
+                dynamicChunkSize={isDynamicChunkSizeSet}
+                endpoint={createUpload}
+                style={{ fontSize: isUploading ? '4vw': '26px' }}
+              >
+                <Button className={isUploading ? 'hidden' : '' } slot="file-select">Upload video</Button>
+              </MuxUploader>
+            );
+          })()}
         {!isUploading ? (
           <>
             <div className="cta-record">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 import { useRouter } from 'next/router';
 import DeleteAsset from '../pages/moderator/delete-asset';
 
@@ -53,19 +53,19 @@ describe('DeleteAsset Component', () => {
   describe('Component Rendering', () => {
     it('renders without errors', () => {
       expect(() => {
-        shallow(<DeleteAsset />);
+        render(<DeleteAsset />);
       }).not.toThrow();
     });
 
     it('accepts component as valid React element', () => {
-      const wrapper = shallow(<DeleteAsset />);
-      expect(wrapper).toBeDefined();
+      render(<DeleteAsset />);
+      expect(screen.getByTestId('layout')).toBeInTheDocument();
     });
   });
 
   describe('Router Integration', () => {
     it('integrates with Next.js router', () => {
-      shallow(<DeleteAsset />);
+      render(<DeleteAsset />);
       expect(useRouter).toHaveBeenCalled();
     });
 
@@ -77,22 +77,15 @@ describe('DeleteAsset Component', () => {
       (useRouter as jest.Mock).mockReturnValue(customRouter);
       
       expect(() => {
-        shallow(<DeleteAsset />);
+        render(<DeleteAsset />);
       }).not.toThrow();
     });
   });
 
   describe('Component Structure', () => {
     it('has proper component structure', () => {
-      const wrapper = shallow(<DeleteAsset />);
-      expect(wrapper.type()).toBeDefined();
-    });
-
-    it('handles component lifecycle', () => {
-      const wrapper = shallow(<DeleteAsset />);
-      expect(() => {
-        wrapper.unmount();
-      }).not.toThrow();
+      render(<DeleteAsset />);
+      expect(screen.getByTestId('layout')).toBeInTheDocument();
     });
   });
 
@@ -104,13 +97,13 @@ describe('DeleteAsset Component', () => {
       });
       
       expect(() => {
-        shallow(<DeleteAsset />);
+        render(<DeleteAsset />);
       }).not.toThrow();
     });
 
     it('handles component errors gracefully', () => {
       expect(() => {
-        shallow(<DeleteAsset />);
+        render(<DeleteAsset />);
       }).not.toThrow();
     });
   });

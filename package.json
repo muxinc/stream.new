@@ -42,7 +42,6 @@
     "yarn": "^1.22.22"
   },
   "devDependencies": {
-    "@cfaester/enzyme-adapter-react-18": "^0.8.0",
     "@stryker-mutator/core": "^9.0.1",
     "@stryker-mutator/jest-runner": "^9.0.1",
     "@stryker-mutator/typescript-checker": "^9.0.1",
@@ -62,7 +61,6 @@
     "babel-eslint": "^10.1.0",
     "babel-jest": "^27.5.1",
     "dotenv": "^8.2.0",
-    "enzyme": "^3.11.0",
     "eslint": "^7.9.0",
     "eslint-plugin-jsx-a11y": "^6.3.1",
     "eslint-plugin-react": "^7.20.6",

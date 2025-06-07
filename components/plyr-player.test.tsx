@@ -1,5 +1,5 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 import PlyrPlayer from './plyr-player';
 
 // Mock dependencies
@@ -12,19 +12,22 @@ jest.mock('plyr', () => {
 
 jest.mock('plyr/dist/plyr.css', () => ({}));
 
-jest.mock('hls.js', () => ({
-  __esModule: true,
-  default: jest.fn().mockImplementation(() => ({
+jest.mock('hls.js', () => {
+  const mockHls = jest.fn().mockImplementation(() => ({
     loadSource: jest.fn(),
     attachMedia: jest.fn(),
     on: jest.fn(),
     destroy: jest.fn(),
-  })),
-  isSupported: jest.fn(() => true),
-  Events: {
+  }));
+  mockHls.isSupported = jest.fn(() => true);
+  mockHls.Events = {
     ERROR: 'hlsError',
-  },
-}));
+  };
+  return {
+    __esModule: true,
+    default: mockHls,
+  };
+});
 
 jest.mock('mux-embed', () => ({
   monitor: jest.fn(),
@@ -71,41 +74,39 @@ describe('PlyrPlayer Component', () => {
 
   describe('Component Rendering', () => {
     it('renders video element with correct attributes', () => {
-      const wrapper = shallow(<PlyrPlayer {...defaultProps} />);
-      const video = wrapper.find('video');
+      render(<PlyrPlayer {...defaultProps} />);
+      const video = screen.getByTestId('plyr-video');
       
-      expect(video).toHaveLength(1);
-      expect(video.prop('poster')).toBe(defaultProps.poster);
-      expect(video.prop('controls')).toBe(true);
-      expect(video.prop('playsInline')).toBe(true);
+      expect(video).toBeInTheDocument();
+      expect(video).toHaveAttribute('poster', defaultProps.poster);
+      expect(video).toHaveAttribute('controls');
+      expect(video).toHaveAttribute('playsInline');
     });
 
     it('includes styled-jsx styling', () => {
-      const wrapper = shallow(<PlyrPlayer {...defaultProps} />);
-      
-      // Styled-jsx is not processed in test environment, so we check component structure instead
-      expect(wrapper.type()).toBe(React.Fragment);
+      render(<PlyrPlayer {...defaultProps} />);
+      expect(screen.getByTestId('plyr-video')).toBeInTheDocument();
     });
   });
 
   describe('Props Handling', () => {
     it('accepts all required props', () => {
       expect(() => {
-        shallow(<PlyrPlayer {...defaultProps} />);
+        render(<PlyrPlayer {...defaultProps} />);
       }).not.toThrow();
     });
 
     it('handles optional aspectRatio prop', () => {
       const customRatio = 4/3;
-      const wrapper = shallow(<PlyrPlayer {...defaultProps} aspectRatio={customRatio} />);
+      render(<PlyrPlayer {...defaultProps} aspectRatio={customRatio} />);
       
-      expect(wrapper.find('video')).toHaveLength(1);
+      expect(screen.getByTestId('plyr-video')).toBeInTheDocument();
     });
 
     it('handles optional currentTime prop', () => {
-      const wrapper = shallow(<PlyrPlayer {...defaultProps} currentTime={45} />);
+      render(<PlyrPlayer {...defaultProps} currentTime={45} />);
       
-      expect(wrapper.find('video')).toHaveLength(1);
+      expect(screen.getByTestId('plyr-video')).toBeInTheDocument();
     });
 
     it('handles missing optional props gracefully', () => {
@@ -118,27 +119,25 @@ describe('PlyrPlayer Component', () => {
       };
       
       expect(() => {
-        shallow(<PlyrPlayer {...minimalProps} />);
+        render(<PlyrPlayer {...minimalProps} />);
       }).not.toThrow();
     });
   });
 
   describe('Component Structure', () => {
-    it('renders fragment with video and style elements', () => {
-      const wrapper = shallow(<PlyrPlayer {...defaultProps} />);
+    it('renders video element', () => {
+      render(<PlyrPlayer {...defaultProps} />);
       
-      expect(wrapper.type()).toBe(React.Fragment);
-      expect(wrapper.find('video')).toHaveLength(1);
-      // Style elements are not rendered in test environment with styled-jsx
+      expect(screen.getByTestId('plyr-video')).toBeInTheDocument();
     });
 
     it('applies correct video attributes', () => {
-      const wrapper = shallow(<PlyrPlayer {...defaultProps} />);
-      const video = wrapper.find('video');
+      render(<PlyrPlayer {...defaultProps} />);
+      const video = screen.getByTestId('plyr-video');
       
-      expect(video.prop('poster')).toBe(defaultProps.poster);
-      expect(video.prop('controls')).toBe(true);
-      expect(video.prop('playsInline')).toBe(true);
+      expect(video).toHaveAttribute('poster', defaultProps.poster);
+      expect(video).toHaveAttribute('controls');
+      expect(video).toHaveAttribute('playsInline');
     });
   });
 
@@ -146,7 +145,7 @@ describe('PlyrPlayer Component', () => {
     it('uses URL utility functions', () => {
       const { getStreamBaseUrl, getImageBaseUrl } = require('../lib/urlutils');
       
-      shallow(<PlyrPlayer {...defaultProps} />);
+      render(<PlyrPlayer {...defaultProps} />);
       
       // The component should use these utilities when setting up Plyr and HLS
       expect(getStreamBaseUrl).toBeDefined();
@@ -165,7 +164,7 @@ describe('PlyrPlayer Component', () => {
       const mockOnError = jest.fn();
       
       expect(() => {
-        shallow(<PlyrPlayer {...defaultProps} onError={mockOnError} />);
+        render(<PlyrPlayer {...defaultProps} onError={mockOnError} />);
       }).not.toThrow();
     });
 
@@ -173,7 +172,7 @@ describe('PlyrPlayer Component', () => {
       const mockOnLoaded = jest.fn();
       
       expect(() => {
-        shallow(<PlyrPlayer {...defaultProps} onLoaded={mockOnLoaded} />);
+        render(<PlyrPlayer {...defaultProps} onLoaded={mockOnLoaded} />);
       }).not.toThrow();
     });
   });
@@ -183,7 +182,7 @@ describe('PlyrPlayer Component', () => {
       const testRef = React.createRef();
       
       expect(() => {
-        shallow(<PlyrPlayer {...defaultProps} forwardedRef={testRef} />);
+        render(<PlyrPlayer {...defaultProps} forwardedRef={testRef} />);
       }).not.toThrow();
     });
   });

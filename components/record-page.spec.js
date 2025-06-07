@@ -1,15 +1,39 @@
-import { shallow } from 'enzyme';
+import React from 'react';
+import { render, screen } from '@testing-library/react';
 import RecordPage from './record-page';
-import VideoSourceToggle from './video-source-toggle';
-import StopWatch from './stop-watch';
+
+// Mock Next.js router
+jest.mock('next/router', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    query: {},
+    pathname: '/',
+    route: '/',
+    asPath: '/',
+  }),
+}));
+
+// Mock complex dependencies
+jest.mock('./video-source-toggle', () => {
+  return function MockVideoSourceToggle({ activeSource, onChange }) {
+    return <div data-testid="video-source-toggle">Video Source Toggle</div>;
+  };
+});
+
+jest.mock('./stop-watch', () => {
+  return function MockStopWatch({ startTimeUnixMs }) {
+    return <div data-testid="stop-watch">Stop Watch</div>;
+  };
+});
 
 test('should render with a video source toggle component', () => {
-  const wrapper = shallow(<RecordPage />);
-  expect(wrapper.find(VideoSourceToggle).length).toEqual(1);
+  render(<RecordPage />);
+  expect(screen.getByTestId('video-source-toggle')).toBeInTheDocument();
 });
 
 test('should render basic structure', () => {
-  const wrapper = shallow(<RecordPage />);
+  render(<RecordPage />);
   // Just test that the component renders without crashing
-  expect(wrapper.find('h1').length).toBeGreaterThan(0);
+  const headings = screen.getAllByRole('heading');
+  expect(headings.length).toBeGreaterThan(0);
 });
