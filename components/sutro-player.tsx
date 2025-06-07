@@ -32,6 +32,15 @@ const SutroPlayer: React.FC<Props> = ({
 }) => {
   useEffect(() => {
     onLoaded();
+    
+    // Cleanup function to handle component unmounting
+    return () => {
+      try {
+        // Any cleanup if needed for HLS video element
+      } catch (error) {
+        console.warn('Sutro player cleanup error:', error);
+      }
+    };
   }, []);
 
   const handleError = (event: React.SyntheticEvent<HTMLVideoElement, Event>) => {
@@ -48,8 +57,22 @@ const SutroPlayer: React.FC<Props> = ({
   };
 
   return (
-    <div style={{ width: '100%', aspectRatio: `${aspectRatio}` }}>
-      <MediaThemeSutro style={{ width: '100%', height: '100%' }}>
+    <div style={{ 
+      aspectRatio: `${aspectRatio}`,
+      maxWidth: '100%',
+      maxHeight: '100%', 
+      width: 'auto',
+      height: '100%',
+      display: 'block',
+      marginLeft: 'auto',
+      marginRight: 'auto'
+    }}>
+      <MediaThemeSutro style={{ 
+        width: '100%', 
+        height: '100%',
+        maxWidth: '100%',
+        maxHeight: '100%'
+      }}>
         <HlsVideo
           slot="media"
           src={`${getStreamBaseUrl()}/${playbackId}.m3u8`}

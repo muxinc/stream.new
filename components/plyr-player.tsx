@@ -89,14 +89,19 @@ const PlyrPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoaded
     }
 
     return () => {
-      if (video) {
-        video.removeEventListener('error', videoError);
-      }
-      if (hls) {
-        hls.destroy();
-      }
-      if (playerRef.current) {
-        playerRef.current.destroy();
+      try {
+        if (video) {
+          video.removeEventListener('error', videoError);
+        }
+        if (hls) {
+          hls.destroy();
+        }
+        if (playerRef.current) {
+          playerRef.current.destroy();
+        }
+      } catch (error) {
+        // Silently handle cleanup errors that can occur during rapid navigation
+        console.warn('Player cleanup error:', error);
       }
     };
   }, [playbackId, videoRef]);

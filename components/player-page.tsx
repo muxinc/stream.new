@@ -7,7 +7,14 @@ import FullpageLoader from './fullpage-loader';
 import PlayerLoader from './player-loader';
 import Layout from './layout';
 import ReportForm from './report-form';
-import { HOST_URL, VALID_PLAYER_TYPES } from '../constants';
+import { 
+  HOST_URL, 
+  VALID_PLAYER_TYPES,
+  PLYR_TYPE,
+  MUX_PLAYER_TYPE,
+  SUTRO_PLAYER_TYPE,
+  WINAMP_PLAYER_TYPE
+} from '../constants';
 import type { PlayerTypes } from '../constants';
 import logger from '../lib/logger';
 import { Props } from '../lib/player-page-utils';
@@ -24,6 +31,7 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
   const [errorMessage, setErrorMessage] = useState('');
   const [isCopied, setIsCopied] = useState(false);
   const [openReport, setOpenReport] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const copyTimeoutRef = useRef<number | null>(null);
   const router = useRouter();
 
@@ -69,6 +77,40 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
   const playerEmbedUrl = useMemo(() => {
     return `${HOST_URL}/v/${playbackId}/embed`;
   }, [playbackId]);
+
+  const playerOptions = [
+    { 
+      type: MUX_PLAYER_TYPE, 
+      name: 'Mux Player (default)', 
+      path: `/v/${playbackId}` 
+    },
+    { 
+      type: SUTRO_PLAYER_TYPE, 
+      name: 'Sutro', 
+      path: `/v/${playbackId}/sutro` 
+    },
+    { 
+      type: PLYR_TYPE, 
+      name: 'Plyr', 
+      path: `/v/${playbackId}/plyr` 
+    },
+    { 
+      type: WINAMP_PLAYER_TYPE, 
+      name: 'Winamp', 
+      path: `/v/${playbackId}/winamp` 
+    },
+  ];
+
+  const switchPlayer = (path: string) => {
+    // Preserve query parameters when switching players
+    const queryParams = new URLSearchParams();
+    if (router.query.time) queryParams.set('time', router.query.time as string);
+    if (router.query.color) queryParams.set('color', router.query.color as string);
+    
+    const queryString = queryParams.toString();
+    const newPath = `${path}${queryString ? `?${queryString}` : ''}`;
+    router.push(newPath);
+  };
 
   if (router.isFallback || !router.isReady) {
     return (
@@ -145,6 +187,7 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
         <div className="wrapper">
           {(tryToLoadPlayer && aspectRatio && !openReport) && (
             <PlayerLoader
+              key={`${playbackId}-${playerType || 'default'}`}
               blurDataURL={blurDataURL}
               color={color}
               playbackId={playbackId}
@@ -169,6 +212,17 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
             )}
             {!openReport && (
               <a
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                onKeyPress={() => setShowAdvanced(!showAdvanced)}
+                role="button"
+                tabIndex={0}
+                className="advanced"
+              >
+                Advanced
+              </a>
+            )}
+            {!openReport && (
+              <a
                 onClick={() => setOpenReport(!openReport)}
                 onKeyPress={() => setOpenReport(!openReport)}
                 role="button"
@@ -178,6 +232,33 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
                 {openReport ? 'Back' : 'Report abuse'}
               </a>
             )}
+            <div className="advanced-panel">
+              {showAdvanced && !openReport && (
+                <div className="advanced-options">
+                  <div className="player-selection">
+                    <span className="label">Player: </span>
+                    {playerOptions.map((option, index) => (
+                      <span key={option.type}>
+                        {option.type === playerType || (option.type === MUX_PLAYER_TYPE && !playerType) ? (
+                          <span className="current-player">{option.name}</span>
+                        ) : (
+                          <a
+                            onClick={() => switchPlayer(option.path)}
+                            onKeyPress={() => switchPlayer(option.path)}
+                            role="button"
+                            tabIndex={0}
+                            className="player-link"
+                          >
+                            {option.name}
+                          </a>
+                        )}
+                        {index < playerOptions.length - 1 && <span className="separator"> • </span>}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
           <div className="report-form">
             {openReport && (
@@ -193,10 +274,45 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
             .actions {
               display: flex;
               justify-content: center;
+              position: relative;
             }
             .actions a {
               padding-left: 15px;
               padding-right: 15px;
+            }
+            .advanced-options {
+              background: rgba(255, 255, 255, 0.05);
+              border-radius: 8px;
+              padding: 20px;
+              border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .player-selection {
+              display: flex;
+              flex-wrap: wrap;
+              align-items: center;
+              gap: 8px;
+            }
+            .label {
+              font-weight: bold;
+              color: #fff;
+              margin-right: 10px;
+            }
+            .current-player {
+              color: #fff;
+              font-weight: bold;
+              text-decoration: underline;
+            }
+            .player-link {
+              color: #ccc;
+              cursor: pointer;
+              text-decoration: none;
+            }
+            .player-link:hover {
+              color: #fff;
+              text-decoration: underline;
+            }
+            .separator {
+              color: #666;
             }
             .report-form {
               margin: 20px auto auto;
@@ -207,6 +323,25 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
               flex-direction: column;
               height: 100%;
               justify-content: center;
+            }
+            .advanced-panel {
+              position: absolute;
+              top: 100%;
+              left: 50%;
+              transform: translateX(-50%);
+              z-index: 10;
+              margin: 20px auto 0;
+              max-width: 800px;
+              width: 100%;
+            }
+            @media (max-width: 600px) {
+              .player-selection {
+                flex-direction: column;
+                align-items: flex-start;
+              }
+              .label {
+                margin-bottom: 10px;
+              }
             }
           `}
         </style>
