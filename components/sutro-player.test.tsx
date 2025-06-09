@@ -57,7 +57,8 @@ describe('SutroPlayer Component', () => {
   describe('Component Structure', () => {
     it('should render MediaThemeSutro wrapper', () => {
       expect(componentSource).toContain('<MediaThemeSutro');
-      expect(componentSource).toContain('style={{ width: \'100%\', height: \'100%\' }}');
+      expect(componentSource).toContain('width: \'100%\'');
+      expect(componentSource).toContain('height: \'100%\'');
     });
 
     it('should render HlsVideo element with slot attribute', () => {

@@ -32,6 +32,9 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
   const [isCopied, setIsCopied] = useState(false);
   const [openReport, setOpenReport] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showMetadata, setShowMetadata] = useState(false);
+  const [metadataLoading, setMetadataLoading] = useState(false);
+  const [metadata, setMetadata] = useState<any>(null);
   const copyTimeoutRef = useRef<number | null>(null);
   const router = useRouter();
 
@@ -149,6 +152,55 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
     }, 5000);
   };
 
+  const fetchMetadata = async () => {
+    if (metadata || metadataLoading) return;
+    
+    setMetadataLoading(true);
+    try {
+      // Try to get asset data using the playback ID
+      const response = await fetch(`/api/assets/by-playback-id/${playbackId}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setMetadata(data);
+      } else {
+        // If we can't get the full data, show what we have available client-side
+        setMetadata({
+          playback_id: playbackId,
+          poster: poster,
+          share_url: shareUrl,
+          aspect_ratio: aspectRatio,
+          video_exists: videoExists,
+          player_type: playerType || 'mux-player',
+          blur_data_url: blurDataURL,
+          current_url: window.location.href,
+          note: 'Full asset metadata requires API access. This shows client-side data only.'
+        });
+      }
+    } catch (error) {
+      logger.error('Error fetching metadata:', error);
+      // Show what data we have available
+      setMetadata({
+        playback_id: playbackId,
+        poster: poster,
+        share_url: shareUrl,
+        aspect_ratio: aspectRatio,
+        video_exists: videoExists,
+        player_type: playerType || 'mux-player',
+        error: 'Could not fetch asset metadata'
+      });
+    } finally {
+      setMetadataLoading(false);
+    }
+  };
+
+  const toggleMetadata = () => {
+    setShowMetadata(!showMetadata);
+    if (!showMetadata && !metadata) {
+      fetchMetadata();
+    }
+  };
+
   if (errorMessage) {
     return (
       <Layout darkMode >
@@ -180,60 +232,64 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
         image={poster}
         playerEmbedUrl={playerEmbedUrl}
         aspectRatio={aspectRatio}
-        centered={showLoading}
+        centered
         darkMode
       >
         {showLoading && !tryToLoadPlayer && <FullpageLoader text="Loading player" />}
         <div className="wrapper">
-          {(tryToLoadPlayer && aspectRatio && !openReport) && (
-            <PlayerLoader
-              key={`${playbackId}-${playerType || 'default'}`}
-              blurDataURL={blurDataURL}
-              color={color}
-              playbackId={playbackId}
-              poster={poster}
-              currentTime={startTime}
-              aspectRatio={aspectRatio}
-              onLoaded={() => setIsLoaded(true)}
-              onError={onError}
-              playerType={playerType}
-            />
-          )}
-          <div className="actions">
-            {!openReport && (
-              <a
-                onClick={copyUrl}
-                onKeyPress={copyUrl}
-                role="button"
-                tabIndex={0}
-              >
-                {isCopied ? 'Copied to clipboard' : 'Copy video URL'}
-              </a>
-            )}
-            {!openReport && (
-              <a
-                onClick={() => setShowAdvanced(!showAdvanced)}
-                onKeyPress={() => setShowAdvanced(!showAdvanced)}
-                role="button"
-                tabIndex={0}
-                className="advanced"
-              >
-                Advanced
-              </a>
-            )}
-            {!openReport && (
-              <a
-                onClick={() => setOpenReport(!openReport)}
-                onKeyPress={() => setOpenReport(!openReport)}
-                role="button"
-                tabIndex={0}
-                className="report"
-              >
-                {openReport ? 'Back' : 'Report abuse'}
-              </a>
-            )}
-            <div className="advanced-panel">
-              {showAdvanced && !openReport && (
+          <div className="content-container">
+            <div className="player-section">
+              {(tryToLoadPlayer && aspectRatio && !openReport) && (
+                <PlayerLoader
+                  key={`${playbackId}-${playerType || 'default'}`}
+                  blurDataURL={blurDataURL}
+                  color={color}
+                  playbackId={playbackId}
+                  poster={poster}
+                  currentTime={startTime}
+                  aspectRatio={aspectRatio}
+                  onLoaded={() => setIsLoaded(true)}
+                  onError={onError}
+                  playerType={playerType}
+                />
+              )}
+              <div className="actions">
+                {!openReport && (
+                  <a
+                    onClick={copyUrl}
+                    onKeyPress={copyUrl}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    {isCopied ? 'Copied to clipboard' : 'Copy video URL'}
+                  </a>
+                )}
+                {!openReport && (
+                  <a
+                    onClick={() => setShowAdvanced(!showAdvanced)}
+                    onKeyPress={() => setShowAdvanced(!showAdvanced)}
+                    role="button"
+                    tabIndex={0}
+                    className="advanced"
+                  >
+                    Advanced
+                  </a>
+                )}
+                {!openReport && (
+                  <a
+                    onClick={() => setOpenReport(!openReport)}
+                    onKeyPress={() => setOpenReport(!openReport)}
+                    role="button"
+                    tabIndex={0}
+                    className="report"
+                  >
+                    {openReport ? 'Back' : 'Report abuse'}
+                  </a>
+                )}
+              </div>
+            </div>
+            {showAdvanced && !openReport && (
+              <div className="advanced-panel">
                 <div className="advanced-options">
                   <div className="player-selection">
                     <span className="label">Player: </span>
@@ -256,9 +312,29 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
                       </span>
                     ))}
                   </div>
+                  <div className="metadata-toggle">
+                    <a
+                      onClick={toggleMetadata}
+                      onKeyPress={toggleMetadata}
+                      role="button"
+                      tabIndex={0}
+                      className="metadata-link"
+                    >
+                      {showMetadata ? 'Hide Metadata' : 'Show Metadata'}
+                    </a>
+                  </div>
+                  {showMetadata && (
+                    <div className="metadata-panel">
+                      {metadataLoading ? (
+                        <div className="metadata-loading">Loading metadata...</div>
+                      ) : metadata ? (
+                        <pre className="metadata-content">{JSON.stringify(metadata, null, 2)}</pre>
+                      ) : null}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
           <div className="report-form">
             {openReport && (
@@ -274,7 +350,6 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
             .actions {
               display: flex;
               justify-content: center;
-              position: relative;
             }
             .actions a {
               padding-left: 15px;
@@ -314,6 +389,44 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
             .separator {
               color: #666;
             }
+            .metadata-toggle {
+              margin-top: 15px;
+              padding-top: 15px;
+              border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .metadata-link {
+              color: #ccc;
+              cursor: pointer;
+              text-decoration: none;
+            }
+            .metadata-link:hover {
+              color: #fff;
+              text-decoration: underline;
+            }
+            .metadata-panel {
+              margin-top: 15px;
+              padding-top: 15px;
+              border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .metadata-loading {
+              color: #ccc;
+              font-style: italic;
+            }
+            .metadata-content {
+              background: rgba(0, 0, 0, 0.4);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              border-radius: 4px;
+              padding: 15px;
+              overflow-x: auto;
+              color: #ccc;
+              font-family: monospace;
+              font-size: 12px;
+              line-height: 1.5;
+              white-space: pre-wrap;
+              word-wrap: break-word;
+              max-height: 400px;
+              overflow-y: auto;
+            }
             .report-form {
               margin: 20px auto auto;
               max-width: 800px;
@@ -321,18 +434,42 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
             .wrapper {
               display: flex;
               flex-direction: column;
-              height: 100%;
+              align-items: center;
               justify-content: center;
+              flex-grow: 1;
+              width: 100%;
+              padding: 20px;
+            }
+            .content-container {
+              display: flex;
+              gap: 40px;
+              align-items: center;
+              justify-content: center;
+              width: 100%;
+              margin: 0 auto;
+            }
+            .player-section {
+              flex: 0 1 auto;
+              display: flex;
+              flex-direction: column;
+              max-width: min(90vw, calc(100vh - 200px) * 1.78);
+              width: 100%;
             }
             .advanced-panel {
-              position: absolute;
-              top: 100%;
-              left: 50%;
-              transform: translateX(-50%);
-              z-index: 10;
-              margin: 20px auto 0;
-              max-width: 800px;
-              width: 100%;
+              flex: 0 0 300px;
+              margin-top: 40px;
+            }
+            @media (max-width: 900px) {
+              .content-container {
+                flex-direction: column;
+                align-items: center;
+              }
+              .advanced-panel {
+                flex: 0 0 auto;
+                width: 100%;
+                max-width: 800px;
+                margin-top: 20px;
+              }
             }
             @media (max-width: 600px) {
               .player-selection {

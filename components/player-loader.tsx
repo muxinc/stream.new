@@ -49,9 +49,6 @@ const PlayerLoader = forwardRef<PlayerElement, Props>(({ playbackId, poster, cur
           margin-bottom: 40px;
           margin-top: 40px;
           border-radius: 30px;
-          height: 0;
-          flex-shrink: 1;
-          flex-grow: 1;
         }
       `}
       </style>
