@@ -239,20 +239,35 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
         <div className="wrapper">
           <div className="content-container">
             <div className="player-section">
-              {(tryToLoadPlayer && aspectRatio && !openReport) && (
-                <PlayerLoader
-                  key={`${playbackId}-${playerType || 'default'}`}
-                  blurDataURL={blurDataURL}
-                  color={color}
-                  playbackId={playbackId}
-                  poster={poster}
-                  currentTime={startTime}
-                  aspectRatio={aspectRatio}
-                  onLoaded={() => setIsLoaded(true)}
-                  onError={onError}
-                  playerType={playerType}
-                />
-              )}
+              <div className="player-wrapper">
+                {!openReport && (
+                  <div className="advanced-link-container">
+                    <a
+                      onClick={() => setShowAdvanced(!showAdvanced)}
+                      onKeyPress={() => setShowAdvanced(!showAdvanced)}
+                      role="button"
+                      tabIndex={0}
+                      className="advanced-link"
+                    >
+                      Advanced
+                    </a>
+                  </div>
+                )}
+                {(tryToLoadPlayer && aspectRatio && !openReport) && (
+                  <PlayerLoader
+                    key={`${playbackId}-${playerType || 'default'}`}
+                    blurDataURL={blurDataURL}
+                    color={color}
+                    playbackId={playbackId}
+                    poster={poster}
+                    currentTime={startTime}
+                    aspectRatio={aspectRatio}
+                    onLoaded={() => setIsLoaded(true)}
+                    onError={onError}
+                    playerType={playerType}
+                  />
+                )}
+              </div>
               <div className="actions">
                 {!openReport && (
                   <a
@@ -262,17 +277,6 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
                     tabIndex={0}
                   >
                     {isCopied ? 'Copied to clipboard' : 'Copy video URL'}
-                  </a>
-                )}
-                {!openReport && (
-                  <a
-                    onClick={() => setShowAdvanced(!showAdvanced)}
-                    onKeyPress={() => setShowAdvanced(!showAdvanced)}
-                    role="button"
-                    tabIndex={0}
-                    className="advanced"
-                  >
-                    Advanced
                   </a>
                 )}
                 {!openReport && (
@@ -443,7 +447,7 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
             .content-container {
               display: flex;
               gap: 40px;
-              align-items: center;
+              align-items: flex-start;
               justify-content: center;
               width: 100%;
               margin: 0 auto;
@@ -454,6 +458,30 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
               flex-direction: column;
               max-width: min(90vw, calc(100vh - 200px) * 1.78);
               width: 100%;
+            }
+            .player-wrapper {
+              position: relative;
+              width: 100%;
+            }
+            .advanced-link-container {
+              position: absolute;
+              top: -30px;
+              right: 0;
+              z-index: 10;
+            }
+            .advanced-link {
+              color: #ccc;
+              cursor: pointer;
+              text-decoration: none;
+              font-size: 14px;
+              padding: 5px 10px;
+              background: rgba(0, 0, 0, 0.6);
+              border-radius: 4px;
+              transition: all 0.2s ease;
+            }
+            .advanced-link:hover {
+              color: #fff;
+              background: rgba(0, 0, 0, 0.8);
             }
             .advanced-panel {
               flex: 0 0 300px;
