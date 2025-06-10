@@ -36,6 +36,8 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
   const [metadataLoading, setMetadataLoading] = useState(false);
   const [metadata, setMetadata] = useState<any>(null);
   const [isMetadataCopied, setIsMetadataCopied] = useState(false);
+  const [viewCount, setViewCount] = useState<number | null>(null);
+  const [viewCountLoading, setViewCountLoading] = useState(false);
   const copyTimeoutRef = useRef<number | null>(null);
   const metadataCopyTimeoutRef = useRef<number | null>(null);
   const router = useRouter();
@@ -64,6 +66,30 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
       setErrorMessage(`Don't know how to load the player called: ${playerType}`);
     }
   }, [playerType]);
+
+  useEffect(() => {
+    if (showAdvanced) {
+      fetchViewCount();
+    }
+  }, [showAdvanced, playbackId]);
+
+  const fetchViewCount = async () => {
+    if (!playbackId) return;
+    
+    console.log('Fetching view count for playback ID:', playbackId);
+    setViewCountLoading(true);
+    try {
+      const response = await fetch(`/api/views/${playbackId}`);
+      const data = await response.json();
+      console.log('View count API response:', data);
+      setViewCount(typeof data.views === 'number' ? data.views : null);
+    } catch (error) {
+      console.error('Error fetching view count:', error);
+      setViewCount(null);
+    } finally {
+      setViewCountLoading(false);
+    }
+  };
 
   const color = useMemo(() => {
     if (router.query?.color) {
@@ -330,6 +356,16 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
                       </span>
                     ))}
                   </div>
+                  <div className="view-count">
+                    <span className="label">Views (7d): </span>
+                    {viewCountLoading ? (
+                      <span className="loading">Loading...</span>
+                    ) : typeof viewCount === 'number' ? (
+                      <span className="count">{viewCount.toLocaleString()}</span>
+                    ) : (
+                      <span className="error">No data</span>
+                    )}
+                  </div>
                   <div className="metadata-toggle">
                     <a
                       onClick={toggleMetadata}
@@ -555,6 +591,25 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
             .advanced-panel {
               flex: 0 0 300px;
               margin-top: 40px;
+            }
+            .view-count {
+              margin-top: 15px;
+              padding-top: 15px;
+              border-top: 1px solid rgba(255, 255, 255, 0.1);
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            }
+            .view-count .loading {
+              color: #ccc;
+              font-style: italic;
+            }
+            .view-count .count {
+              color: #fff;
+              font-weight: bold;
+            }
+            .view-count .error {
+              color: #ff6b6b;
             }
             @media (max-width: 900px) {
               .content-container {
