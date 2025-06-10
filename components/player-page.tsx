@@ -35,12 +35,15 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
   const [showMetadata, setShowMetadata] = useState(false);
   const [metadataLoading, setMetadataLoading] = useState(false);
   const [metadata, setMetadata] = useState<any>(null);
+  const [isMetadataCopied, setIsMetadataCopied] = useState(false);
   const copyTimeoutRef = useRef<number | null>(null);
+  const metadataCopyTimeoutRef = useRef<number | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     return () => {
       if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+      if (metadataCopyTimeoutRef.current) clearTimeout(metadataCopyTimeoutRef.current);
     };
   }, []);
 
@@ -201,6 +204,17 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
     }
   };
 
+  const copyMetadata = () => {
+    if (metadata) {
+      copy(JSON.stringify(metadata, null, 2));
+      setIsMetadataCopied(true);
+      metadataCopyTimeoutRef.current = window.setTimeout(() => {
+        setIsMetadataCopied(false);
+        metadataCopyTimeoutRef.current = null;
+      }, 2000);
+    }
+  };
+
   if (errorMessage) {
     return (
       <Layout darkMode >
@@ -326,6 +340,35 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
                     >
                       {showMetadata ? 'Hide Metadata' : 'Show Metadata'}
                     </a>
+                    {showMetadata && metadata && (
+                      <a
+                        onClick={copyMetadata}
+                        onKeyPress={copyMetadata}
+                        role="button"
+                        tabIndex={0}
+                        className="copy-metadata-link"
+                        title="Copy"
+                      >
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="copy-icon"
+                        >
+                          <path
+                            d="M10.5 1.5H3.5C2.67157 1.5 2 2.17157 2 3V11H3.5V3H10.5V1.5Z"
+                            fill="currentColor"
+                          />
+                          <path
+                            d="M12.5 4.5H6.5C5.67157 4.5 5 5.17157 5 6V13C5 13.8284 5.67157 14.5 6.5 14.5H12.5C13.3284 14.5 14 13.8284 14 13V6C14 5.17157 13.3284 4.5 12.5 4.5ZM12.5 13H6.5V6H12.5V13Z"
+                            fill="currentColor"
+                          />
+                        </svg>
+                        {isMetadataCopied && <span className="copy-success">Copied!</span>}
+                      </a>
+                    )}
                   </div>
                   {showMetadata && (
                     <div className="metadata-panel">
@@ -397,6 +440,9 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
               margin-top: 15px;
               padding-top: 15px;
               border-top: 1px solid rgba(255, 255, 255, 0.1);
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
             }
             .metadata-link {
               color: #ccc;
@@ -411,6 +457,29 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
               margin-top: 15px;
               padding-top: 15px;
               border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .copy-metadata-link {
+              display: inline-flex;
+              align-items: center;
+              gap: 8px;
+              color: #ccc;
+              cursor: pointer;
+              padding: 4px 8px;
+              border-radius: 4px;
+              transition: all 0.2s ease;
+            }
+            .copy-metadata-link:hover {
+              color: #fff;
+              background: rgba(255, 255, 255, 0.1);
+            }
+            .copy-icon {
+              width: 16px;
+              height: 16px;
+              flex-shrink: 0;
+            }
+            .copy-success {
+              font-size: 12px;
+              color: #4ade80;
             }
             .metadata-loading {
               color: #ccc;
