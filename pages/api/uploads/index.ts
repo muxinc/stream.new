@@ -10,7 +10,14 @@ export default async (req: NextApiRequest, res: NextApiResponse): Promise<void> 
     case 'POST':
       try {
         const upload = await mux.video.uploads.create({
-          new_asset_settings: { playback_policy: ['public'] },
+          new_asset_settings: { 
+            playback_policy: ['public'],
+            static_renditions: [
+              {
+                resolution: 'audio-only'
+              }
+            ]
+          },
           cors_origin: '*'
         });
         res.json({
