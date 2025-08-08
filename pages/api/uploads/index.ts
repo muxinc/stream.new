@@ -12,6 +12,7 @@ export default async (req: NextApiRequest, res: NextApiResponse): Promise<void> 
         const upload = await mux.video.uploads.create({
           new_asset_settings: { 
             playback_policy: ['public'],
+            video_quality: 'basic',
             static_renditions: [
               {
                 resolution: 'audio-only'
