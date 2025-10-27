@@ -47,7 +47,7 @@ const MuxPlayerInternal: React.FC<Props> = ({
         ref={forwardedRef}
         beaconCollectionDomain={MUX_DATA_CUSTOM_DOMAIN}
         playbackId={playbackId}
-        onError={(err) => onError(err as ErrorEvent)}
+        onError={(err) => onError(err as unknown as ErrorEvent)}
         poster={poster}
         startTime={currentTime}
         envKey={process.env.NEXT_PUBLIC_MUX_ENV_KEY}

@@ -12,7 +12,7 @@ import Script from 'next/script';
  * Lucky for us, next/dynamic will handle the code splitting and not load code for components
  * that we don't end up using.
  */
-const PlyrPlayer = dynamic(() => import('./plyr-player'));
+const PlyrPlayer = dynamic(() => import('./plyr-player'), { ssr: false });
 const MuxPlayer = dynamic(() => import('./mux-player'));
 const MuxPlayerClassic = dynamic(() => import('./mux-player-classic'));
 const MuxVideo = dynamic(() => import('./mux-video'));
