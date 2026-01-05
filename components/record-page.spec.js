@@ -1,11 +1,14 @@
 import { render, screen } from '@testing-library/react';
 import RecordPage from './record-page';
 
-// Mock Next.js router
-jest.mock('next/router', () => ({
+// Mock Next.js App Router navigation
+jest.mock('next/navigation', () => ({
   useRouter: () => ({
-    query: { source: 'camera' },
     push: jest.fn(),
+    refresh: jest.fn(),
+  }),
+  useSearchParams: () => ({
+    get: jest.fn(() => 'camera'), // Default to camera source
   }),
 }));
 
