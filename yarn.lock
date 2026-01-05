@@ -4684,6 +4684,13 @@ media-chrome@~4.16.1:
   dependencies:
     ce-la-react "^0.3.2"
 
+media-chrome@~4.17.2:
+  version "4.17.2"
+  resolved "https://registry.yarnpkg.com/media-chrome/-/media-chrome-4.17.2.tgz#00830ea85ecb79b6c12bcf47c82c25ff1c04ed20"
+  integrity sha512-o/IgiHx0tdSVwRxxqF5H12FK31A/A8T71sv3KdAvh7b6XeBS9dXwqvIFwlR9kdEuqg3n7xpmRIuL83rmYq8FTg==
+  dependencies:
+    ce-la-react "^0.3.2"
+
 media-tracks@~0.3.4:
   version "0.3.4"
   resolved "https://registry.yarnpkg.com/media-tracks/-/media-tracks-0.3.4.tgz#8d078ba11fafa7bbdf07eb0583a2d60eed2279c7"
