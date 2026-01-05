@@ -15,20 +15,18 @@ type AsteriskProps = {
 const AsteriskLink: React.FC<AsteriskProps> = ({ spinning }) => {
   return (
     <>
-      <Link href="/">
-        <a title="Home">
-          <Asterisk />
-        </a>
+      <Link href="/" title="Home" className="asterisk-link">
+        <Asterisk />
       </Link>
       <style jsx>{`
-        a {
+        :global(.asterisk-link) {
           animation: ${spinning ? 'rotation 4s linear infinite' : 'none'};
           width: 46px;
           height: 46px;
           display: block;
         }
 
-        a:hover {
+        :global(.asterisk-link:hover) {
           opacity: 0.5;
         }
       `}</style>
@@ -123,7 +121,7 @@ const Layout: React.FC<Props> = ({
                   <div className="footer-link info"><a role="presentation" onClick={() => setModalOpen(true)}>Info</a></div>
                   <div className="footer-link mux">An <a href={OPEN_SOURCE_URL}>open source</a> project by <a href={MUX_HOME_PAGE_URL}>Mux</a></div>
                   <div className="divider" />
-                  <div className="footer-link terms"><Link href="/terms"><a>Terms</a></Link></div>
+                  <div className="footer-link terms"><Link href="/terms">Terms</Link></div>
                   </>
   
                 }
