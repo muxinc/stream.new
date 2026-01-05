@@ -1,7 +1,9 @@
+'use client';
+
 /* global navigator MediaRecorder Blob File */
 /* eslint-disable jsx-a11y/no-onchange */
 import { useRef, useEffect, useState, ChangeEvent } from 'react';
-import { useRouter } from 'next/router';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Layout from './layout';
 import StopWatch from './stop-watch';
 import VideoSourceToggle from './video-source-toggle';
@@ -27,12 +29,9 @@ type DeviceList = {
 
 type VideoSources = 'camera' | 'screen';
 
-type QueryParams = {
-  source: VideoSources
-};
-
 const RecordPage: React.FC<NoProps> = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [videoSource, setVideoSource] = useState<'camera' | 'screen' | ''>('');
   const [errorMessage, setErrorMessage] = useState('');
   const [file, setFile] = useState<File | null>(null);
@@ -57,14 +56,13 @@ const RecordPage: React.FC<NoProps> = () => {
   const [showUploadPage, setShowUploadPage] = useState(true);
 
   useEffect(() => {
-    if (router.query && router.query.source) {
-      const source = (router.query as QueryParams).source;
+    const source = searchParams?.get('source') as VideoSources | null;
+    if (source) {
       setVideoSource(source);
+    } else {
+      router.push('/record?source=camera');
     }
-    if (router.query && !router.query.source) {
-      router.push({ pathname: '/record', query: { source: 'camera' } });
-    }
-  }, [router]);
+  }, [searchParams, router]);
 
   const getDevices = async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
@@ -381,7 +379,7 @@ const RecordPage: React.FC<NoProps> = () => {
 
   const changeVideoSource = (source: VideoSources) => {
     hardCleanup();
-    router.push({ pathname: '/record', query: { source } });
+    router.push(`/record?source=${source}`);
   };
 
   const enableMicForScreenshare = async () => {

@@ -1,6 +1,8 @@
+'use client';
+
 import { useState, useMemo, useRef, useEffect } from 'react';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
+import { useSearchParams } from 'next/navigation';
 import copy from 'copy-to-clipboard';
 
 import FullpageLoader from './fullpage-loader';
@@ -25,7 +27,7 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
   const [isCopied, setIsCopied] = useState(false);
   const [openReport, setOpenReport] = useState(false);
   const copyTimeoutRef = useRef<number | null>(null);
-  const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     return () => {
@@ -52,38 +54,25 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
   }, [playerType]);
 
   const color = useMemo(() => {
-    if (router.query?.color) {
-      const val = (router.query?.color as string);
-      if (/^[0-9a-fA-F]+$/.test(val)) {
-        return `#${val}`;
+    const colorParam = searchParams?.get('color');
+    if (colorParam) {
+      if (/^[0-9a-fA-F]+$/.test(colorParam)) {
+        return `#${colorParam}`;
       } else {
-        logger.warn('Invalid color hex value param:', val);
+        logger.warn('Invalid color hex value param:', colorParam);
       }
     }
-  }, [router.query]);
+  }, [searchParams]);
 
   const startTime = useMemo(() => {
-    return (router.query?.time && parseFloat(router.query.time as string)) || 0;
-  }, [router.query]);
+    const timeParam = searchParams?.get('time');
+    return (timeParam && parseFloat(timeParam)) || 0;
+  }, [searchParams]);
 
   const playerEmbedUrl = useMemo(() => {
     return `${HOST_URL}/v/${playbackId}/embed`;
   }, [playbackId]);
 
-  if (router.isFallback || !router.isReady) {
-    return (
-      <Layout
-        metaTitle="View this video created on stream.new"
-        image={poster}
-        playerEmbedUrl={playerEmbedUrl}
-        aspectRatio={aspectRatio}
-        centered
-        darkMode
-      >
-        <FullpageLoader text="Loading player..." />;
-      </Layout>
-    );
-  }
 
   const onError = (evt: ErrorEvent) => {
     setErrorMessage('Error loading this video');

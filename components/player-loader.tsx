@@ -1,7 +1,7 @@
 import { ForwardedRef, forwardRef } from 'react';
 import { HTMLVideoElementWithPlyr, PlayerElement } from '../types';
 import type MuxPlayerElement from '@mux/mux-player';
-import { PLYR_TYPE, MUX_PLAYER_TYPE, MUX_PLAYER_CLASSIC_TYPE, MUX_VIDEO_TYPE, WINAMP_PLAYER_TYPE } from '../constants';
+import { PLYR_TYPE, MUX_PLAYER_TYPE, MUX_PLAYER_CLASSIC_TYPE } from '../constants';
 import dynamic from 'next/dynamic';
 import Script from 'next/script';
 
@@ -15,8 +15,6 @@ import Script from 'next/script';
 const PlyrPlayer = dynamic(() => import('./plyr-player'), { ssr: false });
 const MuxPlayer = dynamic(() => import('./mux-player'));
 const MuxPlayerClassic = dynamic(() => import('./mux-player-classic'));
-const MuxVideo = dynamic(() => import('./mux-video'));
-const WinampPlayer = dynamic(() => import('./winamp-player'));
 
 type Props = {
   blurDataURL?: string;
@@ -41,8 +39,6 @@ const PlayerLoader = forwardRef<PlayerElement, Props>(({ playbackId, poster, cur
         {playerType === PLYR_TYPE && <PlyrPlayer forwardedRef={ref as ForwardedRef<HTMLVideoElementWithPlyr>} aspectRatio={aspectRatio} playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
         {playerType === MUX_PLAYER_TYPE && <MuxPlayer forwardedRef={ref as ForwardedRef<MuxPlayerElement>} playbackId={playbackId} aspectRatio={aspectRatio} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} blurDataURL={blurDataURL} color={color} />}
         {playerType === MUX_PLAYER_CLASSIC_TYPE && <MuxPlayerClassic forwardedRef={ref as ForwardedRef<MuxPlayerElement>} playbackId={playbackId} aspectRatio={aspectRatio} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} blurDataURL={blurDataURL} color={color} />}
-        {playerType === MUX_VIDEO_TYPE && <MuxVideo playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
-        {playerType === WINAMP_PLAYER_TYPE && <WinampPlayer playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
       </div>
       <style jsx>{`
         .video-container {
