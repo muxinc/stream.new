@@ -927,6 +927,14 @@
   dependencies:
     "@mux/upchunk" "^3.4.0"
 
+"@mux/mux-video-react@^0.29.2":
+  version "0.29.2"
+  resolved "https://registry.yarnpkg.com/@mux/mux-video-react/-/mux-video-react-0.29.2.tgz#284e3c38f6eee0571988d0e8030c0e4dfe15d74d"
+  integrity sha512-BSKL9j0TS3RnOqorheWEP265j2ScSbhksUKLP5HyFYA35Rugq8HjguWZUph1weT6U56jq7xGHYUtO/gQ5DDp+w==
+  dependencies:
+    "@mux/playback-core" "0.32.2"
+    prop-types "^15.8.1"
+
 "@mux/mux-video@0.29.1":
   version "0.29.1"
   resolved "https://registry.yarnpkg.com/@mux/mux-video/-/mux-video-0.29.1.tgz#3ec9d80dc6c512b51a407fceea5afc77a52769e9"
@@ -942,6 +950,14 @@
   version "0.32.1"
   resolved "https://registry.yarnpkg.com/@mux/playback-core/-/playback-core-0.32.1.tgz#37d0bcd13bf3da6744bd8bb0f364caa0480f3b53"
   integrity sha512-d1iYtftbbnjgXhL8htT6I1Z9zPdrRVcLYbOjifr5dUoqCHsXXq4f/FDCK1P5a787ekNIEG/5BT2/vWeuvjqYig==
+  dependencies:
+    hls.js "~1.6.15"
+    mux-embed "^5.8.3"
+
+"@mux/playback-core@0.32.2":
+  version "0.32.2"
+  resolved "https://registry.yarnpkg.com/@mux/playback-core/-/playback-core-0.32.2.tgz#dd714b8dc165118ce10af83f3fa563fafa7b8e86"
+  integrity sha512-cmaZN0hRIrEFcSVsj+quBDOeztg5oxug02WwuAiweWkMt1vSBM8nlzuF03coRnD/sKhgnQawdJOrng42R8I0Cg==
   dependencies:
     hls.js "~1.6.15"
     mux-embed "^5.8.3"
