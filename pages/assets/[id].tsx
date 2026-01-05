@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import Router, { useRouter } from 'next/router';
-import Link from 'next/link';
 import useSwr from 'swr';
 import Layout from '../../components/layout';
 import Button from '../../components/button';
@@ -59,9 +58,7 @@ const Asset: React.FC<Props> = () => {
         <div><h1>{errorMessage}</h1></div>
         {errorDetails && <p>{errorDetails}</p>}
         <div>
-          <Link href="/">
-            <Button>Home</Button>
-          </Link>
+          <Button buttonLink href="/">Home</Button>
         </div>
       </Layout>
     );

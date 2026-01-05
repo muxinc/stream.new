@@ -31,21 +31,22 @@ const Button = forwardRef<ButtonOrAnchor, Props>(
           a {
             text-decoration: none;
             display: inline-block;
+            mix-blend-mode: normal !important;
           }
           a, button {
             font-size: 26px;
             font-family: Akkurat;
             line-height: 33px;
-            background: #fff;
+            background: #fff !important;
             border: 2px solid ${disabled ? '#b0b0b0' : '#222222'};
-            color: ${disabled ? '#b0b0b0' : '#222222'};
+            color: ${disabled ? '#b0b0b0' : '#222222'} !important;
             padding: 10px 20px;
             border-radius: 50px;
             transition: all 0.2s ease;
           }
-          button:hover {
-            background: ${disabled ? '#fff' : '#222'};
-            color: ${disabled ? '#b0b0b0' : '#fff'};
+          a:hover, button:hover {
+            background: ${disabled ? '#fff' : '#222'} !important;
+            color: ${disabled ? '#b0b0b0' : '#fff'} !important;
             cursor: ${disabled ? 'not-allowed' : 'pointer'};
           }
         `}
