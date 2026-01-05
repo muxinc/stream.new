@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, ReactNode } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -52,6 +52,7 @@ type Props = {
   centered?: boolean;
   spinningLogo?: boolean;
   backNav?: boolean;
+  children?: ReactNode;
 };
 
 const Layout: React.FC<Props> = ({
