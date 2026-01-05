@@ -11,7 +11,7 @@ export async function getImageDimensions (playbackId: string): Promise<Dimension
   let imageSize; 
   try {
     imageSize = await probe(imageUrl);
-  } catch (e) {
+  } catch (_e) {
     return null;
   }
   const { width, height } = imageSize;

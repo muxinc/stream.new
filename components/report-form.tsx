@@ -38,7 +38,7 @@ const ReportForm: React.FC<Props> = ({ playbackId, close }) => {
           setIsSavingReport(false);
           setHasSavedReport(true);
         });
-    } catch (e) {
+    } catch (_e) {
       setErrorMessage('Error saving this report, please try again');
     }
   };
