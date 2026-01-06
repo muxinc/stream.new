@@ -2,6 +2,7 @@ import got from './got-client';
 import { HOST_URL } from '../constants';
 import { ModerationScores } from '../types';
 import { getImageBaseUrl } from './urlutils';
+import type { SummaryAndTagsResult, ModerationResult } from '@mux/ai/workflows';
 
 const slackWebhook = process.env.SLACK_WEBHOOK_ASSET_READY;
 const moderatorPassword = process.env.SLACK_MODERATOR_PASSWORD;
@@ -156,6 +157,92 @@ export const sendSlackAssetReady = async ({ playbackId, assetId, duration, googl
     json: {
       text: `New video created on stream.new. <${HOST_URL}/v/${playbackId}|View on stream.new>`,
       icon_emoji: 'see_no_evil',
+      blocks,
+    },
+  });
+  return null;
+};
+
+export const sendSlackAssetReadyUsingMuxAI = async ({
+  playbackId,
+  assetId,
+  duration,
+  summaryResult,
+  moderationResult
+}: {
+  playbackId: string;
+  assetId: string;
+  duration: number;
+  summaryResult: SummaryAndTagsResult;
+  moderationResult: ModerationResult;
+}): Promise<null> => {
+  if (!slackWebhook) {
+    console.log('No slack webhook configured'); // eslint-disable-line no-console
+    return null;
+  }
+
+  const blocks = baseBlocks({ playbackId, assetId, duration });
+
+  // Add title if available
+  if (summaryResult?.title) {
+    blocks.push({
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `*Title:*\n${summaryResult.title}`,
+      }
+    });
+  }
+
+  // Add description if available
+  if (summaryResult?.description) {
+    blocks.push({
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `*Description:*\n${summaryResult.description}`,
+      }
+    });
+  }
+
+  // Add moderation scores from OpenAI (0-1 scale)
+  if (moderationResult?.maxScores) {
+    const { sexual, violence } = moderationResult.maxScores;
+    const exceedsThreshold = moderationResult.exceedsThreshold;
+    const warningEmoji = exceedsThreshold ? ' 🚨' : '';
+
+    blocks.push({
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `*Moderation scores (OpenAI) | score is 0-1:*\nSexual: ${sexual.toFixed(3)}\nViolence: ${violence.toFixed(3)}\nExceeds threshold: ${exceedsThreshold}${warningEmoji}`,
+      }
+    });
+  }
+
+  if (moderatorPassword) {
+    blocks.push({
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: 'If this is bad, it can be deleted with 1 click:',
+      },
+      accessory: {
+        type: 'button',
+        text: {
+          type: 'plain_text',
+          text: 'DELETE',
+        },
+        url: `${HOST_URL}/moderator/delete-asset?asset_id=${assetId}&slack_moderator_password=${moderatorPassword}`,
+        style: 'danger',
+      },
+    });
+  }
+
+  await got.post(slackWebhook, {
+    json: {
+      text: `New video created on stream.new. <${HOST_URL}/v/${playbackId}|View on stream.new>`,
+      icon_emoji: 'robot_face',
       blocks,
     },
   });

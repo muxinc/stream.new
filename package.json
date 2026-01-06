@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@google-cloud/vision": "^2.3.2",
+    "@mux/ai": "^0.4.2",
     "@mux/blurup": "^1.0.2",
     "@mux/mux-node": "^12.8.1",
     "@mux/mux-player-react": "^3.10.2",
@@ -32,7 +33,8 @@
     "probe-image-size": "^7.2.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "swr": "^0.2.0"
+    "swr": "^0.2.0",
+    "workflow": "^4.0.1-beta.41"
   },
   "devDependencies": {
     "@testing-library/dom": "^8.20.1",
