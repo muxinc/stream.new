@@ -5,10 +5,11 @@ const mux = new Mux();
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
-    const asset = await mux.video.assets.retrieve(params.id);
+    const asset = await mux.video.assets.retrieve(id);
     if (!(asset.playback_ids && asset.playback_ids[0])) {
       throw new Error('Error getting playback_id from asset');
     }
@@ -28,8 +29,10 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
+
   if (!process.env.SLACK_MODERATOR_PASSWORD) {
     return new NextResponse('Unauthorized', { status: 401 });
   }
@@ -40,8 +43,8 @@ export async function DELETE(
   }
 
   try {
-    await mux.video.assets.delete(params.id);
-    return new NextResponse(`Deleted ${params.id}`, { status: 200 });
+    await mux.video.assets.delete(id);
+    return new NextResponse(`Deleted ${id}`, { status: 200 });
   } catch (e) {
     console.error('Request error', e); // eslint-disable-line no-console
     return new NextResponse('Error deleting asset', { status: 500 });

@@ -5,8 +5,9 @@ import type { PlayerTypes } from '../../../../constants';
 
 export const dynamicParams = true;
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
-  const props = await getPropsFromPlaybackId(params.id);
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const props = await getPropsFromPlaybackId(id);
   return {
     title: 'View this video created on stream.new',
     openGraph: {
@@ -22,9 +23,10 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 export default async function PlayerTypePage({
   params
 }: {
-  params: { id: string; playerType: string }
+  params: Promise<{ id: string; playerType: string }>
 }) {
-  const props = await getPropsFromPlaybackId(params.id);
+  const { id, playerType } = await params;
+  const props = await getPropsFromPlaybackId(id);
 
   if (!props.videoExists) {
     notFound();
@@ -38,7 +40,7 @@ export default async function PlayerTypePage({
       poster={props.poster}
       aspectRatio={props.aspectRatio}
       blurDataURL={props.blurDataURL}
-      playerType={params.playerType as PlayerTypes}
+      playerType={playerType as PlayerTypes}
     />
   );
 }
