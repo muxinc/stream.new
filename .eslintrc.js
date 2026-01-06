@@ -16,6 +16,13 @@ module.exports = {
   },
   env: {
     jest: true,
+    node: true,
+    browser: true,
+  },
+  settings: {
+    react: {
+      version: 'detect',
+    },
   },
   extends: [
     'eslint:recommended', // eslint default rules
@@ -31,6 +38,12 @@ module.exports = {
     'jsx-a11y/media-has-caption': 'off',
     'import/prefer-default-export': 'off',
     'semi': 'warn',
+    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-unused-vars': ['error', {
+      'argsIgnorePattern': '^_',
+      'varsIgnorePattern': '^_',
+      'caughtErrorsIgnorePattern': '^_'
+    }],
     "react/no-unknown-property": [
       2,
       {

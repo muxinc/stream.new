@@ -17,22 +17,23 @@ type ButtonOrAnchor = Ref<HTMLButtonElement | HTMLAnchorElement>;
 
 const Button = forwardRef<ButtonOrAnchor, Props>(
   function Button (props, ref) {
-    const { buttonLink, type, children, onClick, href, fullW, disabled, ...otherProps } = props;
+    const { buttonLink, type, children, onClick, href, fullW, disabled, className, ...otherProps } = props;
     return (
       <>
         {buttonLink
-          ? <a {...otherProps} href={href} ref={ref as Ref<HTMLAnchorElement>} onClick={onClick}>{children}</a>
-          : <button type={type || 'button'} onClick={onClick} ref={ref as Ref<HTMLButtonElement>} {...otherProps}>{children}</button>}
+          ? <a {...otherProps} className={`button-link ${className || ''}`} href={href} ref={ref as Ref<HTMLAnchorElement>} onClick={onClick}>{children}</a>
+          : <button type={type || 'button'} onClick={onClick} className={className} ref={ref as Ref<HTMLButtonElement>} {...otherProps}>{children}</button>}
         <style jsx>{`
           button {
             cursor: pointer;
             width: ${fullW ? '100%' : 'auto'};
           }
-          a {
+          a.button-link {
             text-decoration: none;
             display: inline-block;
+            mix-blend-mode: normal;
           }
-          a, button {
+          a.button-link, button {
             font-size: 26px;
             font-family: Akkurat;
             line-height: 33px;
@@ -43,7 +44,7 @@ const Button = forwardRef<ButtonOrAnchor, Props>(
             border-radius: 50px;
             transition: all 0.2s ease;
           }
-          button:hover {
+          a.button-link:hover, button:hover {
             background: ${disabled ? '#fff' : '#222'};
             color: ${disabled ? '#b0b0b0' : '#fff'};
             cursor: ${disabled ? 'not-allowed' : 'pointer'};

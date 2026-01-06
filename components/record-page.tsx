@@ -16,7 +16,7 @@ import { RecordState } from '../types';
 
 const MEDIA_RECORDER_TIMESLICE_MS = 2000;
 
-const getAudioContext = () => typeof window !== undefined && window.AudioContext || window.webkitAudioContext;
+const getAudioContext = () => typeof window !== 'undefined' && window.AudioContext || window.webkitAudioContext;
 
 type DeviceItems = MediaDeviceInfo[];
 

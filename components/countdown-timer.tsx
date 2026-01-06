@@ -40,7 +40,7 @@ const CountdownTimer = ({ seconds = 3, onElapsed }:Props, ref:React.Ref<Countdow
   const tick = () => {
     if(recCountdownRef.current <= 1) {
       resetTimeout();
-      onElapsed && onElapsed();
+      if (onElapsed) onElapsed();
 
       return;
     }

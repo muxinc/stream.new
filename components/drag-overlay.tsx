@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { MuxUploaderDrop } from '@mux/mux-uploader-react';
 
 type Props = {
-  dragActive?: boolean | undefined,
+  dragActive?: boolean | undefined;
+  children?: ReactNode;
 };
 
 const DragOverlay: React.FC<Props> = ({ children, dragActive }) => {

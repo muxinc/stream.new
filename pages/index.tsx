@@ -4,7 +4,6 @@ import Router from 'next/router';
 import MuxUploader from '@mux/mux-uploader-react';
 import type { MuxUploaderProps } from '@mux/mux-uploader-react';
 import useSwr from 'swr';
-import Link from 'next/link';
 import Button from '../components/button';
 import Layout from '../components/layout';
 import { breakpoints } from '../style-vars';
@@ -160,10 +159,10 @@ const Index: React.FC<Props> = () => {
         {!isUploading ? (
           <>
             <div className="cta-record">
-              <Link href="/record?source=camera"><Button>Record from camera</Button></Link>
+              <Button buttonLink href="/record?source=camera">Record from camera</Button>
             </div>
             <div className="cta-record">
-              <Link href="/record?source=screen"><Button>Record my screen</Button></Link>
+              <Button buttonLink href="/record?source=screen">Record my screen</Button>
             </div>
           </>
         ) : null}
