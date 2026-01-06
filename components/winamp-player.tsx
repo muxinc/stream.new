@@ -37,39 +37,49 @@ const WinampPlayer: React.FC<Props> = ({
       <div className="winamp-player">
         <div className="wrapper">
           <div className="controls">
+            {/* @ts-ignore - mediaController removed from media-chrome 4.17+ types but works at runtime */}
             <MediaSeekBackwardButton
               mediaController="controller"
               className="media-seek-backward-button"
             >
               <div slot="icon"></div>
             </MediaSeekBackwardButton>
+            {/* @ts-ignore - mediaController removed from media-chrome 4.17+ types but works at runtime */}
             <MediaPlayButton className="play" mediaController="controller">
               <div slot="play"></div>
               <div slot="pause"></div>
             </MediaPlayButton>
+            {/* @ts-ignore - mediaController removed from media-chrome 4.17+ types but works at runtime */}
             <MediaPlayButton className="pause" mediaController="controller">
               <div slot="play"></div>
               <div slot="pause"></div>
             </MediaPlayButton>
+            {/* @ts-ignore - mediaController removed from media-chrome 4.17+ types but works at runtime */}
             <MediaPlayButton className="stop" mediaController="controller">
               <div slot="play"></div>
               <div slot="pause"></div>
             </MediaPlayButton>
+            {/* @ts-ignore - mediaController removed from media-chrome 4.17+ types but works at runtime */}
             <MediaSeekForwardButton mediaController="controller">
               <div slot="icon"></div>
             </MediaSeekForwardButton>
+            {/* @ts-ignore - mediaController removed from media-chrome 4.17+ types but works at runtime */}
             <MediaFullscreenButton mediaController="controller">
               <div slot="enter"></div>
             </MediaFullscreenButton>
           </div>
+          {/* @ts-ignore - mediaController removed from media-chrome 4.17+ types but works at runtime */}
           <MediaTimeDisplay mediaController="controller"></MediaTimeDisplay>
+          {/* @ts-ignore - mediaController removed from media-chrome 4.17+ types but works at runtime */}
           <MediaTimeRange mediaController="controller"></MediaTimeRange>
+          {/* @ts-ignore - mediaController removed from media-chrome 4.17+ types but works at runtime */}
           <MediaVolumeRange mediaController="controller"></MediaVolumeRange>
           <div className="titlebar"></div>
           <div className="display"></div>
           <div className="eq"></div>
           <div className="pl"></div>
           <div className="loop"></div>
+          {/* @ts-ignore - mediaController removed from media-chrome 4.17+ types but works at runtime */}
           <MediaCaptionsButton mediaController="controller">
             <div slot="on"></div>
             <div slot="off"></div>
@@ -85,6 +95,7 @@ const WinampPlayer: React.FC<Props> = ({
           {/* eslint-enable */}
           <div className="kbps">192</div>
           <div className="khz">44</div>
+          {/* @ts-ignore - mediaController removed from media-chrome 4.17+ types but works at runtime */}
           <MediaPlayButton
             mediaController="controller"
             className="play-pause-indicator"
@@ -92,6 +103,7 @@ const WinampPlayer: React.FC<Props> = ({
             <div slot="play"></div>
             <div slot="pause"></div>
           </MediaPlayButton>
+          {/* @ts-ignore - mediaController removed from media-chrome 4.17+ types but works at runtime */}
           <MediaPlayButton mediaController="controller" className="vu-meter">
             <div slot="play"></div>
             <div slot="pause"></div>

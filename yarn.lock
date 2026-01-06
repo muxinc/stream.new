@@ -4670,22 +4670,17 @@ math-intrinsics@^1.1.0:
   resolved "https://registry.yarnpkg.com/math-intrinsics/-/math-intrinsics-1.1.0.tgz#a0dd74be81e2aa5c2f27e65ce283605ee4e2b7f9"
   integrity sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==
 
-media-chrome@^4.3.0:
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/media-chrome/-/media-chrome-4.3.0.tgz#e18a7bb910f005746261ddbaa1a0a2624ed2c74e"
-  integrity sha512-Gr8Jd7eEjG53u8w0kJSWVUf1AbqUhRmMO9g2CvMDU4/V3ixy+FRKNRDNkPTQLHU6YN8PsCwfQVv619HL7lm8+Q==
+media-chrome@^4.17.2, media-chrome@~4.17.2:
+  version "4.17.2"
+  resolved "https://registry.yarnpkg.com/media-chrome/-/media-chrome-4.17.2.tgz#00830ea85ecb79b6c12bcf47c82c25ff1c04ed20"
+  integrity sha512-o/IgiHx0tdSVwRxxqF5H12FK31A/A8T71sv3KdAvh7b6XeBS9dXwqvIFwlR9kdEuqg3n7xpmRIuL83rmYq8FTg==
+  dependencies:
+    ce-la-react "^0.3.2"
 
 media-chrome@~4.16.1:
   version "4.16.1"
   resolved "https://registry.yarnpkg.com/media-chrome/-/media-chrome-4.16.1.tgz#0ebaba9ac678329723cfcc5235db19f6a83a1a1a"
   integrity sha512-qtFlsy0lNDVCyVo//ZCAfRPKwgehfOYp6rThZzDUuZ5ypv41yqUfAxK+P9TOs+XSVWXATPTT2WRV0fbW0BH4vQ==
-  dependencies:
-    ce-la-react "^0.3.2"
-
-media-chrome@~4.17.2:
-  version "4.17.2"
-  resolved "https://registry.yarnpkg.com/media-chrome/-/media-chrome-4.17.2.tgz#00830ea85ecb79b6c12bcf47c82c25ff1c04ed20"
-  integrity sha512-o/IgiHx0tdSVwRxxqF5H12FK31A/A8T71sv3KdAvh7b6XeBS9dXwqvIFwlR9kdEuqg3n7xpmRIuL83rmYq8FTg==
   dependencies:
     ce-la-react "^0.3.2"
 
