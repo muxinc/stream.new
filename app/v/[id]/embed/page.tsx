@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useParams } from 'next/navigation';
 
 import FullpageLoader from '../../../../components/fullpage-loader';
 import PlayerLoader from '../../../../components/player-loader';
@@ -36,7 +36,8 @@ const AsteriskButton: React.FC<AsteriskButtonProps> = ({ onOpenOverlay }) => {
   );
 };
 
-export default function PlaybackEmbedded({ params }: { params: { id: string } }) {
+export default function PlaybackEmbedded() {
+  const params = useParams();
   const searchParams = useSearchParams();
   const videoRef = useRef<PlayerElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -44,7 +45,7 @@ export default function PlaybackEmbedded({ params }: { params: { id: string } })
   const [showOverlay, setShowOverlay] = useState(false);
   const [wasPlaying, setWasPlaying] = useState(false);
 
-  const playbackId = params.id;
+  const playbackId = params.id as string;
   const poster = `https://image.mux.com/${playbackId}/thumbnail.png`;
 
   const onCloseOverlay = () => {

@@ -5,10 +5,11 @@ const mux = new Mux();
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
-    const upload = await mux.video.uploads.retrieve(params.id);
+    const upload = await mux.video.uploads.retrieve(id);
     return NextResponse.json({
       upload: {
         status: upload.status,

@@ -5,8 +5,9 @@ import { getPropsFromPlaybackId } from '../../../lib/player-page-utils';
 
 export const dynamicParams = true;
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
-  const props = await getPropsFromPlaybackId(params.id);
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const props = await getPropsFromPlaybackId(id);
   return {
     title: 'View this video created on stream.new',
     openGraph: {
@@ -19,8 +20,9 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
   };
 }
 
-export default async function PlaybackPage({ params }: { params: { id: string } }) {
-  const props = await getPropsFromPlaybackId(params.id);
+export default async function PlaybackPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const props = await getPropsFromPlaybackId(id);
 
   if (!props.videoExists) {
     notFound();

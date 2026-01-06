@@ -31,7 +31,7 @@
     "media-chrome": "^4.17.2",
     "micro": "9.3.5-canary.3",
     "mux-embed": "^5.15.0",
-    "next": "^14.2.15",
+    "next": "^16.0.0",
     "plyr": "^3.6.3",
     "probe-image-size": "^7.2.1",
     "react": "^18.3.1",
