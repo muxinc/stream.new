@@ -20,6 +20,10 @@ type BlockItem = {
     type: string,
     text: string,
   },
+  fields?: Array<{
+    type: string,
+    text: string,
+  }>,
   accessory?: {
     type: string,
     text: {
@@ -44,31 +48,20 @@ type BlockItem = {
 const baseBlocks = ({ playbackId, assetId, duration }: {playbackId: string, assetId: string, duration: number}): BlockItem[] => ([
   {
     type: 'section',
-    text: {
-      type: 'mrkdwn',
-      text: 'New video created on stream.new',
-    },
-  },
-  {
-    type: 'section',
-    text: {
-      type: 'mrkdwn',
-      text: `*Asset ID:*\n ${assetId}`,
-    },
-  },
-  {
-    type: 'section',
-    text: {
-      type: 'mrkdwn',
-      text: `*Playback ID:*\n ${playbackId}`,
-    },
-  },
-  {
-    type: 'section',
-    text: {
-      type: 'mrkdwn',
-      text: `*Duration:*\n ${Math.floor(duration)} seconds`,
-    },
+    fields: [
+      {
+        type: 'mrkdwn',
+        text: `*Asset ID:*\n${assetId}`,
+      },
+      {
+        type: 'mrkdwn',
+        text: `*Playback ID:*\n${playbackId}`,
+      },
+      {
+        type: 'mrkdwn',
+        text: `*Duration:*\n${Math.floor(duration)} seconds`,
+      },
+    ],
   },
   {
     type: 'image',
@@ -163,17 +156,15 @@ export const sendSlackAssetReady = async ({ playbackId, assetId, duration, googl
   return null;
 };
 
-export const sendSlackAssetReadyUsingMuxAI = async ({
+export const sendSlackModerationResult = async ({
   playbackId,
   assetId,
   duration,
-  summaryResult,
   moderationResult
 }: {
   playbackId: string;
   assetId: string;
   duration: number;
-  summaryResult: SummaryAndTagsResult;
   moderationResult: ModerationResult;
 }): Promise<null> => {
   if (!slackWebhook) {
@@ -182,6 +173,72 @@ export const sendSlackAssetReadyUsingMuxAI = async ({
   }
 
   const blocks = baseBlocks({ playbackId, assetId, duration });
+
+  // Add moderation scores to the fields in the first section block
+  if (moderationResult?.maxScores && blocks[0].fields) {
+    const { sexual, violence } = moderationResult.maxScores;
+    const exceedsThreshold = moderationResult.exceedsThreshold;
+    const emoji = exceedsThreshold ? '🚨' : '✅';
+
+    blocks[0].fields.push({
+      type: 'mrkdwn',
+      text: `*Moderation (OpenAI):*\nSexual: ${sexual.toFixed(3)}, Violence: ${violence.toFixed(3)} ${emoji}`,
+    });
+  }
+
+  // Always include delete button
+  if (moderatorPassword) {
+    blocks.push({
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: 'If this is bad, it can be deleted with 1 click:',
+      },
+      accessory: {
+        type: 'button',
+        text: {
+          type: 'plain_text',
+          text: 'DELETE',
+        },
+        url: `${HOST_URL}/moderator/delete-asset?asset_id=${assetId}&slack_moderator_password=${moderatorPassword}`,
+        style: 'danger',
+      },
+    });
+  }
+
+  await got.post(slackWebhook, {
+    json: {
+      text: `Moderation complete for video on stream.new. <${HOST_URL}/v/${playbackId}|View on stream.new>`,
+      icon_emoji: 'robot_face',
+      blocks,
+    },
+  });
+  return null;
+};
+
+export const sendSlackSummarizationResult = async ({
+  playbackId,
+  assetId,
+  summaryResult
+}: {
+  playbackId: string;
+  assetId: string;
+  summaryResult: SummaryAndTagsResult;
+}): Promise<null> => {
+  if (!slackWebhook) {
+    console.log('No slack webhook configured'); // eslint-disable-line no-console
+    return null;
+  }
+
+  const blocks: BlockItem[] = [];
+
+  blocks.push({
+    type: 'section',
+    text: {
+      type: 'mrkdwn',
+      text: 'AI summary complete for video on stream.new',
+    },
+  });
 
   // Add title if available
   if (summaryResult?.title) {
@@ -205,21 +262,16 @@ export const sendSlackAssetReadyUsingMuxAI = async ({
     });
   }
 
-  // Add moderation scores from OpenAI (0-1 scale)
-  if (moderationResult?.maxScores) {
-    const { sexual, violence } = moderationResult.maxScores;
-    const exceedsThreshold = moderationResult.exceedsThreshold;
-    const warningEmoji = exceedsThreshold ? ' 🚨' : '';
+  // Add links section
+  blocks.push({
+    type: 'section',
+    text: {
+      type: 'mrkdwn',
+      text: `<${HOST_URL}/v/${playbackId}|Watch on stream.new> | <${getImageBaseUrl()}/${playbackId}/storyboard.png|View storyboard>`,
+    }
+  });
 
-    blocks.push({
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `*Moderation scores (OpenAI) | score is 0-1:*\nSexual: ${sexual.toFixed(3)}\nViolence: ${violence.toFixed(3)}\nExceeds threshold: ${exceedsThreshold}${warningEmoji}`,
-      }
-    });
-  }
-
+  // Always include delete button
   if (moderatorPassword) {
     blocks.push({
       type: 'section',
@@ -241,8 +293,8 @@ export const sendSlackAssetReadyUsingMuxAI = async ({
 
   await got.post(slackWebhook, {
     json: {
-      text: `New video created on stream.new. <${HOST_URL}/v/${playbackId}|View on stream.new>`,
-      icon_emoji: 'robot_face',
+      text: `AI summary complete for video on stream.new. <${HOST_URL}/v/${playbackId}|View on stream.new>`,
+      icon_emoji: 'mag',
       blocks,
     },
   });
