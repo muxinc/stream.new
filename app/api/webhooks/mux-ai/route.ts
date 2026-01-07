@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Mux from '@mux/mux-node';
 import { start } from 'workflow/api';
-import { processMuxAI } from '../../../../workflows/process-mux-ai';
+import { processModerationOnly, processSummaryOnly } from '../../../../workflows/process-mux-ai';
 
 const webhookSignatureSecret = process.env.MUX_WEBHOOK_SIGNATURE_SECRET;
 const mux = new Mux();
@@ -35,22 +35,46 @@ export async function POST(request: NextRequest) {
   const jsonBody = JSON.parse(rawBody);
   const { data, type } = jsonBody;
 
-  if (type !== 'video.asset.ready') {
-    return NextResponse.json({ message: 'Event type not handled' });
-  }
-
   try {
-    const assetId = data.id;
+    // Handle video.asset.ready - start moderation workflow
+    if (type === 'video.asset.ready') {
+      const assetId = data.id;
 
-    // Start durable workflow - returns immediately while processing continues in background
-    const workflowRun = await start(processMuxAI, [assetId]);
+      // Start moderation workflow - returns immediately while processing continues in background
+      const workflowRun = await start(processModerationOnly, [assetId]);
 
-    // Return immediately
-    return NextResponse.json({
-      message: 'AI analysis workflow started',
-      asset_id: assetId,
-      workflow_id: workflowRun.runId
-    });
+      return NextResponse.json({
+        message: 'Moderation workflow started',
+        asset_id: assetId,
+        workflow_id: workflowRun.runId
+      });
+    }
+
+    // Handle video.asset.track.ready - check if it's generated subtitles, then start summarization workflow
+    if (type === 'video.asset.track.ready') {
+      const track = data;
+
+      // Only process if this is a generated subtitle track
+      if (track.type === 'text' && track.text_type === 'subtitles' && track.text_source === 'generated_vod') {
+        const assetId = track.asset_id;
+
+        // Start summarization workflow - returns immediately while processing continues in background
+        const workflowRun = await start(processSummaryOnly, [assetId]);
+
+        return NextResponse.json({
+          message: 'Summarization workflow started',
+          asset_id: assetId,
+          track_id: track.id,
+          workflow_id: workflowRun.runId
+        });
+      }
+
+      // Track type not relevant for our workflow
+      return NextResponse.json({ message: 'Track type not relevant for AI processing' });
+    }
+
+    // Event type not handled
+    return NextResponse.json({ message: 'Event type not handled' });
   } catch (e) {
     console.error('Request error', e); // eslint-disable-line no-console
     return NextResponse.json({ error: 'Error handling webhook' }, { status: 500 });
