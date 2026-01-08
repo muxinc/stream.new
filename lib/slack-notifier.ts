@@ -59,7 +59,7 @@ const baseBlocks = ({ playbackId, assetId, duration }: {playbackId: string, asse
       },
       {
         type: 'mrkdwn',
-        text: `*Duration:*\n${Math.floor(duration)} seconds`,
+        text: `*Duration:*\n${Math.round(duration)} seconds`,
       },
     ],
   },
@@ -174,27 +174,37 @@ export const sendSlackModerationResult = async ({
     return null;
   }
 
-  const blocks = baseBlocks({ playbackId, assetId, duration });
+  const blocks: BlockItem[] = [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: 'New video on stream.new!',
+      },
+    },
+  ];
 
-  // Add OpenAI moderation scores to the fields
-  if (openaiResult?.maxScores && blocks[0].fields) {
+  blocks.push(...baseBlocks({ playbackId, assetId, duration }));
+
+  // Add OpenAI moderation scores to the fields (blocks[1] is the first baseBlocks item)
+  if (openaiResult?.maxScores && blocks[1].fields) {
     const { sexual, violence } = openaiResult.maxScores;
     const exceedsThreshold = openaiResult.exceedsThreshold;
     const emoji = exceedsThreshold ? '🚨' : '✅';
 
-    blocks[0].fields.push({
+    blocks[1].fields.push({
       type: 'mrkdwn',
       text: `*Moderation (OpenAI):*\nSexual: ${sexual.toFixed(3)}, Violence: ${violence.toFixed(3)} ${emoji}`,
     });
   }
 
   // Add Hive moderation scores to the fields
-  if (hiveResult?.maxScores && blocks[0].fields) {
+  if (hiveResult?.maxScores && blocks[1].fields) {
     const { sexual, violence } = hiveResult.maxScores;
     const exceedsThreshold = hiveResult.exceedsThreshold;
     const emoji = exceedsThreshold ? '🚨' : '✅';
 
-    blocks[0].fields.push({
+    blocks[1].fields.push({
       type: 'mrkdwn',
       text: `*Moderation (Hive):*\nSexual: ${sexual.toFixed(3)}, Violence: ${violence.toFixed(3)} ${emoji}`,
     });
@@ -276,13 +286,21 @@ export const sendSlackSummarizationResult = async ({
     });
   }
 
-  // Add links section
+  // Add view button
   blocks.push({
-    type: 'section',
-    text: {
-      type: 'mrkdwn',
-      text: `<${HOST_URL}/v/${playbackId}|Watch on stream.new> | <${getImageBaseUrl()}/${playbackId}/storyboard.png|View storyboard>`,
-    }
+    type: 'actions',
+    elements: [
+      {
+        type: 'button',
+        text: {
+          type: 'plain_text',
+          emoji: true,
+          text: 'View on stream.new',
+        },
+        style: 'primary',
+        url: `${HOST_URL}/v/${playbackId}`,
+      },
+    ],
   });
 
   // Always include delete button
