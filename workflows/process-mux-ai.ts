@@ -1,12 +1,14 @@
 import { getSummaryAndTags, getModerationScores, SummaryAndTagsResult, ModerationResult } from '@mux/ai/workflows';
 import Mux from '@mux/mux-node';
-import { sendSlackModerationResult, sendSlackSummarizationResult } from '../lib/slack-notifier';
+import { sendSlackModerationResult, sendSlackSummarizationResult, sendSlackAutoDeleteMessage } from '../lib/slack-notifier';
+import { checkAndAutoDelete } from '../lib/moderation-action';
 
 const mux = new Mux();
 
-async function notifySlackModeration(
+async function handleModerationAndNotify(
   assetId: string,
-  moderationResult: ModerationResult
+  openaiResult: ModerationResult,
+  hiveResult: ModerationResult
 ) {
   "use step";
 
@@ -15,12 +17,34 @@ async function notifySlackModeration(
   const playbackId = asset.playback_ids?.[0]?.id || '';
   const duration = asset.duration || 0;
 
-  await sendSlackModerationResult({
-    playbackId,
+  // Check if we should auto-delete (if either service flags it)
+  const didAutoDelete = await checkAndAutoDelete({
     assetId,
-    duration,
-    moderationResult,
+    playbackId,
+    openaiResult,
+    hiveResult,
   });
+
+  // Send appropriate Slack message
+  if (didAutoDelete) {
+    const flaggedBy = [];
+    if (openaiResult.exceedsThreshold) flaggedBy.push('OpenAI');
+    if (hiveResult.exceedsThreshold) flaggedBy.push('Hive');
+
+    await sendSlackAutoDeleteMessage({
+      assetId,
+      duration,
+      moderationDetails: `OpenAI - Sexual: ${openaiResult.maxScores.sexual.toFixed(3)}, Violence: ${openaiResult.maxScores.violence.toFixed(3)} | Hive - Sexual: ${hiveResult.maxScores.sexual.toFixed(3)}, Violence: ${hiveResult.maxScores.violence.toFixed(3)} | Flagged by: ${flaggedBy.join(', ')}`,
+    });
+  } else {
+    await sendSlackModerationResult({
+      playbackId,
+      assetId,
+      duration,
+      openaiResult,
+      hiveResult,
+    });
+  }
 }
 
 async function notifySlackSummarization(
@@ -45,18 +69,26 @@ export async function processModerationOnly(assetId: string) {
 
   console.log('Processing moderation for asset:', assetId); // eslint-disable-line no-console
 
-  const moderationResult = await getModerationScores(assetId, {
-    provider: 'openai',
-  });
+  // Run both OpenAI and Hive moderation concurrently
+  const [openaiResult, hiveResult] = await Promise.all([
+    getModerationScores(assetId, {
+      provider: 'openai',
+    }),
+    getModerationScores(assetId, {
+      provider: 'hive',
+    }),
+  ]);
 
-  console.log('AI Moderation Scores Result:', JSON.stringify(moderationResult, null, 2)); // eslint-disable-line no-console
+  console.log('OpenAI Moderation Result:', JSON.stringify(openaiResult, null, 2)); // eslint-disable-line no-console
+  console.log('Hive Moderation Result:', JSON.stringify(hiveResult, null, 2)); // eslint-disable-line no-console
 
-  // Send Slack notification
-  await notifySlackModeration(assetId, moderationResult);
+  // Handle auto-delete and send Slack notification
+  await handleModerationAndNotify(assetId, openaiResult, hiveResult);
 
   return {
     assetId,
-    moderationResult,
+    openaiResult,
+    hiveResult,
   };
 }
 

@@ -160,12 +160,14 @@ export const sendSlackModerationResult = async ({
   playbackId,
   assetId,
   duration,
-  moderationResult
+  openaiResult,
+  hiveResult
 }: {
   playbackId: string;
   assetId: string;
   duration: number;
-  moderationResult: ModerationResult;
+  openaiResult: ModerationResult;
+  hiveResult: ModerationResult;
 }): Promise<null> => {
   if (!slackWebhook) {
     console.log('No slack webhook configured'); // eslint-disable-line no-console
@@ -174,15 +176,27 @@ export const sendSlackModerationResult = async ({
 
   const blocks = baseBlocks({ playbackId, assetId, duration });
 
-  // Add moderation scores to the fields in the first section block
-  if (moderationResult?.maxScores && blocks[0].fields) {
-    const { sexual, violence } = moderationResult.maxScores;
-    const exceedsThreshold = moderationResult.exceedsThreshold;
+  // Add OpenAI moderation scores to the fields
+  if (openaiResult?.maxScores && blocks[0].fields) {
+    const { sexual, violence } = openaiResult.maxScores;
+    const exceedsThreshold = openaiResult.exceedsThreshold;
     const emoji = exceedsThreshold ? '🚨' : '✅';
 
     blocks[0].fields.push({
       type: 'mrkdwn',
       text: `*Moderation (OpenAI):*\nSexual: ${sexual.toFixed(3)}, Violence: ${violence.toFixed(3)} ${emoji}`,
+    });
+  }
+
+  // Add Hive moderation scores to the fields
+  if (hiveResult?.maxScores && blocks[0].fields) {
+    const { sexual, violence } = hiveResult.maxScores;
+    const exceedsThreshold = hiveResult.exceedsThreshold;
+    const emoji = exceedsThreshold ? '🚨' : '✅';
+
+    blocks[0].fields.push({
+      type: 'mrkdwn',
+      text: `*Moderation (Hive):*\nSexual: ${sexual.toFixed(3)}, Violence: ${violence.toFixed(3)} ${emoji}`,
     });
   }
 
@@ -301,15 +315,22 @@ export const sendSlackSummarizationResult = async ({
   return null;
 };
 
-export const sendSlackAutoDeleteMessage = async ({ assetId, duration, hiveScores, hiveTaskIds }: { assetId: string, duration: number, hiveScores?: ModerationScores, hiveTaskIds?: string[] }): Promise<null> => {
+export const sendSlackAutoDeleteMessage = async ({ assetId, duration, hiveScores, hiveTaskIds, moderationDetails }: { assetId: string, duration: number, hiveScores?: ModerationScores, hiveTaskIds?: string[], moderationDetails?: string }): Promise<null> => {
   if (!slackWebhook) {
     console.log('No slack webhook configured'); // eslint-disable-line no-console
     return null;
   }
 
+  let details = '';
+  if (moderationDetails) {
+    details = moderationDetails;
+  } else if (hiveScores) {
+    details = `${JSON.stringify(hiveScores)}. Task IDs: ${JSON.stringify(hiveTaskIds)}`;
+  }
+
   await got.post(slackWebhook, {
     json: {
-      text: `Auto-deleted by moderator: ${assetId} duration: ${duration}. ${JSON.stringify(hiveScores)}. Task IDs: ${JSON.stringify(hiveTaskIds)}`,
+      text: `Auto-deleted by moderator: ${assetId} duration: ${duration}. ${details}`,
       icon_emoji: 'female-police-officer',
     },
   });
