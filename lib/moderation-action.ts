@@ -1,4 +1,5 @@
 import { ModerationScores } from '../types';
+import type { ModerationResult } from '@mux/ai/workflows';
 import Mux from '@mux/mux-node';
 import { RequestError } from 'got';
 import got from './got-client';
@@ -38,6 +39,32 @@ export async function autoDelete({ assetId, playbackId, hiveScores }: { assetId:
   if (shouldAutoDeleteContent(hiveScores)) {
     await mux.video.assets.deletePlaybackId(assetId, playbackId);
     await saveDeletionRecordInAirtable({ assetId, notes: JSON.stringify(hiveScores) });
+
+    return true;
+  }
+
+  return false;
+}
+
+export async function checkAndAutoDelete({ assetId, playbackId, openaiResult, hiveResult }: { assetId: string, playbackId: string, openaiResult: ModerationResult, hiveResult: ModerationResult }): Promise<boolean> {
+  const autoDeleteEnabled = process.env.AUTO_DELETE_ENABLED === '1';
+
+  // Check if either moderation service flags the content
+  const openaiExceeds = openaiResult.exceedsThreshold;
+  const hiveExceeds = hiveResult.exceedsThreshold;
+  const shouldDelete = openaiExceeds || hiveExceeds;
+
+  if (autoDeleteEnabled && shouldDelete) {
+    await mux.video.assets.deletePlaybackId(assetId, playbackId);
+
+    const flaggedBy = [];
+    if (openaiExceeds) flaggedBy.push('OpenAI');
+    if (hiveExceeds) flaggedBy.push('Hive');
+
+    await saveDeletionRecordInAirtable({
+      assetId,
+      notes: `Flagged by: ${flaggedBy.join(', ')} | OpenAI - Sexual: ${openaiResult.maxScores.sexual}, Violence: ${openaiResult.maxScores.violence} | Hive - Sexual: ${hiveResult.maxScores.sexual}, Violence: ${hiveResult.maxScores.violence}`
+    });
 
     return true;
   }
