@@ -75,9 +75,19 @@ export async function processModerationOnly(assetId: string) {
   const [openaiResult, hiveResult] = await Promise.all([
     getModerationScores(assetId, {
       provider: 'openai',
+      thresholds: {
+        sexual: 0.9,
+        violence: 0.9,
+      },
+      maxSamples: 5,
     }),
     getModerationScores(assetId, {
       provider: 'hive',
+      thresholds: {
+        sexual: 0.9,
+        violence: 0.9,
+      },
+      maxSamples: 5,
     }),
   ]);
 
