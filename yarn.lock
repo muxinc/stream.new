@@ -1916,28 +1916,9 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@mux/ai@^0.4.2":
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/@mux/ai/-/ai-0.4.2.tgz#440ea8aa8e60160a30f413faa095ee7606bf4b40"
-  integrity sha512-QuS2jtwip3ggH97CDk8u90izEWBEi5tgO6W44haUyavEQH4r+daTEOtK2U2iYkR7k7im2liwZRRoUkFjIRC/lA==
-  dependencies:
-    "@ai-sdk/anthropic" "^2.0.45"
-    "@ai-sdk/google" "^2.0.48"
-    "@ai-sdk/openai" "^2.0.71"
-    "@aws-sdk/client-s3" "^3.0.0"
-    "@aws-sdk/lib-storage" "^3.0.0"
-    "@aws-sdk/s3-request-presigner" "^3.0.0"
-    "@mux/mux-node" "^12.5.0"
-    ai "^5.0.98"
-    dedent "^1.7.0"
-    dotenv "^17.2.2"
-    dotenv-expand "^12.0.3"
-    p-retry "^7.0.0"
-    zod "^3.25.76"
-
 "@mux/ai@file:./vendor/mux-ai-0.4.2.tgz":
   version "0.4.2"
-  resolved "file:./vendor/mux-ai-0.4.2.tgz#af3077498869d1e031be829e701a655978742e1a"
+  resolved "file:./vendor/mux-ai-0.4.2.tgz#ebefb0abc3c6d09d1e6a5566c92bbb0e7aa84d12"
   dependencies:
     "@ai-sdk/anthropic" "^2.0.45"
     "@ai-sdk/google" "^2.0.48"
