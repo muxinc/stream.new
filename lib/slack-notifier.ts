@@ -2,7 +2,7 @@ import got from './got-client';
 import { HOST_URL } from '../constants';
 import { ModerationScores } from '../types';
 import { getImageBaseUrl } from './urlutils';
-import type { SummaryAndTagsResult, ModerationResult } from '@mux/ai/workflows';
+import type { SummaryAndTagsResult, ModerationResult, AskQuestionsResult } from '@mux/ai/workflows';
 
 const slackWebhook = process.env.SLACK_WEBHOOK_ASSET_READY;
 const moderatorPassword = process.env.SLACK_MODERATOR_PASSWORD;
@@ -243,11 +243,13 @@ export const sendSlackModerationResult = async ({
 export const sendSlackSummarizationResult = async ({
   playbackId,
   assetId,
-  summaryResult
+  summaryResult,
+  questionsResult
 }: {
   playbackId: string;
   assetId: string;
   summaryResult: SummaryAndTagsResult;
+  questionsResult: AskQuestionsResult;
 }): Promise<null> => {
   if (!slackWebhook) {
     console.log('No slack webhook configured'); // eslint-disable-line no-console
@@ -260,7 +262,7 @@ export const sendSlackSummarizationResult = async ({
     type: 'section',
     text: {
       type: 'mrkdwn',
-      text: 'AI summary complete for video on stream.new',
+      text: 'AI summary complete for video on stream.new!',
     },
   });
 
@@ -283,6 +285,20 @@ export const sendSlackSummarizationResult = async ({
         type: 'mrkdwn',
         text: `*Description:*\n${summaryResult.description}`,
       }
+    });
+  }
+
+  // Add question answers if available
+  if (questionsResult?.answers && questionsResult.answers.length > 0) {
+    blocks.push({
+      type: 'section',
+      fields: questionsResult.answers.map(qa => {
+        const emoji = qa.answer === 'yes' ? ' 🚨' : '';
+        return {
+          type: 'mrkdwn',
+          text: `*${qa.question}${emoji}*\n${qa.answer}`,
+        };
+      }),
     });
   }
 
@@ -325,7 +341,7 @@ export const sendSlackSummarizationResult = async ({
 
   await got.post(slackWebhook, {
     json: {
-      text: `AI summary complete for video on stream.new. <${HOST_URL}/v/${playbackId}|View on stream.new>`,
+      text: `AI summary complete for video on stream.new!. <${HOST_URL}/v/${playbackId}|View on stream.new>`,
       icon_emoji: 'mag',
       blocks,
     },

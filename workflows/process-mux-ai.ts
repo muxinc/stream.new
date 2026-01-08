@@ -1,4 +1,4 @@
-import { getSummaryAndTags, getModerationScores, SummaryAndTagsResult, ModerationResult } from '@mux/ai/workflows';
+import { getSummaryAndTags, getModerationScores, askQuestions, SummaryAndTagsResult, ModerationResult, AskQuestionsResult } from '@mux/ai/workflows';
 import Mux from '@mux/mux-node';
 import { sendSlackModerationResult, sendSlackSummarizationResult, sendSlackAutoDeleteMessage } from '../lib/slack-notifier';
 import { checkAndAutoDelete } from '../lib/moderation-action';
@@ -49,7 +49,8 @@ async function handleModerationAndNotify(
 
 async function notifySlackSummarization(
   assetId: string,
-  summaryResult: SummaryAndTagsResult
+  summaryResult: SummaryAndTagsResult,
+  questionsResult: AskQuestionsResult
 ) {
   "use step";
 
@@ -61,6 +62,7 @@ async function notifySlackSummarization(
     playbackId,
     assetId,
     summaryResult,
+    questionsResult,
   });
 }
 
@@ -79,9 +81,6 @@ export async function processModerationOnly(assetId: string) {
     }),
   ]);
 
-  console.log('OpenAI Moderation Result:', JSON.stringify(openaiResult, null, 2)); // eslint-disable-line no-console
-  console.log('Hive Moderation Result:', JSON.stringify(hiveResult, null, 2)); // eslint-disable-line no-console
-
   // Handle auto-delete and send Slack notification
   await handleModerationAndNotify(assetId, openaiResult, hiveResult);
 
@@ -97,19 +96,35 @@ export async function processSummaryOnly(assetId: string) {
 
   console.log('Processing summary for asset:', assetId); // eslint-disable-line no-console
 
-  const summaryResult = await getSummaryAndTags(assetId, {
-    provider: 'openai',
-    tone: 'professional',
-    includeTranscript: true,
-  });
+  // Run summary and questions concurrently
+  const [summaryResult, questionsResult] = await Promise.all([
+    getSummaryAndTags(assetId, {
+      provider: 'openai',
+      tone: 'neutral',
+      includeTranscript: true,
+    }),
+    askQuestions(assetId, [
+      { question: "Is this a professionally produced full length movie or TV show, or a standalone segment from it?" },
+      { question: "Is this professionally produced footage of a cycling race?" },
+      { question: "Is this footage of one or a small group of people watching a full length movie or TV show?" },
+      { question: "Does this video use offensive language, and/or is likely to offend?" },
+      { question: "Is this hate speech?" },
+      { question: "Is this video mostly of feet?" },
+    ], {
+      provider: 'openai',
+      includeTranscript: true,
+    }),
+  ]);
 
   console.log('AI Summary and Tags Result:', JSON.stringify(summaryResult, null, 2)); // eslint-disable-line no-console
+  console.log('AI Questions Result:', JSON.stringify(questionsResult, null, 2)); // eslint-disable-line no-console
 
   // Send Slack notification
-  await notifySlackSummarization(assetId, summaryResult);
+  await notifySlackSummarization(assetId, summaryResult, questionsResult);
 
   return {
     assetId,
     summaryResult,
+    questionsResult,
   };
 }
