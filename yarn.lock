@@ -1935,6 +1935,24 @@
     p-retry "^7.0.0"
     zod "^3.25.76"
 
+"@mux/ai@file:./vendor/mux-ai-0.4.2.tgz":
+  version "0.4.2"
+  resolved "file:./vendor/mux-ai-0.4.2.tgz#af3077498869d1e031be829e701a655978742e1a"
+  dependencies:
+    "@ai-sdk/anthropic" "^2.0.45"
+    "@ai-sdk/google" "^2.0.48"
+    "@ai-sdk/openai" "^2.0.71"
+    "@aws-sdk/client-s3" "^3.0.0"
+    "@aws-sdk/lib-storage" "^3.0.0"
+    "@aws-sdk/s3-request-presigner" "^3.0.0"
+    "@mux/mux-node" "^12.5.0"
+    ai "^5.0.98"
+    dedent "^1.7.0"
+    dotenv "^17.2.2"
+    dotenv-expand "^12.0.3"
+    p-retry "^7.0.0"
+    zod "^3.25.76"
+
 "@mux/blurup@^1.0.2":
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@mux/blurup/-/blurup-1.0.2.tgz#4c4b138cc3de4b94efdd1ca4b5588f7051151301"

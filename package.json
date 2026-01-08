@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@google-cloud/vision": "^2.3.2",
-    "@mux/ai": "^0.4.2",
+    "@mux/ai": "file:./vendor/mux-ai-0.4.2.tgz",
     "@mux/blurup": "^1.0.2",
     "@mux/mux-node": "^12.8.1",
     "@mux/mux-player-react": "^3.10.2",
