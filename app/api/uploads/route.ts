@@ -17,12 +17,7 @@ export async function POST(_request: NextRequest) {
             // @ts-expect-error - generated_subtitles with language_code: 'auto' is supported but not in types yet
             language_code: 'auto'
           }
-        ]}],
-        static_renditions: [
-          {
-            resolution: 'audio-only'
-          }
-        ]
+        ]}]
       },
       cors_origin: '*'
     });
