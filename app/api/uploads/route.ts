@@ -10,16 +10,18 @@ export async function POST(_request: NextRequest) {
         playback_policy: ['public'],
         video_quality: 'basic',
 
-        inputs : [
+        inputs: [
           {
-        generated_subtitles: [
-          {
-            // @ts-expect-error - generated_subtitles with language_code: 'auto' is supported but not in types yet
-            language_code: 'auto'
-          }
-        ]}]
+            generated_subtitles: [
+              {
+                // @ts-expect-error - generated_subtitles with language_code: 'auto' is supported but not in types yet
+                language_code: 'auto',
+              },
+            ],
+          },
+        ],
       },
-      cors_origin: '*'
+      cors_origin: '*',
     });
     return NextResponse.json({
       id: upload.id,
@@ -27,6 +29,9 @@ export async function POST(_request: NextRequest) {
     });
   } catch (e) {
     console.error('Request error', e); // eslint-disable-line no-console
-    return NextResponse.json({ error: 'Error creating upload' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Error creating upload' },
+      { status: 500 }
+    );
   }
 }
