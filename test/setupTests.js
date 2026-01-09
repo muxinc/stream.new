@@ -1,5 +1,6 @@
-import '@testing-library/jest-dom';
-import dotenv from 'dotenv';
-import '@mux/mux-node/shims/node';
+/* eslint-disable @typescript-eslint/no-require-imports */
+require('@testing-library/jest-dom');
+const dotenv = require('dotenv');
+require('@mux/mux-node/shims/node');
 
 dotenv.config({ path: '.env.test' });

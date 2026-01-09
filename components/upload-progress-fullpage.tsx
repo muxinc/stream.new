@@ -1,5 +1,7 @@
+'use client';
+
 import { useState, useEffect, useRef } from 'react';
-import Router from 'next/router';
+import { useRouter } from 'next/navigation';
 import { UpChunk } from '@mux/upchunk';
 import useSwr from 'swr';
 import Layout from './layout';
@@ -16,6 +18,7 @@ type Props = {
 };
 
 const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
+  const router = useRouter();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadId, setUploadId] = useState('');
    // Add this ref to store the current upload ID
@@ -117,11 +120,9 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
     isDynamicChunkSizeSet.current = isDynamic === 'true';
 
     if (upload && upload.asset_id) {
-      Router.push({
-        pathname: `/assets/${upload.asset_id}`,
-      });
+      router.push(`/assets/${upload.asset_id}`);
     }
-  }, [upload]);
+  }, [upload, router]);
 
   const startFileValidation = (_file: File): Promise<void> => {
     return new Promise((resolve, reject) => {

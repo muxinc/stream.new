@@ -44,6 +44,10 @@ module.exports = {
       'varsIgnorePattern': '^_',
       'caughtErrorsIgnorePattern': '^_'
     }],
+    '@typescript-eslint/ban-ts-comment': ['error', {
+      'ts-ignore': 'allow-with-description',
+      'minimumDescriptionLength': 10
+    }],
     "react/no-unknown-property": [
       2,
       {

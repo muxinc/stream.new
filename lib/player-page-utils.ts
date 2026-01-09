@@ -1,5 +1,4 @@
 import { getImageDimensions } from './image-dimensions';
-// @ts-expect-error no types yet
 import { createBlurUp } from '@mux/blurup';
 import { getImageBaseUrl, getStreamBaseUrl } from './urlutils';
 import { HOST_URL } from '../constants';
