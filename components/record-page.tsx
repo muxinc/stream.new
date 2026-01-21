@@ -293,23 +293,15 @@ const RecordPage: React.FC<NoProps> = () => {
     logger('start recording');
     try {
       setStartRecordTime((new Date()).valueOf());
-      const preferredOptions = { mimeType: 'video/webm;codecs=vp9' };
-      const backupOptions = { mimeType: 'video/webm;codecs=vp8,opus' };
-      const lastResortOptions = { mimeType: 'video/mp4;codecs=avc1' };
-      let options = preferredOptions;
-      /*
-       * MediaRecorder.isTypeSupported is not a thing in safari,
-       * good thing safari supports the preferredOptions
-       */
-      if (typeof MediaRecorder.isTypeSupported === 'function') {
-        if (!MediaRecorder.isTypeSupported(preferredOptions.mimeType)) {
-          options = backupOptions;
-          if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-            options = lastResortOptions;
-          }
-        }
-      }
+      const videoBitsPerSecond = 5000000; // Double the default quality from 2.5Mbps to 5Mbps
+      const audioBitsPerSecond = 128000; // 128kbps
+      const MIME_TYPE_STACK = ['video/mp4;codecs=avc1', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8,opus'];
+      const supportedMimeType = MIME_TYPE_STACK.find((mimeType) =>
+        MediaRecorder.isTypeSupported(mimeType)
+      );
 
+      if (!supportedMimeType) throw new Error('Cannot find a supported mimeType');
+      const options = { videoBitsPerSecond, audioBitsPerSecond, mimeType: supportedMimeType };
       const stream = streamRef.current;
       if (!stream) throw new Error('Cannot record without a stream');
       recorderRef.current = new MediaRecorder(stream, options);
