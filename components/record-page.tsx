@@ -175,15 +175,21 @@ const RecordPage: React.FC<NoProps> = () => {
     stream.getTracks().forEach(track => {
       track.onended = () => {
         logger('track ended unexpectedly', track.kind, track.label);
-        // If we're currently recording when a track ends, stop the recorder gracefully
-        if (recorderRef.current && recorderRef.current.state === 'recording') {
-          logger('stopping recorder because track ended');
-          // Stop the recorder which will trigger the onstop handler
-          recorderRef.current.stop();
-        } else {
-          // Track ended but we weren't recording, just clean up
-          cleanup();
-          stopUserMedia();
+
+        // Check if any tracks are still active
+        const hasActiveTracks = streamRef.current?.getTracks().some(t => t.readyState === 'live');
+
+        // Only take action when ALL tracks have ended to avoid duplicate handlers
+        if (!hasActiveTracks) {
+          if (recorderRef.current && recorderRef.current.state === 'recording') {
+            logger('all tracks ended during recording, stopping recorder');
+            recorderRef.current.stop();
+          } else if (!recorderRef.current || recorderRef.current.state === 'inactive') {
+            // All tracks ended but we weren't recording, just clean up
+            logger('all tracks ended outside of recording, cleaning up');
+            cleanup();
+            stopUserMedia();
+          }
         }
       };
     });
@@ -338,6 +344,16 @@ const RecordPage: React.FC<NoProps> = () => {
       };
       recorderRef.current.onstop = function onRecorderStop () {
         finalBlob.current = new Blob(mediaChunks.current, { type: recorderRef.current?.mimeType });
+
+        // Check if we have valid recording data
+        if (finalBlob.current.size === 0) {
+          logger.warn('Recording stopped but no data was captured');
+          setErrorMessage('Recording ended without capturing any data. Please try again.');
+          cleanup();
+          stopUserMedia();
+          return;
+        }
+
         const objUrl = URL.createObjectURL(finalBlob.current);
         if (videoRef.current !== null) {
           videoRef.current.srcObject = null;
