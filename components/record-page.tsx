@@ -170,6 +170,30 @@ const RecordPage: React.FC<NoProps> = () => {
         updateAudioLevels(analyser);
       }, 100);
     }
+
+    // Add event listeners to detect when tracks end (e.g., Firefox's native "Stop Sharing" button)
+    stream.getTracks().forEach(track => {
+      track.onended = () => {
+        logger('track ended unexpectedly', track.kind, track.label);
+
+        // Check if any tracks are still active
+        const hasActiveTracks = streamRef.current?.getTracks().some(t => t.readyState === 'live');
+
+        // Only take action when ALL tracks have ended to avoid duplicate handlers
+        if (!hasActiveTracks) {
+          if (recorderRef.current && recorderRef.current.state === 'recording') {
+            logger('all tracks ended during recording, stopping recorder');
+            recorderRef.current.stop();
+          } else if (!recorderRef.current || recorderRef.current.state === 'inactive') {
+            // All tracks ended but we weren't recording, just clean up
+            logger('all tracks ended outside of recording, cleaning up');
+            cleanup();
+            stopUserMedia();
+          }
+        }
+      };
+    });
+
     streamRef.current = stream;
     if (videoRef.current !== null) {
       (videoRef.current as HTMLVideoElement).srcObject = stream;
@@ -320,6 +344,16 @@ const RecordPage: React.FC<NoProps> = () => {
       };
       recorderRef.current.onstop = function onRecorderStop () {
         finalBlob.current = new Blob(mediaChunks.current, { type: recorderRef.current?.mimeType });
+
+        // Check if we have valid recording data
+        if (finalBlob.current.size === 0) {
+          logger.warn('Recording stopped but no data was captured');
+          setErrorMessage('Recording ended without capturing any data. Please try again.');
+          cleanup();
+          stopUserMedia();
+          return;
+        }
+
         const objUrl = URL.createObjectURL(finalBlob.current);
         if (videoRef.current !== null) {
           videoRef.current.srcObject = null;
@@ -329,6 +363,8 @@ const RecordPage: React.FC<NoProps> = () => {
           setIsReviewing(true);
         }
         cleanup();
+        // Stop media tracks after recording completes (moved from stopRecording)
+        stopUserMedia();
       };
       setRecordState(RecordState.RECORDING);
     } catch (err) {
@@ -348,7 +384,8 @@ const RecordPage: React.FC<NoProps> = () => {
       return;
     }
     recorderRef.current.stop();
-    stopUserMedia();
+    // Note: stopUserMedia() is called in the MediaRecorder's onstop handler
+    // to ensure tracks are only stopped after recording completes
   };
 
   const submitRecording = () => {
