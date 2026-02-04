@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Mux from '@mux/mux-node';
 import { start } from 'workflow/api';
-import { processModerationOnly, processSummaryOnly } from '../../../../workflows/process-mux-ai';
+import { processModeration, processSummaryAndQuestions } from '../../../../workflows/process-mux-ai';
 
 const webhookSignatureSecret = process.env.MUX_WEBHOOK_SIGNATURE_SECRET;
 const mux = new Mux();
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       const assetId = data.id;
 
       // Start moderation workflow - returns immediately while processing continues in background
-      const workflowRun = await start(processModerationOnly, [assetId]);
+      const workflowRun = await start(processModeration, [assetId]);
 
       return NextResponse.json({
         message: 'Moderation workflow started',
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
         const assetId = track.asset_id;
 
         // Start summarization workflow - returns immediately while processing continues in background
-        const workflowRun = await start(processSummaryOnly, [assetId]);
+        const workflowRun = await start(processSummaryAndQuestions, [assetId]);
 
         return NextResponse.json({
           message: 'Summarization workflow started',
