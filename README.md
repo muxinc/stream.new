@@ -177,14 +177,17 @@ This integration provides:
 
 ### Setup
 
-1. Configure the webhook endpoint in your Mux dashboard to point to `/api/webhooks/mux-ai`
-2. Subscribe to these webhook events:
+1. Set the following environment variables:
+   - `MUX_TOKEN_ID` and `MUX_TOKEN_SECRET` - Your Mux API credentials
+   - `OPENAI_API_KEY` - Your OpenAI API key (for moderation and summarization)
+   - `HIVE_API_KEY` - Your Hive AI API key (for moderation)
+   - `AUTO_DELETE_ENABLED=1` - Enable automatic deletion of flagged content (optional)
+
+2. Configure the webhook endpoint in your Mux dashboard to point to `/api/webhooks/mux-ai`
+
+3. Subscribe to these webhook events:
    - `video.asset.ready` - triggers moderation workflow
    - `video.asset.track.ready` - triggers summarization when subtitles are generated
-
-3. Set the following environment variables:
-   - `MUX_TOKEN_ID` and `MUX_TOKEN_SECRET` - Your Mux API credentials
-   - `AUTO_DELETE_ENABLED=1` - Enable automatic deletion of flagged content (optional)
 
 ### How it works
 
