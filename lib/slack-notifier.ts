@@ -88,6 +88,23 @@ const baseBlocks = ({ playbackId, assetId, duration }: {playbackId: string, asse
     ],
   }]);
 
+const deleteButtonBlock = (assetId: string): BlockItem => ({
+  type: 'section',
+  text: {
+    type: 'mrkdwn',
+    text: 'If this is bad, it can be deleted with 1 click:',
+  },
+  accessory: {
+    type: 'button',
+    text: {
+      type: 'plain_text',
+      text: 'DELETE',
+    },
+    url: `${HOST_URL}/moderator/delete-asset?asset_id=${assetId}&slack_moderator_password=${moderatorPassword}`,
+    style: 'danger',
+  },
+});
+
 export const sendSlackModerationResult = async ({
   playbackId,
   assetId,
@@ -144,22 +161,7 @@ export const sendSlackModerationResult = async ({
 
   // Always include delete button
   if (moderatorPassword) {
-    blocks.push({
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: 'If this is bad, it can be deleted with 1 click:',
-      },
-      accessory: {
-        type: 'button',
-        text: {
-          type: 'plain_text',
-          text: 'DELETE',
-        },
-        url: `${HOST_URL}/moderator/delete-asset?asset_id=${assetId}&slack_moderator_password=${moderatorPassword}`,
-        style: 'danger',
-      },
-    });
+    blocks.push(deleteButtonBlock(assetId));
   }
 
   await got.post(slackWebhook, {
@@ -253,22 +255,7 @@ export const sendSlackSummarizationResult = async ({
 
   // Always include delete button
   if (moderatorPassword) {
-    blocks.push({
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: 'If this is bad, it can be deleted with 1 click:',
-      },
-      accessory: {
-        type: 'button',
-        text: {
-          type: 'plain_text',
-          text: 'DELETE',
-        },
-        url: `${HOST_URL}/moderator/delete-asset?asset_id=${assetId}&slack_moderator_password=${moderatorPassword}`,
-        style: 'danger',
-      },
-    });
+    blocks.push(deleteButtonBlock(assetId));
   }
 
   await got.post(slackWebhook, {
