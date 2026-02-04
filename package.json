@@ -15,7 +15,6 @@
     "tsc": "tsc"
   },
   "dependencies": {
-    "@google-cloud/vision": "^2.3.2",
     "@mux/ai": "^0.6.0",
     "@mux/blurup": "^1.0.2",
     "@mux/mux-node": "^12.8.1",

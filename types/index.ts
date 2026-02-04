@@ -13,9 +13,3 @@ export interface HTMLVideoElementWithPlyr extends HTMLVideoElement {
 
 export type PlayerElement = HTMLVideoElementWithPlyr | MuxVideoElement | MuxPlayerElement
 
-export type ModerationScores = {
-  adult?: number;
-  violent?: number;
-  suggestive?: number;
-}
-

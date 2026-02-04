@@ -1,13 +1,9 @@
-import { ModerationScores } from '../types';
 import type { ModerationResult } from '@mux/ai/workflows';
 import Mux from '@mux/mux-node';
 import { RequestError } from 'got';
 import got from './got-client';
 
 const mux = new Mux();
-
-const ADULT_SCORE_THRESHHOLD = 0.95;
-const VIOLENCE_SCORE_THRESHHOLD = 0.85;
 
 async function saveDeletionRecordInAirtable ({ assetId, notes }: { assetId: string, notes: string }) {
   if (process.env.AIRTABLE_KEY && process.env.AIRTABLE_BASE_ID) {
@@ -27,23 +23,6 @@ async function saveDeletionRecordInAirtable ({ assetId, notes }: { assetId: stri
       console.error('Error reporting to airtable', err.response?.body, e); // eslint-disable-line no-console
     }
   }
-}
-
-function shouldAutoDeleteContent(hiveScores?: ModerationScores): boolean {
-  const isAdult = (hiveScores && hiveScores.adult && hiveScores.adult >= ADULT_SCORE_THRESHHOLD || false);
-  const isViolent = (hiveScores && hiveScores.violent && hiveScores.violent >= VIOLENCE_SCORE_THRESHHOLD || false);
-  return isAdult || isViolent;
-}
-
-export async function autoDelete({ assetId, playbackId, hiveScores }: { assetId: string, playbackId: string, hiveScores: ModerationScores }): Promise<boolean> {
-  if (shouldAutoDeleteContent(hiveScores)) {
-    await mux.video.assets.deletePlaybackId(assetId, playbackId);
-    await saveDeletionRecordInAirtable({ assetId, notes: JSON.stringify(hiveScores) });
-
-    return true;
-  }
-
-  return false;
 }
 
 export async function checkAndAutoDelete({ assetId, playbackId, openaiResult, hiveResult }: { assetId: string, playbackId: string, openaiResult: ModerationResult, hiveResult: ModerationResult }): Promise<boolean> {
