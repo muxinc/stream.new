@@ -166,7 +166,7 @@ export const sendSlackModerationResult = async ({
 
   await got.post(slackWebhook, {
     json: {
-      text: `Moderation complete for video on stream.new. <${HOST_URL}/v/${playbackId}|View on stream.new>`,
+      text: `Moderation complete for video on stream.new! <${HOST_URL}/v/${playbackId}|View on stream.new>`,
       icon_emoji: 'robot_face',
       blocks,
     },
@@ -260,7 +260,7 @@ export const sendSlackSummarizationResult = async ({
 
   await got.post(slackWebhook, {
     json: {
-      text: `AI summary complete for video on stream.new!. <${HOST_URL}/v/${playbackId}|View on stream.new>`,
+      text: `AI summary complete for video on stream.new! <${HOST_URL}/v/${playbackId}|View on stream.new>`,
       icon_emoji: 'mag',
       blocks,
     },
