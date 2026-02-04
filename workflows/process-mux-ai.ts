@@ -66,7 +66,7 @@ async function notifySlackSummarization(
   });
 }
 
-export async function processModerationOnly(assetId: string) {
+export async function processModeration(assetId: string) {
   "use workflow";
 
   console.log('Processing moderation for asset:', assetId); // eslint-disable-line no-console
@@ -101,7 +101,7 @@ export async function processModerationOnly(assetId: string) {
   };
 }
 
-export async function processSummaryOnly(assetId: string) {
+export async function processSummaryAndQuestions(assetId: string) {
   "use workflow";
 
   console.log('Processing summary for asset:', assetId); // eslint-disable-line no-console
