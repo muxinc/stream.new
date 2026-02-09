@@ -244,5 +244,6 @@ test('still returns true if Airtable recording fails', async () => {
 
   expect(didDelete).toBe(true);
   expect(scopeMux.isDone()).toBe(true);
+  expect(scopeAirtable.isDone()).toBe(true);
   // Airtable error should be logged but not prevent deletion
 });
