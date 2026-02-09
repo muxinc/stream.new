@@ -1,3 +1,4 @@
+const { withWorkflow } = require('@workflow/next');
 const { createSecureHeaders } = require('next-secure-headers');
 
 const secureHeaderOptions = {
@@ -9,7 +10,7 @@ const secureHeaderOptions = {
   },
 };
 
-module.exports = {
+const config = {
   async headers() {
     return [
       {
@@ -23,3 +24,5 @@ module.exports = {
     ];
   },
 };
+
+module.exports = withWorkflow(config);

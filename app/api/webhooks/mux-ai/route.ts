@@ -1,0 +1,82 @@
+import { NextRequest, NextResponse } from 'next/server';
+import Mux from '@mux/mux-node';
+import { start } from 'workflow/api';
+import { processModeration, processSummaryAndQuestions } from '../../../../workflows/process-mux-ai';
+
+const webhookSignatureSecret = process.env.MUX_WEBHOOK_SIGNATURE_SECRET;
+const mux = new Mux();
+
+export async function POST(request: NextRequest) {
+  // Get raw body as text (NOT json) for signature verification
+  const rawBody = await request.text();
+
+  // Verify signature
+  if (webhookSignatureSecret) {
+    // Convert headers to plain object for Mux SDK
+    const headers: Record<string, string> = {};
+    request.headers.forEach((value, key) => {
+      headers[key] = value;
+    });
+
+    try {
+      mux.webhooks.verifySignature(rawBody, headers, webhookSignatureSecret);
+    } catch (e) {
+      console.error('Error verifyWebhookSignature - is the correct signature secret set?', e);
+      return NextResponse.json(
+        { message: (e as Error).message },
+        { status: 400 }
+      );
+    }
+  } else {
+    console.log('Skipping webhook sig verification because no secret is configured'); // eslint-disable-line no-console
+  }
+
+  try {
+    // Parse JSON inside try/catch to handle malformed payloads
+    const jsonBody = JSON.parse(rawBody);
+    const { data, type } = jsonBody;
+
+    // Handle video.asset.ready - start moderation workflow
+    if (type === 'video.asset.ready') {
+      const assetId = data.id;
+
+      // Start moderation workflow - returns immediately while processing continues in background
+      const workflowRun = await start(processModeration, [assetId]);
+
+      return NextResponse.json({
+        message: 'Moderation workflow started',
+        asset_id: assetId,
+        workflow_id: workflowRun.runId
+      });
+    }
+
+    // Handle video.asset.track.ready - check if it's generated subtitles, then start summarization workflow
+    if (type === 'video.asset.track.ready') {
+      const track = data;
+
+      // Only process if this is a generated subtitle track
+      if (track.type === 'text' && track.text_type === 'subtitles' && track.text_source === 'generated_vod') {
+        const assetId = track.asset_id;
+
+        // Start summarization workflow - returns immediately while processing continues in background
+        const workflowRun = await start(processSummaryAndQuestions, [assetId]);
+
+        return NextResponse.json({
+          message: 'Summarization workflow started',
+          asset_id: assetId,
+          track_id: track.id,
+          workflow_id: workflowRun.runId
+        });
+      }
+
+      // Track type not relevant for our workflow
+      return NextResponse.json({ message: 'Track type not relevant for AI processing' });
+    }
+
+    // Event type not handled
+    return NextResponse.json({ message: 'Event type not handled' });
+  } catch (e) {
+    console.error('Request error', e); // eslint-disable-line no-console
+    return NextResponse.json({ error: 'Error handling webhook' }, { status: 500 });
+  }
+}

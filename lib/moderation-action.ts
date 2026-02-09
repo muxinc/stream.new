@@ -1,12 +1,9 @@
-import { ModerationScores } from '../types';
+import type { ModerationResult } from '@mux/ai/workflows';
 import Mux from '@mux/mux-node';
 import { RequestError } from 'got';
 import got from './got-client';
 
 const mux = new Mux();
-
-const ADULT_SCORE_THRESHHOLD = 0.95;
-const VIOLENCE_SCORE_THRESHHOLD = 0.85;
 
 async function saveDeletionRecordInAirtable ({ assetId, notes }: { assetId: string, notes: string }) {
   if (process.env.AIRTABLE_KEY && process.env.AIRTABLE_BASE_ID) {
@@ -28,16 +25,25 @@ async function saveDeletionRecordInAirtable ({ assetId, notes }: { assetId: stri
   }
 }
 
-function shouldAutoDeleteContent(hiveScores?: ModerationScores): boolean {
-  const isAdult = (hiveScores && hiveScores.adult && hiveScores.adult >= ADULT_SCORE_THRESHHOLD || false);
-  const isViolent = (hiveScores && hiveScores.violent && hiveScores.violent >= VIOLENCE_SCORE_THRESHHOLD || false);
-  return isAdult || isViolent;
-}
+export async function checkAndAutoDelete({ assetId, playbackId, openaiResult, hiveResult }: { assetId: string, playbackId: string, openaiResult: ModerationResult, hiveResult: ModerationResult }): Promise<boolean> {
+  const autoDeleteEnabled = process.env.AUTO_DELETE_ENABLED === '1';
 
-export async function autoDelete({ assetId, playbackId, hiveScores }: { assetId: string, playbackId: string, hiveScores: ModerationScores }): Promise<boolean> {
-  if (shouldAutoDeleteContent(hiveScores)) {
+  // Check if either moderation service flags the content
+  const openaiExceeds = openaiResult.exceedsThreshold;
+  const hiveExceeds = hiveResult.exceedsThreshold;
+  const shouldDelete = openaiExceeds || hiveExceeds;
+
+  if (autoDeleteEnabled && shouldDelete) {
     await mux.video.assets.deletePlaybackId(assetId, playbackId);
-    await saveDeletionRecordInAirtable({ assetId, notes: JSON.stringify(hiveScores) });
+
+    const flaggedBy = [];
+    if (openaiExceeds) flaggedBy.push('OpenAI');
+    if (hiveExceeds) flaggedBy.push('Hive');
+
+    await saveDeletionRecordInAirtable({
+      assetId,
+      notes: `Flagged by: ${flaggedBy.join(', ')} | OpenAI - Sexual: ${openaiResult.maxScores.sexual}, Violence: ${openaiResult.maxScores.violence} | Hive - Sexual: ${hiveResult.maxScores.sexual}, Violence: ${hiveResult.maxScores.violence}`
+    });
 
     return true;
   }

@@ -165,90 +165,38 @@ After all of this is set up the flow will be:
 1. (optional) Your server verifies the webhook signature
 1. If the webhook matches `video.asset.ready` then your server will post a message to your slack channel that has the Mux Asset ID, the Mux Playback ID, and a thumbnail of the video.
 
-## Step 5 (optional) Add automatic content analysis to Slackbot Moderator (Google Vision API)
+## Step 5 (optional) Add AI-powered content moderation and summarization using @mux/ai
 
-stream.new can automatically moderate content with the help of Google's [Cloud vision API](https://cloud.google.com/vision).
+stream.new can automatically moderate and summarize content with the help of [@mux/ai](https://www.npmjs.com/package/@mux/ai).
 
-Follow these steps to help moderate uploaded content:
+This integration provides:
+* **Automatic moderation** using both OpenAI and Hive AI providers to detect inappropriate content
+* **Auto-deletion** of content that exceeds moderation thresholds
+* **AI-generated summaries** with titles, descriptions, and tags
+* **Custom Q&A** to answer specific questions about video content
 
-- `GOOGLE_APPLICATION_CREDENTIALS` - This is a base64 encoded JSON representation of your Google service account credentials. Follow instructions below.
+### Setup
 
-1. First, you will need to set up a google developer account at [cloud.google.com](https://cloud.google.com/).
-1. Create a project
-1. Create a service account for your project and enable the "Cloud Vision API" for your project
+1. Set the following environment variables:
+   - `MUX_TOKEN_ID` and `MUX_TOKEN_SECRET` - Your Mux API credentials
+   - `OPENAI_API_KEY` - Your OpenAI API key (for moderation and summarization)
+   - `HIVE_API_KEY` - Your Hive AI API key (for moderation)
+   - `AUTO_DELETE_ENABLED=1` - Enable automatic deletion of flagged content (optional)
 
-Export a Google Service Account authentication file in JSON format. If you have a file that is like this:
+2. Configure the webhook endpoint in your Mux dashboard to point to `/api/webhooks/mux-ai`
 
-`service_account.json`
+3. Subscribe to these webhook events:
+   - `video.asset.ready` - triggers moderation workflow
+   - `video.asset.track.ready` - triggers summarization when subtitles are generated
 
-```
-{
-  "type": "service_account",
-  "project_id": "",
-  "private_key_id": "",
-  "private_key": "-----BEGIN PRIVATE KEY-----\",
-  "client_email": "",
-  "client_id": "",
-  "auth_uri": "",
-  "token_uri": "",
-  "auth_provider_x509_cert_url": "",
-  "client_x509_cert_url": ""
-}
-```
+### How it works
 
-Get the base64 encoded string of this JSON file like so:
-
-```
-cat service-account.json | base64
-```
-
-^ This command will output one long string. This string is what you will use for the ENV var `GOOGLE_APPLICATION_CREDENTIALS`.
-
-When the Slackbot Moderator message gets posted to slack, it will now include a "Moderation score (Google)" with 2 dimensions:
-
-* `"adult"`
-* `"suggestive"`
-* `"violent"`
-
-Each dimension will have a score from 1-5. You should interpret these scores in terms of likelihood that the video contains this type of content. This
-is based on Google Vision's [Likelihood score](https://cloud.google.com/vision/docs/reference/rpc/google.cloud.vision.v1#google.cloud.vision.v1.Likelihood)
-
-* `1`: very unlikely
-* `2`: unlikely
-* `3`: possible
-* `4`: likely
-* `5`: very likely
-
-
-
-<div align="center">
-  <img src="images/moderation-score-slack.png" width="80%" alt="Slackbot Moderation Message"></img>
-</div>
-
-
-
-## Step 6 (optional) Add automatic content analysis to Slackbot Moderator ([Hive AI](https://thehive.ai/))
-
-stream.new can automatically moderate content with the help of [Hive AI](https://thehive.ai/).
-
-Follow these steps to help moderate uploaded content:
-
-- `HIVE_AI_KEY` - This is a base64 encoded JSON representation of your Google service account credentials. Follow instructions below.
-
-1. First, you will need to set up an account at [thehive.ai](https://thehive.ai/).
-1. Create a project
-1. Get the API key for your prject
-
-When the Slackbot Moderator message gets posted to slack, it will now include a section titled "Moderation score (hive)" with 2 dimensions:
-
-* `"adult"`
-* `"suggestive"`
-
-Each dimension will have a score from 0-1 with a precision of 6 decimal places. These numbers come from the "Classification API" that Hive AI provides. [Details here](https://docs.thehive.ai/reference#classification).
-
-<div align="center">
-  <img src="images/moderation-score-slack.png" width="80%" alt="Slackbot Moderation Message"></img>
-</div>
+When a video is uploaded:
+1. The `video.asset.ready` webhook triggers moderation using both OpenAI and Hive AI
+2. If either service detects content exceeding thresholds (default: 0.9), the playback ID is automatically deleted
+3. Moderation results are posted to Slack with visual indicators (🚨 for flagged, ✅ for clean)
+4. When generated subtitles are ready, the `video.asset.track.ready` webhook triggers AI summarization
+5. Summary results with title, description, tags, and custom Q&A answers are posted to Slack
 
 # Hidden playback features via query params:
 
