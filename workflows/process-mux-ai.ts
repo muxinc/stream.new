@@ -14,7 +14,12 @@ async function handleModerationAndNotify(
 
   // Fetch asset data to get playbackId and duration
   const asset = await mux.video.assets.retrieve(assetId);
-  const playbackId = asset.playback_ids?.[0]?.id || '';
+  const playbackId = asset.playback_ids?.[0]?.id;
+
+  if (!playbackId) {
+    throw new Error(`No playback ID found for asset ${assetId}. Cannot proceed with moderation notification.`);
+  }
+
   const duration = asset.duration || 0;
 
   // Check if we should auto-delete (if either service flags it)
@@ -56,7 +61,11 @@ async function notifySlackSummarization(
 
   // Fetch asset data to get playbackId
   const asset = await mux.video.assets.retrieve(assetId);
-  const playbackId = asset.playback_ids?.[0]?.id || '';
+  const playbackId = asset.playback_ids?.[0]?.id;
+
+  if (!playbackId) {
+    throw new Error(`No playback ID found for asset ${assetId}. Cannot proceed with summarization notification.`);
+  }
 
   await sendSlackSummarizationResult({
     playbackId,

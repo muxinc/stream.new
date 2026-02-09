@@ -31,11 +31,11 @@ export async function POST(request: NextRequest) {
     console.log('Skipping webhook sig verification because no secret is configured'); // eslint-disable-line no-console
   }
 
-  // Parse JSON AFTER verification
-  const jsonBody = JSON.parse(rawBody);
-  const { data, type } = jsonBody;
-
   try {
+    // Parse JSON inside try/catch to handle malformed payloads
+    const jsonBody = JSON.parse(rawBody);
+    const { data, type } = jsonBody;
+
     // Handle video.asset.ready - start moderation workflow
     if (type === 'video.asset.ready') {
       const assetId = data.id;
