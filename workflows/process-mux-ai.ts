@@ -110,17 +110,17 @@ export async function processModeration(assetId: string) {
   };
 }
 
-export async function processSummaryAndQuestions(assetId: string) {
+export async function processSummaryAndQuestions(assetId: string, includeTranscript: boolean = true) {
   "use workflow";
 
-  console.log('Processing summary for asset:', assetId); // eslint-disable-line no-console
+  console.log('Processing summary for asset:', assetId, `(includeTranscript: ${includeTranscript})`); // eslint-disable-line no-console
 
   // Run summary and questions concurrently
   const [summaryResult, questionsResult] = await Promise.all([
     getSummaryAndTags(assetId, {
       provider: 'openai',
       tone: 'neutral',
-      includeTranscript: true,
+      includeTranscript,
     }),
     askQuestions(assetId, [
       { question: "Is this a professionally produced full length movie or TV show, or a standalone segment from it?" },
@@ -131,7 +131,7 @@ export async function processSummaryAndQuestions(assetId: string) {
       { question: "Is this video mostly of feet?" },
     ], {
       provider: 'openai',
-      includeTranscript: true,
+      includeTranscript,
     }),
   ]);
 

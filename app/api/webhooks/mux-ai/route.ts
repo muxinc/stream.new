@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
         if (errorMessages.includes('Asset does not have an audio track')) {
           console.log(`Track errored for asset ${assetId} (no audio track), proceeding with summarization anyway`); // eslint-disable-line no-console
 
-          const workflowRun = await start(processSummaryAndQuestions, [assetId]);
+          const workflowRun = await start(processSummaryAndQuestions, [assetId, false]);
 
           return NextResponse.json({
             message: 'Summarization workflow started (track errored, no audio)',
