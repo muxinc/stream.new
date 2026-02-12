@@ -1883,10 +1883,9 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@mux/ai@^0.7.1":
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/@mux/ai/-/ai-0.7.1.tgz#98657f2343e95625cd30ad31f0fb1de1663e02f6"
-  integrity sha512-cEeL5lZ/8uCF7iXA5QRtZeCpkdAGzQoSbAOvQj50fFHJcTycMfJdK17l23mYwMyfxaOYJvqiDZcxtaGfE/Gh4w==
+"@mux/ai@./vendor/mux-ai-0.7.2.tgz":
+  version "0.7.2"
+  resolved "./vendor/mux-ai-0.7.2.tgz#3287a1a4bd4dbd872f01be5c842da4d7854cd377"
   dependencies:
     "@ai-sdk/anthropic" "^3.0.16"
     "@ai-sdk/google" "^3.0.10"
