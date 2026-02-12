@@ -1885,7 +1885,7 @@
 
 "@mux/ai@./vendor/mux-ai-0.7.2.tgz":
   version "0.7.2"
-  resolved "./vendor/mux-ai-0.7.2.tgz#3089c77318c82dd129c4f4954f526fdb"
+  resolved "./vendor/mux-ai-0.7.2.tgz#3287a1a4bd4dbd872f01be5c842da4d7854cd377"
   dependencies:
     "@ai-sdk/anthropic" "^3.0.16"
     "@ai-sdk/google" "^3.0.10"
