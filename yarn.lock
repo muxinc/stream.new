@@ -1883,10 +1883,10 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@mux/ai@^0.6.0":
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/@mux/ai/-/ai-0.6.0.tgz#eadb29c586759650fb3d98d80108976b5684cb10"
-  integrity sha512-dvLJ8s+DMFSWaDnxvtmPRnnxX/uODwsnz1A2+39vv/tMg7JVMJz3p+0CAYK8XqquvdeglQ7GXhwdaGLU8Qor3A==
+"@mux/ai@^0.7.1":
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/@mux/ai/-/ai-0.7.1.tgz#98657f2343e95625cd30ad31f0fb1de1663e02f6"
+  integrity sha512-cEeL5lZ/8uCF7iXA5QRtZeCpkdAGzQoSbAOvQj50fFHJcTycMfJdK17l23mYwMyfxaOYJvqiDZcxtaGfE/Gh4w==
   dependencies:
     "@ai-sdk/anthropic" "^3.0.16"
     "@ai-sdk/google" "^3.0.10"
@@ -1895,7 +1895,6 @@
     "@aws-sdk/lib-storage" "^3.0.0"
     "@aws-sdk/s3-request-presigner" "^3.0.0"
     "@mux/mux-node" "^12.5.0"
-    "@noble/ciphers" "^2.1.1"
     ai "^6.0.42"
     dedent "^1.7.0"
     dotenv "^17.2.2"
@@ -2089,11 +2088,6 @@
   version "16.1.1"
   resolved "https://registry.yarnpkg.com/@next/swc-win32-x64-msvc/-/swc-win32-x64-msvc-16.1.1.tgz#96e9e335e2577481dab6fc7a2af48f3e4a28fbdb"
   integrity sha512-Ncwbw2WJ57Al5OX0k4chM68DKhEPlrXBaSXDCi2kPi5f4d8b3ejr3RRJGfKBLrn2YJL5ezNS7w2TZLHSti8CMw==
-
-"@noble/ciphers@^2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@noble/ciphers/-/ciphers-2.1.1.tgz#c8c74fcda8c3d1f88797d0ecda24f9fc8b92b052"
-  integrity sha512-bysYuiVfhxNJuldNXlFEitTVdNnYUc+XNJZd7Qm2a5j1vZHgY+fazadNFWFaMK/2vye0JVlxV3gHmC0WDfAOQw==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
