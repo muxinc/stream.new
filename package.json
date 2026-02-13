@@ -15,7 +15,7 @@
     "tsc": "tsc"
   },
   "dependencies": {
-    "@mux/ai": "^0.6.0",
+    "@mux/ai": "./vendor/mux-ai-0.7.2.tgz",
     "@mux/blurup": "^1.0.2",
     "@mux/mux-node": "^12.8.1",
     "@mux/mux-player-react": "^3.10.2",
@@ -36,7 +36,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "swr": "^0.2.0",
-    "workflow": "^4.0.1-beta.41"
+    "workflow": "^4.1.0-beta.55"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.0",
