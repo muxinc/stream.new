@@ -9,7 +9,7 @@
     "dev": "next dev",
     "build": "npm run lint && next build",
     "start": "next start",
-    "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "format": "npm run lint",
     "test": "jest",
     "tsc": "tsc"
