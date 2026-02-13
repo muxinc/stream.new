@@ -80,8 +80,8 @@ export async function POST(request: NextRequest) {
         const assetId = track.asset_id;
         const errorMessages = track.error?.messages || [];
 
-        if (errorMessages.includes('Asset does not have an audio track')) {
-          console.log(`Track errored for asset ${assetId} (no audio track), proceeding with summarization anyway`); // eslint-disable-line no-console
+        if (errorMessages.includes('Asset does not have an audio track') || errorMessages.includes('Failed to generate caption track')) {
+          console.log(`Track errored for asset ${assetId} (${errorMessages.join(', ')}), proceeding with summarization anyway`); // eslint-disable-line no-console
 
           const workflowRun = await start(processSummaryAndQuestions, [assetId, false]);
 
