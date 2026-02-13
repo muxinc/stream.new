@@ -7,15 +7,15 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "yarn lint && next build",
+    "build": "npm run lint && next build",
     "start": "next start",
-    "lint": "yarn eslint . --ext .js,.jsx,.ts,.tsx",
-    "format": "yarn lint",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "format": "npm run lint",
     "test": "jest",
     "tsc": "tsc"
   },
   "dependencies": {
-    "@mux/ai": "^0.7.2",
+    "@mux/ai": "^0.7.3",
     "@mux/blurup": "^1.0.2",
     "@mux/mux-node": "^12.8.1",
     "@mux/mux-player-react": "^3.11.4",
@@ -35,7 +35,7 @@
     "probe-image-size": "^7.2.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "swr": "^0.2.0",
+    "swr": "^2.0.0",
     "workflow": "^4.1.0-beta.55"
   },
   "devDependencies": {
@@ -64,7 +64,7 @@
     "nock": "^13.0.11",
     "typescript": "^5.7.2"
   },
-  "resolutions": {
+  "overrides": {
     "normalize-url": "^4.5.1",
     "node-fetch": "^2.6.7"
   }
