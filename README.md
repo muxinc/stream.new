@@ -44,14 +44,12 @@
       <ul>
         <li><a href="#step-1-create-an-account-in-mux">Step 1. Create an Account in Mux</a></li>
         <li><a href="#step-2-set-up-environment-variables">Step 2. Set Up Environment Variables</a></li>
-        <li><a href="#step-3-deploy-on-vercel">Step 3. Deploy on Vercel</a></li>
-        <li><a href="#step-4-optional-slackbot-moderator">Step 4. (Optional) Slackbot Moderator</a></li>
-        <li><a 
-        href="#step-5-optional-add-automatic-content-analysis-to-slackbot-moderator-google-vision-api"
-        >Step 5. (Optional) Add automatic content analysis to Slackbot Moderator (Google Vision API)</a></li>
-        <li><a 
-        href="#step-6-optional-add-automatic-content-analysis-to-slackbot-moderator-hive-ai"
-        >Step 6. (Optional) Add automatic content analysis to Slackbot Moderator Hive AI</a></li>
+        <li><a href="#step-3-run-locally">Step 3. Run Locally</a></li>
+        <li><a href="#step-4-deploy-on-vercel">Step 4. Deploy on Vercel</a></li>
+        <li><a href="#step-5-optional-slackbot-moderator">Step 5. (Optional) Slackbot Moderator</a></li>
+        <li><a
+        href="#step-6-optional-add-ai-powered-content-moderation-and-summarization-using-muxai"
+        >Step 6. (Optional) Add AI-powered content moderation and summarization using @mux/ai</a></li>
       </ul>
     </li>
     <li><a href="#videos-to-test-in-development">Videos to Test in Development</a></li>
@@ -111,7 +109,16 @@ Then, go to the [settings page](https://dashboard.mux.com/settings/access-tokens
 - `SLACK_MODERATOR_PASSWORD` (optional) - this is the password when you want to take actions from the **Slackbot moderator** feature (see below)
 - `NEXT_PUBLIC_MUX_ENV_KEY` (optional) - this is the mux environment key for Mux Data integration
 
-## Step 3. Deploy on Vercel
+## Step 3. Run locally
+
+```bash
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to see the app.
+
+## Step 4. Deploy on Vercel
 
 You can deploy this app to the cloud with [Vercel](https://vercel.com/import?filter=next.js&utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
 
@@ -126,7 +133,7 @@ vercel secrets add stream_new_token_secret <MUX_TOKEN_SECRET>
 
 Then push the project to GitHub/GitLab/Bitbucket and [import to Vercel](https://vercel.com/import?filter=next.js&utm_source=github&utm_medium=readme&utm_campaign=next-example) to deploy.
 
-## Step 4 (optional) Slackbot Moderator
+## Step 5 (optional) Slackbot Moderator
 
 <div align="center">
   <img src="images/slackbot-moderator.png" width="80%" alt="Slackbot message"></img>
@@ -165,7 +172,7 @@ After all of this is set up the flow will be:
 1. (optional) Your server verifies the webhook signature
 1. If the webhook matches `video.asset.ready` then your server will post a message to your slack channel that has the Mux Asset ID, the Mux Playback ID, and a thumbnail of the video.
 
-## Step 5 (optional) Add AI-powered content moderation and summarization using @mux/ai
+## Step 6 (optional) Add AI-powered content moderation and summarization using @mux/ai
 
 stream.new can automatically moderate and summarize content with the help of [@mux/ai](https://www.npmjs.com/package/@mux/ai).
 
