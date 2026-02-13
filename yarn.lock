@@ -1370,12 +1370,12 @@
   dependencies:
     "@mux/upchunk" "^3.5.0"
 
-"@mux/mux-video-react@^0.29.2":
-  version "0.29.2"
-  resolved "https://registry.yarnpkg.com/@mux/mux-video-react/-/mux-video-react-0.29.2.tgz#284e3c38f6eee0571988d0e8030c0e4dfe15d74d"
-  integrity sha512-BSKL9j0TS3RnOqorheWEP265j2ScSbhksUKLP5HyFYA35Rugq8HjguWZUph1weT6U56jq7xGHYUtO/gQ5DDp+w==
+"@mux/mux-video-react@^0.30.2":
+  version "0.30.2"
+  resolved "https://registry.yarnpkg.com/@mux/mux-video-react/-/mux-video-react-0.30.2.tgz#eefdd2395647bc1d19c70b2ab0b93e1198c775d9"
+  integrity sha512-jeYITuzo8KsCOkzsn7YevQtOFOmCs2jcjxnfsXAx2DMSUVG4QG9jY9DqOjBlCPakp32A4hMqlEdd5M2486jp6Q==
   dependencies:
-    "@mux/playback-core" "0.32.2"
+    "@mux/playback-core" "0.33.1"
     prop-types "^15.8.1"
 
 "@mux/mux-video@0.30.2":
@@ -1388,14 +1388,6 @@
     castable-video "~1.1.11"
     custom-media-element "~1.4.5"
     media-tracks "~0.3.4"
-
-"@mux/playback-core@0.32.2":
-  version "0.32.2"
-  resolved "https://registry.yarnpkg.com/@mux/playback-core/-/playback-core-0.32.2.tgz#dd714b8dc165118ce10af83f3fa563fafa7b8e86"
-  integrity sha512-cmaZN0hRIrEFcSVsj+quBDOeztg5oxug02WwuAiweWkMt1vSBM8nlzuF03coRnD/sKhgnQawdJOrng42R8I0Cg==
-  dependencies:
-    hls.js "~1.6.15"
-    mux-embed "^5.8.3"
 
 "@mux/playback-core@0.33.1":
   version "0.33.1"
@@ -6151,11 +6143,6 @@ mux-embed@^5.15.0:
   version "5.15.0"
   resolved "https://registry.yarnpkg.com/mux-embed/-/mux-embed-5.15.0.tgz#d610031a9c6613daedc04dfde1820cdbd4d7b5e5"
   integrity sha512-JlIOEapGImiAJNiEULjJsp8gwvJgGWWAqUZX4oNBjvWh6H2zeinqou9c2KQVuvg9Wpg7vJR1XupD+HkOakGbvw==
-
-mux-embed@^5.8.3:
-  version "5.13.0"
-  resolved "https://registry.yarnpkg.com/mux-embed/-/mux-embed-5.13.0.tgz#511e6394e74e85af6f774004f1cabc0e2062324e"
-  integrity sha512-voN+WCsA8S0lRTeu14v7WaWnQMr4f1D6rKzT7Bq1ZtETjnOaIG9EreG7p/SJrHLHHd1WTt0RYtTr4ZqJICcL6Q==
 
 nanoid@5.1.6:
   version "5.1.6"
