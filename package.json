@@ -7,10 +7,10 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "yarn lint && next build",
+    "build": "npm run lint && next build",
     "start": "next start",
-    "lint": "yarn eslint . --ext .js,.jsx,.ts,.tsx",
-    "format": "yarn lint",
+    "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx",
+    "format": "npm run lint",
     "test": "jest",
     "tsc": "tsc"
   },
@@ -64,7 +64,7 @@
     "nock": "^13.0.11",
     "typescript": "^5.7.2"
   },
-  "resolutions": {
+  "overrides": {
     "normalize-url": "^4.5.1",
     "node-fetch": "^2.6.7"
   }
