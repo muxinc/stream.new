@@ -297,21 +297,22 @@ const RecordPage: React.FC<NoProps> = () => {
     logger('start recording');
     try {
       setStartRecordTime((new Date()).valueOf());
-      const mimeTypes = [
+      const mimeTypesInPreferenceOrder = [
         'video/webm;codecs=vp9',
         'video/webm;codecs=vp8',
         'video/mp4;codecs=avc1',
       ];
-      let options = { mimeType: mimeTypes[0] };
+      let options = { mimeType: mimeTypesInPreferenceOrder[0] };
       /*
        * MediaRecorder.isTypeSupported is not a thing in safari,
        * good thing safari supports the preferredOptions
        */
       if (typeof MediaRecorder.isTypeSupported === 'function') {
-        const supported = mimeTypes.find(mimeType => MediaRecorder.isTypeSupported(mimeType));
+        const supported = mimeTypesInPreferenceOrder.find(mimeType => MediaRecorder.isTypeSupported(mimeType));
         if (supported) {
           options = { mimeType: supported };
         }
+        logger('selected mimeType:', options.mimeType);
       }
 
       const stream = streamRef.current;
