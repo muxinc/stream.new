@@ -106,13 +106,17 @@ const RecordPage: React.FC<NoProps> = () => {
   const cleanup = () => {
     logger('cleanup');
     if (recorderRef.current) {
-      if (recorderRef?.current?.state === 'inactive') {
-        logger('skipping recorder stop() b/c state is "inactive"');
-      } else {
-        recorderRef.current.onstop = function onRecorderStop () {
-          logger('recorder cleanup');
-        };
-        recorderRef.current.stop();
+      try {
+        if (recorderRef?.current?.state === 'inactive') {
+          logger('skipping recorder stop() b/c state is "inactive"');
+        } else {
+          recorderRef.current.onstop = function onRecorderStop () {
+            logger('recorder cleanup');
+          };
+          recorderRef.current.stop();
+        }
+      } catch (err) {
+        logger.warn('Error stopping recorder during cleanup:', err);
       }
     }
     mediaChunks.current = [];
@@ -293,9 +297,8 @@ const RecordPage: React.FC<NoProps> = () => {
     logger('start recording');
     try {
       setStartRecordTime((new Date()).valueOf());
-      const preferredOptions = { mimeType: 'video/webm;codecs=vp9' };
-      const backupOptions = { mimeType: 'video/webm;codecs=vp8,opus' };
-      const lastResortOptions = { mimeType: 'video/mp4;codecs=avc1' };
+      const preferredOptions = { mimeType: 'video/webm' };
+      const backupOptions = { mimeType: 'video/mp4;codecs=avc1' };
       let options = preferredOptions;
       /*
        * MediaRecorder.isTypeSupported is not a thing in safari,
@@ -304,9 +307,6 @@ const RecordPage: React.FC<NoProps> = () => {
       if (typeof MediaRecorder.isTypeSupported === 'function') {
         if (!MediaRecorder.isTypeSupported(preferredOptions.mimeType)) {
           options = backupOptions;
-          if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-            options = lastResortOptions;
-          }
         }
       }
 
@@ -319,16 +319,22 @@ const RecordPage: React.FC<NoProps> = () => {
         logger('added media recorder chunk', mediaChunks.current.length);
       };
       recorderRef.current.onstop = function onRecorderStop () {
-        finalBlob.current = new Blob(mediaChunks.current, { type: recorderRef.current?.mimeType });
-        const objUrl = URL.createObjectURL(finalBlob.current);
-        if (videoRef.current !== null) {
-          videoRef.current.srcObject = null;
-          videoRef.current.src = objUrl;
-          videoRef.current.controls = true;
-          videoRef.current.muted = false;
-          setIsReviewing(true);
+        try {
+          finalBlob.current = new Blob(mediaChunks.current, { type: recorderRef.current?.mimeType });
+          const objUrl = URL.createObjectURL(finalBlob.current);
+          if (videoRef.current !== null) {
+            videoRef.current.srcObject = null;
+            videoRef.current.src = objUrl;
+            videoRef.current.controls = true;
+            videoRef.current.muted = false;
+            setIsReviewing(true);
+          }
+        } catch (err) {
+          logger.error('Error creating recording preview:', err);
+        } finally {
+          try { stopUserMedia(); } catch (err) { logger.error('Error stopping media:', err); }
+          cleanup();
         }
-        cleanup();
       };
       setRecordState(RecordState.RECORDING);
     } catch (err) {
@@ -348,7 +354,6 @@ const RecordPage: React.FC<NoProps> = () => {
       return;
     }
     recorderRef.current.stop();
-    stopUserMedia();
   };
 
   const submitRecording = () => {
