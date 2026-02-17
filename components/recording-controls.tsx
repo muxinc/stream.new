@@ -24,17 +24,18 @@ const RecordingControls: React.FC<Props> = ({
   submitRecording,
   reset,
 }) => {
-  const renderRecordingControl = React.useCallback(() => {
+  const renderRecordingControl = () => {
     if(isReviewing) {
       return null;
     } else if(recordState === RecordState.IDLE) {
       return <Button type="button" onClick={startRecording}>Start recording</Button>;
     } else if(recordState === RecordState.PREPARING) {
       return <Button type="button" onClick={cancelRecording}>Cancel recording</Button>;
-    } else if(RecordState.RECORDING) {
+    } else if(recordState === RecordState.RECORDING) {
       return <Button type="button" onClick={stopRecording}>Stop recording</Button>;
     }
-  }, [recordState, isReviewing]);
+    return null;
+  };
 
   return (
     <div className="container">
