@@ -15,7 +15,7 @@
     "tsc": "tsc"
   },
   "dependencies": {
-    "@mux/ai": "^0.7.3",
+    "@mux/ai": "^0.7.4",
     "@mux/blurup": "^1.0.2",
     "@mux/mux-node": "^12.8.1",
     "@mux/mux-player-react": "^3.11.4",
