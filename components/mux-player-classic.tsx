@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import MuxPlayer from '@mux/mux-player-react/lazy';
 import ThemeClassic from '@mux/mux-player-react/themes/classic';
 import type MuxPlayerElement from '@mux/mux-player';
@@ -26,11 +26,6 @@ const MuxPlayerInternal: React.FC<Props> = ({
   onLoaded,
   aspectRatio,
 }) => {
-  const [
-    preferMse,
-    _setPreferMse, // eslint-disable-line @typescript-eslint/no-unused-vars
-  ] = useState(Math.random() < 0.5);
-
   useEffect(() => {
     onLoaded();
   }, []);
@@ -65,12 +60,10 @@ const MuxPlayerInternal: React.FC<Props> = ({
           marginRight: 'auto',
           height: '100%',
         }}
-        preferPlayback={preferMse ? 'mse' : 'native'}
         metadata={{
           video_id: playbackId,
           video_title: playbackId,
           player_name: 'stream.new',
-          experiment_name: `preferMse: ${preferMse}`,
         }}
         theme={ThemeClassic}
       />
