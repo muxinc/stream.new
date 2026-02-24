@@ -25,6 +25,24 @@ async function saveDeletionRecordInAirtable ({ assetId, notes }: { assetId: stri
   }
 }
 
+export async function checkAndAutoDeleteWatchParty({ assetId, playbackId, answer, confidence }: { assetId: string, playbackId: string, answer: string, confidence: number }): Promise<boolean> {
+  const autoDeleteEnabled = process.env.AUTO_DELETE_ENABLED === '1';
+  const shouldDelete = answer === 'yes' && confidence > 0.8;
+
+  if (autoDeleteEnabled && shouldDelete) {
+    await mux.video.assets.deletePlaybackId(assetId, playbackId);
+
+    await saveDeletionRecordInAirtable({
+      assetId,
+      notes: `Flagged by: AI watch-party detection — Answer: ${answer}, Confidence: ${confidence.toFixed(3)}`
+    });
+
+    return true;
+  }
+
+  return false;
+}
+
 export async function checkAndAutoDelete({ assetId, playbackId, openaiResult, hiveResult }: { assetId: string, playbackId: string, openaiResult: ModerationResult, hiveResult: ModerationResult }): Promise<boolean> {
   const autoDeleteEnabled = process.env.AUTO_DELETE_ENABLED === '1';
 

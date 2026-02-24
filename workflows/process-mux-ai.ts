@@ -2,7 +2,7 @@ import { getSummaryAndTags, getModerationScores, askQuestions, SummaryAndTagsRes
 import Mux from '@mux/mux-node';
 import { createHook, sleep } from 'workflow';
 import { sendSlackModerationResult, sendSlackSummarizationResult, sendSlackAutoDeleteMessage } from '../lib/slack-notifier';
-import { checkAndAutoDelete } from '../lib/moderation-action';
+import { checkAndAutoDelete, checkAndAutoDeleteWatchParty } from '../lib/moderation-action';
 import type { CaptionHookPayload, CaptionStatus } from '../types';
 
 const mux = new Mux();
@@ -83,6 +83,49 @@ async function notifySlackSummarization(
     summaryResult,
     questionsResult,
   });
+}
+
+const WATCH_PARTY_QUESTION = "Is this a watchalong-style video where a person or small group is actively watching and reacting to a full-length movie or TV episode as the main focus of the clip?";
+const WATCH_PARTY_CONFIDENCE_THRESHOLD = 0.8;
+
+async function handleWatchPartyModeration(
+  assetId: string,
+  questionsResult: AskQuestionsResult
+): Promise<boolean> {
+  "use step";
+
+  const watchPartyAnswer = questionsResult.answers.find(
+    (qa) => qa.question === WATCH_PARTY_QUESTION
+  );
+
+  if (!watchPartyAnswer || watchPartyAnswer.answer !== 'yes' || watchPartyAnswer.confidence <= WATCH_PARTY_CONFIDENCE_THRESHOLD) {
+    return false;
+  }
+
+  const asset = await mux.video.assets.retrieve(assetId);
+  const playbackId = asset.playback_ids?.[0]?.id;
+
+  if (!playbackId) {
+    throw new Error(`No playback ID found for asset ${assetId}. Cannot proceed with watch party moderation.`);
+  }
+
+  const didAutoDelete = await checkAndAutoDeleteWatchParty({
+    assetId,
+    playbackId,
+    answer: watchPartyAnswer.answer,
+    confidence: watchPartyAnswer.confidence,
+  });
+
+  if (didAutoDelete) {
+    const duration = asset.duration || 0;
+    await sendSlackAutoDeleteMessage({
+      assetId,
+      duration,
+      moderationDetails: `Flagged by: AI Question — "${WATCH_PARTY_QUESTION}" — Answer: ${watchPartyAnswer.answer}, Confidence: ${watchPartyAnswer.confidence.toFixed(3)}`,
+    });
+  }
+
+  return didAutoDelete;
 }
 
 async function checkCaptionStatus(assetId: string): Promise<CaptionStatus> {
@@ -178,9 +221,9 @@ export async function moderateAndSummarize(assetId: string) {
     askQuestions(assetId, [
       { question: "Is this a professionally produced full length movie or TV show, or a standalone segment from it?" },
       { question: "Is this professionally produced footage of a cycling race?" },
-      { question: "Is this footage of one or a small group of people watching a full length movie or TV show?" },
+      { question: WATCH_PARTY_QUESTION },
       { question: "Does this video use offensive language, and/or is likely to offend?" },
-      { question: "Is this hate speech?" },
+      { question: "Does this contain explicit slurs, dehumanization, or threats toward a protected group (not general insults or political opinions)?" },
       { question: "Is this video mostly of feet?" },
     ], {
       provider: 'openai',
@@ -191,7 +234,12 @@ export async function moderateAndSummarize(assetId: string) {
   console.log('AI Summary and Tags Result:', JSON.stringify(summaryResult, null, 2)); // eslint-disable-line no-console
   console.log('AI Questions Result:', JSON.stringify(questionsResult, null, 2)); // eslint-disable-line no-console
 
-  await notifySlackSummarization(assetId, summaryResult, questionsResult);
+  // 8. Check for watch party content and auto-delete if flagged
+  const watchPartyDeleted = await handleWatchPartyModeration(assetId, questionsResult);
+
+  if (!watchPartyDeleted) {
+    await notifySlackSummarization(assetId, summaryResult, questionsResult);
+  }
 
   return {
     assetId,
