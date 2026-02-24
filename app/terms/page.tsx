@@ -21,6 +21,9 @@ export default function Terms() {
           hateful, pornographic, gore-y, or illegal is going to get insta-deleted.
         </p>
         <p>
+          Stream.new is not a place to host pirated content.
+        </p>
+        <p>
           This project is powered by Mux and covered by the <a href={MUX_TERMS_URL}>Mux Terms of Service</a>.
         </p>
       </div>
