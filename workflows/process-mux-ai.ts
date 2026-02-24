@@ -85,7 +85,7 @@ async function notifySlackSummarization(
   });
 }
 
-const WATCH_PARTY_QUESTION = "Is this footage of one or a small group of people watching a full length movie or TV show?";
+const WATCH_PARTY_QUESTION = "Is this a watchalong-style video where a person or small group is actively watching and reacting to a full-length movie or TV episode as the main focus of the clip?";
 const WATCH_PARTY_CONFIDENCE_THRESHOLD = 0.8;
 
 async function handleWatchPartyModeration(
@@ -221,7 +221,7 @@ export async function moderateAndSummarize(assetId: string) {
     askQuestions(assetId, [
       { question: "Is this a professionally produced full length movie or TV show, or a standalone segment from it?" },
       { question: "Is this professionally produced footage of a cycling race?" },
-      { question: "Is this a watchalong-style video where a person or small group is actively watching and reacting to a full-length movie or TV episode as the main focus of the clip?" },
+      { question: WATCH_PARTY_QUESTION },
       { question: "Does this video use offensive language, and/or is likely to offend?" },
       { question: "Does this contain explicit slurs, dehumanization, or threats toward a protected group (not general insults or political opinions)?" },
       { question: "Is this video mostly of feet?" },
