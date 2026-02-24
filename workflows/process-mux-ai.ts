@@ -7,7 +7,7 @@ import type { CaptionHookPayload, CaptionStatus } from '../types';
 
 const mux = new Mux();
 
-const CAPTION_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
+const CAPTION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
 
 export function captionHookToken(assetId: string) {
   return `captions:${assetId}`;
