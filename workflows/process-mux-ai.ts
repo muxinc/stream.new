@@ -114,10 +114,7 @@ export async function moderateAndSummarize(assetId: string) {
 
   console.log('Processing AI workflow for asset:', assetId); // eslint-disable-line no-console
 
-  // 1. Create hook before moderation so it's ready to receive caption events
-  const captionHook = createHook<CaptionHookPayload>({ token: captionHookToken(assetId) });
-
-  // 2. Run both OpenAI and Hive moderation concurrently
+  // 1. Run both OpenAI and Hive moderation concurrently
   const [openaiResult, hiveResult] = await Promise.all([
     getModerationScores(assetId, {
       provider: 'openai',
@@ -140,12 +137,14 @@ export async function moderateAndSummarize(assetId: string) {
     return { assetId, openaiResult, hiveResult, summarised: false };
   }
 
-  // 5. Check Mux API for caption track status (safety net for race condition)
+  // 5. Check Mux API for caption track status (covers captions that arrived during moderation)
   let captionStatus = await checkCaptionStatus(assetId);
   let includeTranscript = captionStatus.includeTranscript;
 
-  // 6. If captions not ready yet, wait for hook with timeout
+  // 6. If captions not ready yet, create hook and wait with timeout
   if (!captionStatus.done) {
+    const captionHook = createHook<CaptionHookPayload>({ token: captionHookToken(assetId) });
+
     const result = await Promise.race([
       captionHook.then((payload: CaptionHookPayload) => ({ source: 'hook' as const, payload })),
       sleep(CAPTION_TIMEOUT_MS).then(() => ({ source: 'timeout' as const, payload: null })),
