@@ -137,14 +137,15 @@ export async function moderateAndSummarize(assetId: string) {
     return { assetId, openaiResult, hiveResult, summarised: false };
   }
 
-  // 5. Check Mux API for caption track status (covers captions that arrived during moderation)
+  // 5. Create hook before API check to avoid race between check and hook creation
+  const captionHook = createHook<CaptionHookPayload>({ token: captionHookToken(assetId) });
+
+  // 6. Check Mux API for caption track status (covers captions that arrived during moderation)
   let captionStatus = await checkCaptionStatus(assetId);
   let includeTranscript = captionStatus.includeTranscript;
 
-  // 6. If captions not ready yet, create hook and wait with timeout
+  // 7. If captions not ready yet, wait for hook with timeout
   if (!captionStatus.done) {
-    const captionHook = createHook<CaptionHookPayload>({ token: captionHookToken(assetId) });
-
     const result = await Promise.race([
       captionHook.then((payload: CaptionHookPayload) => ({ source: 'hook' as const, payload })),
       sleep(CAPTION_TIMEOUT_MS).then(() => ({ source: 'timeout' as const, payload: null })),
