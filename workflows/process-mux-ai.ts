@@ -8,6 +8,8 @@ import type { CaptionHookPayload, CaptionStatus } from '../types';
 const mux = new Mux();
 
 const CAPTION_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
+const MODERATION_THRESHOLDS = { sexual: 0.9, violence: 0.9 };
+const MODERATION_MAX_SAMPLES = 5;
 
 async function handleModerationAndNotify(
   assetId: string,
@@ -115,13 +117,13 @@ export async function moderateAndSummarize(assetId: string) {
   const [openaiResult, hiveResult] = await Promise.all([
     getModerationScores(assetId, {
       provider: 'openai',
-      thresholds: { sexual: 0.9, violence: 0.9 },
-      maxSamples: 5,
+      thresholds: MODERATION_THRESHOLDS,
+      maxSamples: MODERATION_MAX_SAMPLES,
     }),
     getModerationScores(assetId, {
       provider: 'hive',
-      thresholds: { sexual: 0.9, violence: 0.9 },
-      maxSamples: 5,
+      thresholds: MODERATION_THRESHOLDS,
+      maxSamples: MODERATION_MAX_SAMPLES,
     }),
   ]);
 
