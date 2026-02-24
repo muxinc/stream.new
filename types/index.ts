@@ -13,3 +13,12 @@ export interface HTMLVideoElementWithPlyr extends HTMLVideoElement {
 
 export type PlayerElement = HTMLVideoElementWithPlyr | MuxVideoElement | MuxPlayerElement
 
+export interface CaptionHookPayload {
+  includeTranscript: boolean;
+}
+
+export interface CaptionStatus {
+  done: boolean;
+  includeTranscript: boolean;
+}
+
