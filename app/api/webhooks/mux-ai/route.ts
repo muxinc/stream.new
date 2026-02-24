@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Mux from '@mux/mux-node';
 import { start, resumeHook } from 'workflow/api';
-import { moderateAndSummarize } from '../../../../workflows/process-mux-ai';
+import { moderateAndSummarize, captionHookToken } from '../../../../workflows/process-mux-ai';
 import type { CaptionHookPayload } from '../../../../types';
 
 const webhookSignatureSecret = process.env.MUX_WEBHOOK_SIGNATURE_SECRET;
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
 
       if (track.type === 'text' && track.text_type === 'subtitles' && track.text_source === 'generated_vod') {
         const assetId = track.asset_id;
-        const token = `captions:${assetId}`;
+        const token = captionHookToken(assetId);
 
         try {
           await resumeHook<CaptionHookPayload>(token, { includeTranscript: true });
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
       if (track.type === 'text' && track.text_type === 'subtitles' && track.text_source === 'generated_vod') {
         const assetId = track.asset_id;
         const errorMessages: string[] = track.error?.messages || [];
-        const token = `captions:${assetId}`;
+        const token = captionHookToken(assetId);
 
         // If error is due to no audio or failed generation, proceed without transcript
         const isExpectedError = errorMessages.includes('Asset does not have an audio track') ||

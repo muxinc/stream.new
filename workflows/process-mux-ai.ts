@@ -8,6 +8,10 @@ import type { CaptionHookPayload, CaptionStatus } from '../types';
 const mux = new Mux();
 
 const CAPTION_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
+
+export function captionHookToken(assetId: string) {
+  return `captions:${assetId}`;
+}
 const MODERATION_THRESHOLDS = { sexual: 0.9, violence: 0.9 };
 const MODERATION_MAX_SAMPLES = 5;
 
@@ -111,7 +115,7 @@ export async function moderateAndSummarize(assetId: string) {
   console.log('Processing AI workflow for asset:', assetId); // eslint-disable-line no-console
 
   // 1. Create hook before moderation so it's ready to receive caption events
-  const captionHook = createHook<CaptionHookPayload>({ token: `captions:${assetId}` });
+  const captionHook = createHook<CaptionHookPayload>({ token: captionHookToken(assetId) });
 
   // 2. Run both OpenAI and Hive moderation concurrently
   const [openaiResult, hiveResult] = await Promise.all([
