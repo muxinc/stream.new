@@ -217,6 +217,7 @@ export async function moderateAndSummarize(assetId: string) {
       provider: 'openai',
       tone: 'neutral',
       includeTranscript,
+      outputLanguageCode: 'en',
     }),
     askQuestions(assetId, [
       { question: "Is this a professionally produced full length movie or TV show, or a standalone segment from it?" },
