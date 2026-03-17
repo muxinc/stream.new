@@ -9,6 +9,7 @@ const mux = new Mux();
 
 const ROBOTS_POLL_INTERVAL_MS = 5 * 1000; // 5 seconds
 const ROBOTS_JOB_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
+const ROBOTS_MAX_POLL_ATTEMPTS = Math.ceil(ROBOTS_JOB_TIMEOUT_MS / ROBOTS_POLL_INTERVAL_MS); // ~120 attempts
 
 const MODERATION_THRESHOLDS = { sexual: 0.9, violence: 0.9 };
 const MODERATION_MAX_SAMPLES = 5;
@@ -36,8 +37,6 @@ function normalizeAskQuestionsOutputs(outputs: Record<string, unknown>): RobotsA
     answers: raw.answers,
   };
 }
-
-const ROBOTS_MAX_POLL_ATTEMPTS = Math.ceil(ROBOTS_JOB_TIMEOUT_MS / ROBOTS_POLL_INTERVAL_MS); // ~120 attempts
 
 async function pollRobotsJob<T>(
   workflow: string,
@@ -194,9 +193,7 @@ export async function moderateAndSummarize(assetId: string) {
 
   // 4. Start summarization + ask-questions jobs in parallel, poll for results
   console.log(`Running summarization for asset ${assetId}`); // eslint-disable-line no-console
-
-  // Start both jobs (they run in parallel on Robots API)
-  const { jobId: summaryJobId } = await createSummarizeJob(workflowFetch, assetId, { tone: 'neutral' });
+  const { jobId: summaryJobId } = await createSummarizeJob(workflowFetch, assetId);
   const { jobId: questionsJobId } = await createAskQuestionsJob(workflowFetch, assetId, [
     { question: "Is this a professionally produced full length movie or TV show, or a standalone segment from it?" },
     { question: "Is this professionally produced footage of a cycling race?" },
@@ -210,8 +207,8 @@ export async function moderateAndSummarize(assetId: string) {
   const summaryResult = await pollRobotsJob<RobotsSummaryOutputs>('summarize', summaryJobId, normalizeSummaryOutputs);
   const questionsResult = await pollRobotsJob<RobotsAskQuestionsOutputs>('ask-questions', questionsJobId, normalizeAskQuestionsOutputs);
 
-  console.log('AI Summary and Tags Result:', JSON.stringify(summaryResult, null, 2)); // eslint-disable-line no-console
-  console.log('AI Questions Result:', JSON.stringify(questionsResult, null, 2)); // eslint-disable-line no-console
+  console.log('AI Summarization Result:', JSON.stringify(summaryResult, null, 2)); // eslint-disable-line no-console
+  console.log('AI Ask Questions Result:', JSON.stringify(questionsResult, null, 2)); // eslint-disable-line no-console
 
   // 5. Check for watch party content and auto-delete if flagged
   const watchPartyDeleted = await handleWatchPartyModeration(assetId, questionsResult);

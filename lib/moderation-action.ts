@@ -6,7 +6,7 @@ const mux = new Mux();
 async function saveDeletionRecordInAirtable ({ assetId, notes }: { assetId: string, notes: string }) {
   if (process.env.AIRTABLE_KEY && process.env.AIRTABLE_BASE_ID) {
     try {
-      await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Auto Deleted`, {
+      const res = await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Auto Deleted`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${process.env.AIRTABLE_KEY}`,
@@ -18,6 +18,9 @@ async function saveDeletionRecordInAirtable ({ assetId, notes }: { assetId: stri
           ]
         }),
       });
+      if (!res.ok) {
+        console.error('Airtable responded with', res.status, await res.text()); // eslint-disable-line no-console
+      }
     } catch (e) {
       console.error('Error reporting to airtable', e); // eslint-disable-line no-console
     }

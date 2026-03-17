@@ -1,3 +1,6 @@
+/**
+ * @jest-environment node
+ */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { sendSlackModerationResult } from './slack-notifier';
 import type { RobotsModerationOutputs } from '../types/robots';

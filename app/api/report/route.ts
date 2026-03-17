@@ -4,7 +4,7 @@ import { sendAbuseReport } from '../../../lib/slack-notifier';
 const notify = async ({playbackId, reason, comment }: { playbackId: string, reason: string, comment?: string }) => {
   if (process.env.AIRTABLE_KEY && process.env.AIRTABLE_BASE_ID) {
     try {
-      await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Reported`, {
+      const res = await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Reported`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${process.env.AIRTABLE_KEY}`,
@@ -16,6 +16,9 @@ const notify = async ({playbackId, reason, comment }: { playbackId: string, reas
           ]
         }),
       });
+      if (!res.ok) {
+        console.error('Airtable responded with', res.status, await res.text()); // eslint-disable-line no-console
+      }
     } catch (e) {
       console.error('Error reporting to airtable', e); // eslint-disable-line no-console
     }

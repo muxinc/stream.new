@@ -10,11 +10,15 @@ const playbackId = 'test-playback-456';
 
 beforeEach(() => {
   nock.disableNetConnect();
+  process.env.AIRTABLE_KEY = 'test-airtable-key';
+  process.env.AIRTABLE_BASE_ID = 'test-base-id';
 });
 
 afterEach(() => {
   nock.cleanAll();
   delete process.env.AUTO_DELETE_ENABLED;
+  delete process.env.AIRTABLE_KEY;
+  delete process.env.AIRTABLE_BASE_ID;
 });
 
 test('returns false when AUTO_DELETE_ENABLED is not set, even if moderation exceeds', async () => {
@@ -40,7 +44,7 @@ test('deletes and records when AUTO_DELETE_ENABLED=1 and moderation exceeds', as
     .reply(204);
 
   const scopeAirtable = nock('https://api.airtable.com')
-    .post(`/v0/${process.env.AIRTABLE_BASE_ID}/Auto%20Deleted`)
+    .post('/v0/test-base-id/Auto%20Deleted')
     .reply(200, { records: [] });
 
   const moderationResult: RobotsModerationOutputs = {
@@ -84,7 +88,7 @@ test('still returns true if Airtable recording fails', async () => {
     .reply(204);
 
   const scopeAirtable = nock('https://api.airtable.com')
-    .post(`/v0/${process.env.AIRTABLE_BASE_ID}/Auto%20Deleted`)
+    .post('/v0/test-base-id/Auto%20Deleted')
     .reply(500, { error: 'Internal error' });
 
   const moderationResult: RobotsModerationOutputs = {
@@ -114,7 +118,7 @@ test('watch party: deletes when answer is yes and confidence > 0.8', async () =>
     .reply(204);
 
   const scopeAirtable = nock('https://api.airtable.com')
-    .post(`/v0/${process.env.AIRTABLE_BASE_ID}/Auto%20Deleted`)
+    .post('/v0/test-base-id/Auto%20Deleted')
     .reply(200, { records: [] });
 
   const didDelete = await checkAndAutoDeleteWatchParty({
@@ -187,7 +191,7 @@ test('watch party: still returns true if Airtable recording fails', async () => 
     .reply(204);
 
   const scopeAirtable = nock('https://api.airtable.com')
-    .post(`/v0/${process.env.AIRTABLE_BASE_ID}/Auto%20Deleted`)
+    .post('/v0/test-base-id/Auto%20Deleted')
     .reply(500, { error: 'Internal error' });
 
   const didDelete = await checkAndAutoDeleteWatchParty({

@@ -147,7 +147,7 @@ export const sendSlackModerationResult = async ({
     blocks.push(deleteButtonBlock(assetId));
   }
 
-  await fetch(slackWebhook, {
+  const res = await fetch(slackWebhook, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -156,6 +156,9 @@ export const sendSlackModerationResult = async ({
       blocks,
     }),
   });
+  if (!res.ok) {
+    console.error('Slack webhook error', res.status, await res.text()); // eslint-disable-line no-console
+  }
   return null;
 };
 
@@ -243,7 +246,7 @@ export const sendSlackSummarizationResult = async ({
     blocks.push(deleteButtonBlock(assetId));
   }
 
-  await fetch(slackWebhook, {
+  const res = await fetch(slackWebhook, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -252,6 +255,9 @@ export const sendSlackSummarizationResult = async ({
       blocks,
     }),
   });
+  if (!res.ok) {
+    console.error('Slack webhook error', res.status, await res.text()); // eslint-disable-line no-console
+  }
   return null;
 };
 
@@ -261,7 +267,7 @@ export const sendSlackAutoDeleteMessage = async ({ assetId, duration, moderation
     return null;
   }
 
-  await fetch(slackWebhook, {
+  const res = await fetch(slackWebhook, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -269,6 +275,9 @@ export const sendSlackAutoDeleteMessage = async ({ assetId, duration, moderation
       icon_emoji: 'female-police-officer',
     }),
   });
+  if (!res.ok) {
+    console.error('Slack webhook error', res.status, await res.text()); // eslint-disable-line no-console
+  }
 
   return null;
 };
@@ -279,7 +288,7 @@ export const sendAbuseReport = async ({ playbackId, reason, comment }: {playback
     return null;
   }
 
-  await fetch(slackWebhook, {
+  const res = await fetch(slackWebhook, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -287,5 +296,8 @@ export const sendAbuseReport = async ({ playbackId, reason, comment }: {playback
       icon_emoji: 'rotating_light',
     }),
   });
+  if (!res.ok) {
+    console.error('Slack webhook error', res.status, await res.text()); // eslint-disable-line no-console
+  }
   return null;
 };
