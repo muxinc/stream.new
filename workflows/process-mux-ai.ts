@@ -1,28 +1,83 @@
-import { getSummaryAndTags, getModerationScores, askQuestions, SummaryAndTagsResult, ModerationResult, AskQuestionsResult } from '@mux/ai/workflows';
 import Mux from '@mux/mux-node';
-import { createHook, sleep } from 'workflow';
+import { createHook, sleep, fetch as workflowFetch } from 'workflow';
 import { sendSlackModerationResult, sendSlackSummarizationResult, sendSlackAutoDeleteMessage } from '../lib/slack-notifier';
 import { checkAndAutoDelete, checkAndAutoDeleteWatchParty } from '../lib/moderation-action';
+import { createModerationJob, createSummarizeJob, createAskQuestionsJob, getJobStatus } from '../lib/robots-client';
+import type { RobotsModerationOutputs, RobotsSummaryOutputs, RobotsAskQuestionsOutputs, RobotsModerationWebhookOutputs, RobotsSummaryWebhookOutputs, RobotsAskQuestionsWebhookOutputs } from '../types/robots';
 import type { CaptionHookPayload, CaptionStatus } from '../types';
 
 const mux = new Mux();
 
 const CAPTION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+const ROBOTS_POLL_INTERVAL_MS = 5 * 1000; // 5 seconds
+const ROBOTS_JOB_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
 
 export function captionHookToken(assetId: string) {
   return `captions:${assetId}`;
 }
+
 const MODERATION_THRESHOLDS = { sexual: 0.9, violence: 0.9 };
 const MODERATION_MAX_SAMPLES = 5;
 
+function normalizeModerationOutputs(outputs: Record<string, unknown>): RobotsModerationOutputs {
+  const raw = outputs as unknown as RobotsModerationWebhookOutputs;
+  return {
+    maxScores: raw.max_scores,
+    exceedsThreshold: raw.exceeds_threshold,
+  };
+}
+
+function normalizeSummaryOutputs(outputs: Record<string, unknown>): RobotsSummaryOutputs {
+  const raw = outputs as unknown as RobotsSummaryWebhookOutputs;
+  return {
+    title: raw.title,
+    description: raw.description,
+    tags: raw.tags,
+  };
+}
+
+function normalizeAskQuestionsOutputs(outputs: Record<string, unknown>): RobotsAskQuestionsOutputs {
+  const raw = outputs as unknown as RobotsAskQuestionsWebhookOutputs;
+  return {
+    answers: raw.answers,
+  };
+}
+
+const ROBOTS_MAX_POLL_ATTEMPTS = Math.ceil(ROBOTS_JOB_TIMEOUT_MS / ROBOTS_POLL_INTERVAL_MS); // ~120 attempts
+
+async function pollRobotsJob<T>(
+  workflow: string,
+  jobId: string,
+  normalizeOutputs: (outputs: Record<string, unknown>) => T,
+): Promise<T> {
+  for (let attempt = 0; attempt < ROBOTS_MAX_POLL_ATTEMPTS; attempt++) {
+    await sleep(ROBOTS_POLL_INTERVAL_MS);
+
+    const status = await getJobStatus(workflowFetch, workflow, jobId);
+
+    if (status.status === 'completed' && status.outputs) {
+      return normalizeOutputs(status.outputs);
+    }
+
+    if (status.status === 'errored') {
+      const errorMessage = status.errors?.[0]?.message || 'Unknown error';
+      throw new Error(`Robots ${workflow} job ${jobId} failed: ${errorMessage}`);
+    }
+
+    if (status.status === 'cancelled') {
+      throw new Error(`Robots ${workflow} job ${jobId} was cancelled`);
+    }
+  }
+
+  throw new Error(`Robots ${workflow} job ${jobId} timed out after ${ROBOTS_MAX_POLL_ATTEMPTS} attempts`);
+}
+
 async function handleModerationAndNotify(
   assetId: string,
-  openaiResult: ModerationResult,
-  hiveResult: ModerationResult
+  moderationResult: RobotsModerationOutputs
 ) {
   "use step";
 
-  // Fetch asset data to get playbackId and duration
   const asset = await mux.video.assets.retrieve(assetId);
   const playbackId = asset.playback_ids?.[0]?.id;
 
@@ -32,44 +87,35 @@ async function handleModerationAndNotify(
 
   const duration = asset.duration || 0;
 
-  // Check if we should auto-delete (if either service flags it)
   const didAutoDelete = await checkAndAutoDelete({
     assetId,
     playbackId,
-    openaiResult,
-    hiveResult,
+    moderationResult,
   });
 
-  // Send appropriate Slack message
   if (didAutoDelete) {
-    const flaggedBy = [];
-    if (openaiResult.exceedsThreshold) flaggedBy.push('OpenAI');
-    if (hiveResult.exceedsThreshold) flaggedBy.push('Hive');
-
     await sendSlackAutoDeleteMessage({
       assetId,
       duration,
-      moderationDetails: `OpenAI - Sexual: ${openaiResult.maxScores.sexual.toFixed(3)}, Violence: ${openaiResult.maxScores.violence.toFixed(3)} | Hive - Sexual: ${hiveResult.maxScores.sexual.toFixed(3)}, Violence: ${hiveResult.maxScores.violence.toFixed(3)} | Flagged by: ${flaggedBy.join(', ')}`,
+      moderationDetails: `Sexual: ${moderationResult.maxScores.sexual.toFixed(3)}, Violence: ${moderationResult.maxScores.violence.toFixed(3)}`,
     });
   } else {
     await sendSlackModerationResult({
       playbackId,
       assetId,
       duration,
-      openaiResult,
-      hiveResult,
+      moderationResult,
     });
   }
 }
 
 async function notifySlackSummarization(
   assetId: string,
-  summaryResult: SummaryAndTagsResult,
-  questionsResult: AskQuestionsResult
+  summaryResult: RobotsSummaryOutputs,
+  questionsResult: RobotsAskQuestionsOutputs
 ) {
   "use step";
 
-  // Fetch asset data to get playbackId
   const asset = await mux.video.assets.retrieve(assetId);
   const playbackId = asset.playback_ids?.[0]?.id;
 
@@ -90,7 +136,7 @@ const WATCH_PARTY_CONFIDENCE_THRESHOLD = 0.8;
 
 async function handleWatchPartyModeration(
   assetId: string,
-  questionsResult: AskQuestionsResult
+  questionsResult: RobotsAskQuestionsOutputs
 ): Promise<boolean> {
   "use step";
 
@@ -157,37 +203,33 @@ export async function moderateAndSummarize(assetId: string) {
 
   console.log('Processing AI workflow for asset:', assetId); // eslint-disable-line no-console
 
-  // 1. Run both OpenAI and Hive moderation concurrently
-  const [openaiResult, hiveResult] = await Promise.all([
-    getModerationScores(assetId, {
-      provider: 'openai',
-      thresholds: MODERATION_THRESHOLDS,
-      maxSamples: MODERATION_MAX_SAMPLES,
-    }),
-    getModerationScores(assetId, {
-      provider: 'hive',
-      thresholds: MODERATION_THRESHOLDS,
-      maxSamples: MODERATION_MAX_SAMPLES,
-    }),
-  ]);
+  // 1. Start moderation job and poll for result
+  const { jobId: moderationJobId } = await createModerationJob(workflowFetch, assetId, {
+    thresholds: MODERATION_THRESHOLDS,
+    maxSamples: MODERATION_MAX_SAMPLES,
+  });
 
-  // 3. Handle moderation results + Slack notification
-  await handleModerationAndNotify(assetId, openaiResult, hiveResult);
+  const moderationResult = await pollRobotsJob<RobotsModerationOutputs>(
+    'moderate', moderationJobId, normalizeModerationOutputs
+  );
 
-  // 4. If flagged, skip summarisation
-  if (openaiResult.exceedsThreshold || hiveResult.exceedsThreshold) {
+  // 2. Handle moderation results + Slack notification
+  await handleModerationAndNotify(assetId, moderationResult);
+
+  // 3. If flagged, skip summarisation
+  if (moderationResult.exceedsThreshold) {
     console.log(`Asset ${assetId} flagged by moderation, skipping summarisation`); // eslint-disable-line no-console
-    return { assetId, openaiResult, hiveResult, summarised: false };
+    return { assetId, moderationResult, summarised: false };
   }
 
-  // 5. Create hook before API check to avoid race between check and hook creation
+  // 4. Create caption hook before API check to avoid race
   const captionHook = createHook<CaptionHookPayload>({ token: captionHookToken(assetId) });
 
-  // 6. Check Mux API for caption track status (covers captions that arrived during moderation)
+  // 5. Check Mux API for caption track status (covers captions that arrived during moderation)
   let captionStatus = await checkCaptionStatus(assetId);
   let includeTranscript = captionStatus.includeTranscript;
 
-  // 7. If captions not ready yet, wait for hook with timeout
+  // 6. If captions not ready yet, wait for hook with timeout
   if (!captionStatus.done) {
     const result = await Promise.race([
       captionHook.then((payload: CaptionHookPayload) => ({ source: 'hook' as const, payload })),
@@ -209,28 +251,23 @@ export async function moderateAndSummarize(assetId: string) {
     }
   }
 
-  // 7. Run summarisation
+  // 7. Start summarisation + ask-questions jobs in parallel, poll for results
   console.log(`Running summarisation for asset ${assetId} (includeTranscript: ${includeTranscript})`); // eslint-disable-line no-console
 
-  const [summaryResult, questionsResult] = await Promise.all([
-    getSummaryAndTags(assetId, {
-      provider: 'openai',
-      tone: 'neutral',
-      includeTranscript,
-      outputLanguageCode: 'en',
-    }),
-    askQuestions(assetId, [
-      { question: "Is this a professionally produced full length movie or TV show, or a standalone segment from it?" },
-      { question: "Is this professionally produced footage of a cycling race?" },
-      { question: WATCH_PARTY_QUESTION },
-      { question: "Does this video use offensive language, and/or is likely to offend?" },
-      { question: "Does this contain explicit slurs, dehumanization, or threats toward a protected group (not general insults or political opinions)?" },
-      { question: "Is this video mostly of feet?" },
-    ], {
-      provider: 'openai',
-      includeTranscript,
-    }),
+  // Start both jobs (they run in parallel on Robots API)
+  const { jobId: summaryJobId } = await createSummarizeJob(workflowFetch, assetId, { tone: 'neutral' });
+  const { jobId: questionsJobId } = await createAskQuestionsJob(workflowFetch, assetId, [
+    { question: "Is this a professionally produced full length movie or TV show, or a standalone segment from it?" },
+    { question: "Is this professionally produced footage of a cycling race?" },
+    { question: WATCH_PARTY_QUESTION },
+    { question: "Does this video use offensive language, and/or is likely to offend?" },
+    { question: "Does this contain explicit slurs, dehumanization, or threats toward a protected group (not general insults or political opinions)?" },
+    { question: "Is this video mostly of feet?" },
   ]);
+
+  // Poll sequentially to avoid interleaved steps that break workflow replay
+  const summaryResult = await pollRobotsJob<RobotsSummaryOutputs>('summarize', summaryJobId, normalizeSummaryOutputs);
+  const questionsResult = await pollRobotsJob<RobotsAskQuestionsOutputs>('ask-questions', questionsJobId, normalizeAskQuestionsOutputs);
 
   console.log('AI Summary and Tags Result:', JSON.stringify(summaryResult, null, 2)); // eslint-disable-line no-console
   console.log('AI Questions Result:', JSON.stringify(questionsResult, null, 2)); // eslint-disable-line no-console
@@ -244,8 +281,7 @@ export async function moderateAndSummarize(assetId: string) {
 
   return {
     assetId,
-    openaiResult,
-    hiveResult,
+    moderationResult,
     summarised: true,
     summaryResult,
     questionsResult,

@@ -1,7 +1,6 @@
-import got from './got-client';
 import { HOST_URL } from '../constants';
 import { getImageBaseUrl } from './urlutils';
-import type { SummaryAndTagsResult, ModerationResult, AskQuestionsResult } from '@mux/ai/workflows';
+import type { RobotsModerationOutputs, RobotsSummaryOutputs, RobotsAskQuestionsOutputs } from '../types/robots';
 
 const slackWebhook = process.env.SLACK_WEBHOOK_ASSET_READY;
 const moderatorPassword = process.env.SLACK_MODERATOR_PASSWORD;
@@ -109,14 +108,12 @@ export const sendSlackModerationResult = async ({
   playbackId,
   assetId,
   duration,
-  openaiResult,
-  hiveResult
+  moderationResult,
 }: {
   playbackId: string;
   assetId: string;
   duration: number;
-  openaiResult: ModerationResult;
-  hiveResult: ModerationResult;
+  moderationResult: RobotsModerationOutputs;
 }): Promise<null> => {
   if (!slackWebhook) {
     console.log('No slack webhook configured'); // eslint-disable-line no-console
@@ -135,27 +132,13 @@ export const sendSlackModerationResult = async ({
 
   blocks.push(...baseBlocks({ playbackId, assetId, duration }));
 
-  // Add OpenAI moderation scores to the fields (blocks[1] is the first baseBlocks item)
-  if (openaiResult?.maxScores && blocks[1].fields) {
-    const { sexual, violence } = openaiResult.maxScores;
-    const exceedsThreshold = openaiResult.exceedsThreshold;
-    const emoji = exceedsThreshold ? '🚨' : '✅';
+  if (moderationResult?.maxScores && blocks[1].fields) {
+    const { sexual, violence } = moderationResult.maxScores;
+    const emoji = moderationResult.exceedsThreshold ? '🚨' : '✅';
 
     blocks[1].fields.push({
       type: 'mrkdwn',
-      text: `*Moderation (OpenAI):*\nSexual: ${sexual.toFixed(3)}, Violence: ${violence.toFixed(3)} ${emoji}`,
-    });
-  }
-
-  // Add Hive moderation scores to the fields
-  if (hiveResult?.maxScores && blocks[1].fields) {
-    const { sexual, violence } = hiveResult.maxScores;
-    const exceedsThreshold = hiveResult.exceedsThreshold;
-    const emoji = exceedsThreshold ? '🚨' : '✅';
-
-    blocks[1].fields.push({
-      type: 'mrkdwn',
-      text: `*Moderation (Hive):*\nSexual: ${sexual.toFixed(3)}, Violence: ${violence.toFixed(3)} ${emoji}`,
+      text: `*Moderation:*\nSexual: ${sexual.toFixed(3)}, Violence: ${violence.toFixed(3)} ${emoji}`,
     });
   }
 
@@ -164,12 +147,14 @@ export const sendSlackModerationResult = async ({
     blocks.push(deleteButtonBlock(assetId));
   }
 
-  await got.post(slackWebhook, {
-    json: {
+  await fetch(slackWebhook, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
       text: `Moderation complete for video on stream.new! <${HOST_URL}/v/${playbackId}|View on stream.new>`,
       icon_emoji: 'robot_face',
       blocks,
-    },
+    }),
   });
   return null;
 };
@@ -182,8 +167,8 @@ export const sendSlackSummarizationResult = async ({
 }: {
   playbackId: string;
   assetId: string;
-  summaryResult: SummaryAndTagsResult;
-  questionsResult: AskQuestionsResult;
+  summaryResult: RobotsSummaryOutputs;
+  questionsResult: RobotsAskQuestionsOutputs;
 }): Promise<null> => {
   if (!slackWebhook) {
     console.log('No slack webhook configured'); // eslint-disable-line no-console
@@ -258,12 +243,14 @@ export const sendSlackSummarizationResult = async ({
     blocks.push(deleteButtonBlock(assetId));
   }
 
-  await got.post(slackWebhook, {
-    json: {
+  await fetch(slackWebhook, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
       text: `AI summary complete for video on stream.new! <${HOST_URL}/v/${playbackId}|View on stream.new>`,
       icon_emoji: 'mag',
       blocks,
-    },
+    }),
   });
   return null;
 };
@@ -274,11 +261,13 @@ export const sendSlackAutoDeleteMessage = async ({ assetId, duration, moderation
     return null;
   }
 
-  await got.post(slackWebhook, {
-    json: {
+  await fetch(slackWebhook, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
       text: `Auto-deleted by moderator: ${assetId} duration: ${duration}. ${moderationDetails}`,
       icon_emoji: 'female-police-officer',
-    },
+    }),
   });
 
   return null;
@@ -290,11 +279,13 @@ export const sendAbuseReport = async ({ playbackId, reason, comment }: {playback
     return null;
   }
 
-  await got.post(slackWebhook, {
-    json: {
+  await fetch(slackWebhook, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
       text: `Reported for abuse: ${reason}. ${comment}. ${playbackId} <${HOST_URL}/v/${playbackId}|View on stream.new>`,
       icon_emoji: 'rotating_light',
-    },
+    }),
   });
   return null;
 };
