@@ -7,15 +7,17 @@ type FetchFn = typeof globalThis.fetch;
 function toBase64(str: string): string {
   let result = '';
   let i = 0;
-  while (i < str.length) {
+  const len = str.length;
+  while (i < len) {
+    const remaining = len - i;
     const a = str.charCodeAt(i++);
-    const b = i < str.length ? str.charCodeAt(i++) : 0;
-    const c = i < str.length ? str.charCodeAt(i++) : 0;
+    const b = i < len ? str.charCodeAt(i++) : 0;
+    const c = i < len ? str.charCodeAt(i++) : 0;
     const triplet = (a << 16) | (b << 8) | c;
     result += BASE64_CHARS[(triplet >> 18) & 0x3f];
     result += BASE64_CHARS[(triplet >> 12) & 0x3f];
-    result += i - 2 < str.length ? BASE64_CHARS[(triplet >> 6) & 0x3f] : '=';
-    result += i - 1 < str.length ? BASE64_CHARS[triplet & 0x3f] : '=';
+    result += remaining > 1 ? BASE64_CHARS[(triplet >> 6) & 0x3f] : '=';
+    result += remaining > 2 ? BASE64_CHARS[triplet & 0x3f] : '=';
   }
   return result;
 }

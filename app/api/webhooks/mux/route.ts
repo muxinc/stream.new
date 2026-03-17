@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Mux from '@mux/mux-node';
-import { start, resumeHook } from 'workflow/api';
-import { moderateAndSummarize, captionHookToken } from '../../../../workflows/process-mux-ai';
-import type { CaptionHookPayload } from '../../../../types';
+import { start } from 'workflow/api';
+import { moderateAndSummarize } from '../../../../workflows/process-mux-ai';
 
 const webhookSignatureSecret = process.env.MUX_WEBHOOK_SIGNATURE_SECRET;
 const mux = new Mux();
@@ -48,66 +47,6 @@ export async function POST(request: NextRequest) {
         asset_id: assetId,
         workflow_id: workflowRun.runId
       });
-    }
-
-    // Handle video.asset.track.ready - resume caption hook
-    if (type === 'video.asset.track.ready') {
-      const track = data;
-
-      if (track.type === 'text' && track.text_type === 'subtitles' && track.text_source === 'generated_vod') {
-        const assetId = track.asset_id;
-        const token = captionHookToken(assetId);
-
-        try {
-          await resumeHook<CaptionHookPayload>(token, { includeTranscript: true });
-        } catch (e) {
-          // Hook may not exist yet if captions arrived before workflow started
-          console.log(`Could not resume caption hook for asset ${assetId}: ${(e as Error).message}`); // eslint-disable-line no-console
-        }
-
-        return NextResponse.json({
-          message: 'Caption hook resumed',
-          asset_id: assetId,
-          track_id: track.id,
-        });
-      }
-
-      return NextResponse.json({ message: 'Track type not relevant for AI processing' });
-    }
-
-    // Handle video.asset.track.errored - resume caption hook with appropriate includeTranscript
-    if (type === 'video.asset.track.errored') {
-      const track = data;
-
-      if (track.type === 'text' && track.text_type === 'subtitles' && track.text_source === 'generated_vod') {
-        const assetId = track.asset_id;
-        const errorMessages: string[] = track.error?.messages || [];
-        const token = captionHookToken(assetId);
-
-        // If error is due to no audio or failed generation, proceed without transcript
-        const isExpectedError = errorMessages.includes('Asset does not have an audio track') ||
-          errorMessages.includes('Failed to generate caption track');
-
-        if (isExpectedError) {
-          console.log(`Track errored for asset ${assetId} (${errorMessages.join(', ')}), resuming hook without transcript`); // eslint-disable-line no-console
-        } else {
-          console.log(`Track errored for asset ${assetId} with unhandled error: ${errorMessages.join(', ')}`); // eslint-disable-line no-console
-        }
-
-        try {
-          await resumeHook<CaptionHookPayload>(token, { includeTranscript: false });
-        } catch (e) {
-          console.log(`Could not resume caption hook for asset ${assetId}: ${(e as Error).message}`); // eslint-disable-line no-console
-        }
-
-        return NextResponse.json({
-          message: 'Caption hook resumed (track errored)',
-          asset_id: assetId,
-          track_id: track.id,
-        });
-      }
-
-      return NextResponse.json({ message: 'Track type not relevant for AI processing' });
     }
 
     // Event type not handled

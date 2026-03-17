@@ -1,20 +1,14 @@
 import Mux from '@mux/mux-node';
-import { createHook, sleep, fetch as workflowFetch } from 'workflow';
+import { sleep, fetch as workflowFetch } from 'workflow';
 import { sendSlackModerationResult, sendSlackSummarizationResult, sendSlackAutoDeleteMessage } from '../lib/slack-notifier';
 import { checkAndAutoDelete, checkAndAutoDeleteWatchParty } from '../lib/moderation-action';
 import { createModerationJob, createSummarizeJob, createAskQuestionsJob, getJobStatus } from '../lib/robots-client';
 import type { RobotsModerationOutputs, RobotsSummaryOutputs, RobotsAskQuestionsOutputs, RobotsModerationWebhookOutputs, RobotsSummaryWebhookOutputs, RobotsAskQuestionsWebhookOutputs } from '../types/robots';
-import type { CaptionHookPayload, CaptionStatus } from '../types';
 
 const mux = new Mux();
 
-const CAPTION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
 const ROBOTS_POLL_INTERVAL_MS = 5 * 1000; // 5 seconds
 const ROBOTS_JOB_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
-
-export function captionHookToken(assetId: string) {
-  return `captions:${assetId}`;
-}
 
 const MODERATION_THRESHOLDS = { sexual: 0.9, violence: 0.9 };
 const MODERATION_MAX_SAMPLES = 5;
@@ -174,30 +168,6 @@ async function handleWatchPartyModeration(
   return didAutoDelete;
 }
 
-async function checkCaptionStatus(assetId: string): Promise<CaptionStatus> {
-  "use step";
-
-  const asset = await mux.video.assets.retrieve(assetId);
-  const captionTrack = asset.tracks?.find(
-    (t) => t.type === 'text' && t.text_type === 'subtitles' && t.text_source === 'generated_vod'
-  );
-
-  if (!captionTrack) {
-    return { done: false, includeTranscript: false };
-  }
-
-  if (captionTrack.status === 'ready') {
-    return { done: true, includeTranscript: true };
-  }
-
-  if (captionTrack.status === 'errored') {
-    return { done: true, includeTranscript: false };
-  }
-
-  // Track exists but is still preparing
-  return { done: false, includeTranscript: false };
-}
-
 export async function moderateAndSummarize(assetId: string) {
   "use workflow";
 
@@ -216,43 +186,14 @@ export async function moderateAndSummarize(assetId: string) {
   // 2. Handle moderation results + Slack notification
   await handleModerationAndNotify(assetId, moderationResult);
 
-  // 3. If flagged, skip summarisation
+  // 3. If flagged, skip summarization
   if (moderationResult.exceedsThreshold) {
-    console.log(`Asset ${assetId} flagged by moderation, skipping summarisation`); // eslint-disable-line no-console
-    return { assetId, moderationResult, summarised: false };
+    console.log(`Asset ${assetId} flagged by moderation, skipping summarization`); // eslint-disable-line no-console
+    return { assetId, moderationResult };
   }
 
-  // 4. Create caption hook before API check to avoid race
-  const captionHook = createHook<CaptionHookPayload>({ token: captionHookToken(assetId) });
-
-  // 5. Check Mux API for caption track status (covers captions that arrived during moderation)
-  let captionStatus = await checkCaptionStatus(assetId);
-  let includeTranscript = captionStatus.includeTranscript;
-
-  // 6. If captions not ready yet, wait for hook with timeout
-  if (!captionStatus.done) {
-    const result = await Promise.race([
-      captionHook.then((payload: CaptionHookPayload) => ({ source: 'hook' as const, payload })),
-      sleep(CAPTION_TIMEOUT_MS).then(() => ({ source: 'timeout' as const, payload: null })),
-    ]);
-
-    if (result.source === 'hook') {
-      includeTranscript = result.payload.includeTranscript;
-    } else {
-      // Timeout — final Mux API check
-      console.log(`Caption hook timed out for asset ${assetId}, checking Mux API`); // eslint-disable-line no-console
-      captionStatus = await checkCaptionStatus(assetId);
-      if (captionStatus.done) {
-        includeTranscript = captionStatus.includeTranscript;
-      } else {
-        console.log(`Captions still not ready for asset ${assetId} after timeout, proceeding without transcript`); // eslint-disable-line no-console
-        includeTranscript = false;
-      }
-    }
-  }
-
-  // 7. Start summarisation + ask-questions jobs in parallel, poll for results
-  console.log(`Running summarisation for asset ${assetId} (includeTranscript: ${includeTranscript})`); // eslint-disable-line no-console
+  // 4. Start summarization + ask-questions jobs in parallel, poll for results
+  console.log(`Running summarization for asset ${assetId}`); // eslint-disable-line no-console
 
   // Start both jobs (they run in parallel on Robots API)
   const { jobId: summaryJobId } = await createSummarizeJob(workflowFetch, assetId, { tone: 'neutral' });
@@ -272,18 +213,12 @@ export async function moderateAndSummarize(assetId: string) {
   console.log('AI Summary and Tags Result:', JSON.stringify(summaryResult, null, 2)); // eslint-disable-line no-console
   console.log('AI Questions Result:', JSON.stringify(questionsResult, null, 2)); // eslint-disable-line no-console
 
-  // 8. Check for watch party content and auto-delete if flagged
+  // 5. Check for watch party content and auto-delete if flagged
   const watchPartyDeleted = await handleWatchPartyModeration(assetId, questionsResult);
 
   if (!watchPartyDeleted) {
     await notifySlackSummarization(assetId, summaryResult, questionsResult);
   }
 
-  return {
-    assetId,
-    moderationResult,
-    summarised: true,
-    summaryResult,
-    questionsResult,
-  };
+  return { assetId, moderationResult, summaryResult, questionsResult };
 }
