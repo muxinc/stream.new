@@ -39,6 +39,7 @@ function normalizeAskQuestionsOutputs(outputs: Record<string, unknown>): RobotsA
 }
 
 async function pollRobotsJob<T>(
+  authHeader: string,
   workflow: string,
   jobId: string,
   normalizeOutputs: (outputs: Record<string, unknown>) => T,
@@ -46,7 +47,7 @@ async function pollRobotsJob<T>(
   for (let attempt = 0; attempt < ROBOTS_MAX_POLL_ATTEMPTS; attempt++) {
     await sleep(ROBOTS_POLL_INTERVAL_MS);
 
-    const status = await getJobStatus(workflowFetch, workflow, jobId);
+    const status = await getJobStatus(workflowFetch, authHeader, workflow, jobId);
 
     if (status.status === 'completed' && status.outputs) {
       return normalizeOutputs(status.outputs);
@@ -167,19 +168,28 @@ async function handleWatchPartyModeration(
   return didAutoDelete;
 }
 
+async function getRobotsAuthHeader(): Promise<string> {
+  "use step";
+  const tokenId = process.env.MUX_TOKEN_ID;
+  const tokenSecret = process.env.MUX_TOKEN_SECRET;
+  return `Basic ${Buffer.from(`${tokenId}:${tokenSecret}`).toString('base64')}`;
+}
+
 export async function moderateAndSummarize(assetId: string) {
   "use workflow";
 
   console.log('Processing AI workflow for asset:', assetId); // eslint-disable-line no-console
 
+  const authHeader = await getRobotsAuthHeader();
+
   // 1. Start moderation job and poll for result
-  const { jobId: moderationJobId } = await createModerationJob(workflowFetch, assetId, {
+  const { jobId: moderationJobId } = await createModerationJob(workflowFetch, authHeader, assetId, {
     thresholds: MODERATION_THRESHOLDS,
     maxSamples: MODERATION_MAX_SAMPLES,
   });
 
   const moderationResult = await pollRobotsJob<RobotsModerationOutputs>(
-    'moderate', moderationJobId, normalizeModerationOutputs
+    authHeader, 'moderate', moderationJobId, normalizeModerationOutputs
   );
 
   // 2. Handle moderation results + Slack notification
@@ -193,8 +203,8 @@ export async function moderateAndSummarize(assetId: string) {
 
   // 4. Start summarization + ask-questions jobs in parallel, poll for results
   console.log(`Running summarization for asset ${assetId}`); // eslint-disable-line no-console
-  const { jobId: summaryJobId } = await createSummarizeJob(workflowFetch, assetId);
-  const { jobId: questionsJobId } = await createAskQuestionsJob(workflowFetch, assetId, [
+  const { jobId: summaryJobId } = await createSummarizeJob(workflowFetch, authHeader, assetId);
+  const { jobId: questionsJobId } = await createAskQuestionsJob(workflowFetch, authHeader, assetId, [
     { question: "Is this a professionally produced full length movie or TV show, or a standalone segment from it?" },
     { question: "Is this professionally produced footage of a cycling race?" },
     { question: WATCH_PARTY_QUESTION },
@@ -204,8 +214,8 @@ export async function moderateAndSummarize(assetId: string) {
   ]);
 
   // Poll sequentially to avoid interleaved steps that break workflow replay
-  const summaryResult = await pollRobotsJob<RobotsSummaryOutputs>('summarize', summaryJobId, normalizeSummaryOutputs);
-  const questionsResult = await pollRobotsJob<RobotsAskQuestionsOutputs>('ask-questions', questionsJobId, normalizeAskQuestionsOutputs);
+  const summaryResult = await pollRobotsJob<RobotsSummaryOutputs>(authHeader, 'summarize', summaryJobId, normalizeSummaryOutputs);
+  const questionsResult = await pollRobotsJob<RobotsAskQuestionsOutputs>(authHeader, 'ask-questions', questionsJobId, normalizeAskQuestionsOutputs);
 
   console.log('AI Summarization Result:', JSON.stringify(summaryResult, null, 2)); // eslint-disable-line no-console
   console.log('AI Ask Questions Result:', JSON.stringify(questionsResult, null, 2)); // eslint-disable-line no-console
