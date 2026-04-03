@@ -1,9 +1,10 @@
 import Mux from '@mux/mux-node';
-import { sleep, fetch as workflowFetch } from 'workflow';
+import { sleep } from 'workflow';
+import type { ModerateJobOutputs } from '@mux/mux-node/resources/robots/jobs/moderate';
+import type { SummarizeJobOutputs } from '@mux/mux-node/resources/robots/jobs/summarize';
+import type { AskQuestionsJobOutputs } from '@mux/mux-node/resources/robots/jobs/ask-questions';
 import { sendSlackModerationResult, sendSlackSummarizationResult, sendSlackAutoDeleteMessage } from '../lib/slack-notifier';
 import { checkAndAutoDelete, checkAndAutoDeleteWatchParty } from '../lib/moderation-action';
-import { createModerationJob, createSummarizeJob, createAskQuestionsJob, getJobStatus } from '../lib/robots-client';
-import type { RobotsModerationOutputs, RobotsSummaryOutputs, RobotsAskQuestionsOutputs, RobotsModerationWebhookOutputs, RobotsSummaryWebhookOutputs, RobotsAskQuestionsWebhookOutputs } from '../types/robots';
 
 const mux = new Mux();
 
@@ -14,61 +15,36 @@ const ROBOTS_MAX_POLL_ATTEMPTS = Math.ceil(ROBOTS_JOB_TIMEOUT_MS / ROBOTS_POLL_I
 const MODERATION_THRESHOLDS = { sexual: 0.9, violence: 0.9 };
 const MODERATION_MAX_SAMPLES = 5;
 
-function normalizeModerationOutputs(outputs: Record<string, unknown>): RobotsModerationOutputs {
-  const raw = outputs as unknown as RobotsModerationWebhookOutputs;
-  return {
-    maxScores: raw.max_scores,
-    exceedsThreshold: raw.exceeds_threshold,
-  };
-}
-
-function normalizeSummaryOutputs(outputs: Record<string, unknown>): RobotsSummaryOutputs {
-  const raw = outputs as unknown as RobotsSummaryWebhookOutputs;
-  return {
-    title: raw.title,
-    description: raw.description,
-    tags: raw.tags,
-  };
-}
-
-function normalizeAskQuestionsOutputs(outputs: Record<string, unknown>): RobotsAskQuestionsOutputs {
-  const raw = outputs as unknown as RobotsAskQuestionsWebhookOutputs;
-  return {
-    answers: raw.answers,
-  };
-}
-
 async function pollRobotsJob<T>(
-  authHeader: string,
-  workflow: string,
+  retrieve: (jobId: string) => Promise<{ status: string; outputs?: T; errors?: Array<{ message: string }> }>,
   jobId: string,
-  normalizeOutputs: (outputs: Record<string, unknown>) => T,
+  workflowName: string,
 ): Promise<T> {
   for (let attempt = 0; attempt < ROBOTS_MAX_POLL_ATTEMPTS; attempt++) {
     await sleep(ROBOTS_POLL_INTERVAL_MS);
 
-    const status = await getJobStatus(workflowFetch, authHeader, workflow, jobId);
+    const job = await retrieve(jobId);
 
-    if (status.status === 'completed' && status.outputs) {
-      return normalizeOutputs(status.outputs);
+    if (job.status === 'completed' && job.outputs) {
+      return job.outputs;
     }
 
-    if (status.status === 'errored') {
-      const errorMessage = status.errors?.[0]?.message || 'Unknown error';
-      throw new Error(`Robots ${workflow} job ${jobId} failed: ${errorMessage}`);
+    if (job.status === 'errored') {
+      const errorMessage = job.errors?.[0]?.message || 'Unknown error';
+      throw new Error(`Robots ${workflowName} job ${jobId} failed: ${errorMessage}`);
     }
 
-    if (status.status === 'cancelled') {
-      throw new Error(`Robots ${workflow} job ${jobId} was cancelled`);
+    if (job.status === 'cancelled') {
+      throw new Error(`Robots ${workflowName} job ${jobId} was cancelled`);
     }
   }
 
-  throw new Error(`Robots ${workflow} job ${jobId} timed out after ${ROBOTS_MAX_POLL_ATTEMPTS} attempts`);
+  throw new Error(`Robots ${workflowName} job ${jobId} timed out after ${ROBOTS_MAX_POLL_ATTEMPTS} attempts`);
 }
 
 async function handleModerationAndNotify(
   assetId: string,
-  moderationResult: RobotsModerationOutputs
+  moderationResult: ModerateJobOutputs
 ) {
   "use step";
 
@@ -91,7 +67,7 @@ async function handleModerationAndNotify(
     await sendSlackAutoDeleteMessage({
       assetId,
       duration,
-      moderationDetails: `Sexual: ${moderationResult.maxScores.sexual.toFixed(3)}, Violence: ${moderationResult.maxScores.violence.toFixed(3)}`,
+      moderationDetails: `Sexual: ${moderationResult.max_scores.sexual.toFixed(3)}, Violence: ${moderationResult.max_scores.violence.toFixed(3)}`,
     });
   } else {
     await sendSlackModerationResult({
@@ -105,8 +81,8 @@ async function handleModerationAndNotify(
 
 async function notifySlackSummarization(
   assetId: string,
-  summaryResult: RobotsSummaryOutputs,
-  questionsResult: RobotsAskQuestionsOutputs
+  summaryResult: SummarizeJobOutputs,
+  questionsResult: AskQuestionsJobOutputs
 ) {
   "use step";
 
@@ -130,7 +106,7 @@ const WATCH_PARTY_CONFIDENCE_THRESHOLD = 0.8;
 
 async function handleWatchPartyModeration(
   assetId: string,
-  questionsResult: RobotsAskQuestionsOutputs
+  questionsResult: AskQuestionsJobOutputs
 ): Promise<boolean> {
   "use step";
 
@@ -168,54 +144,65 @@ async function handleWatchPartyModeration(
   return didAutoDelete;
 }
 
-async function getRobotsAuthHeader(): Promise<string> {
-  "use step";
-  const tokenId = process.env.MUX_TOKEN_ID;
-  const tokenSecret = process.env.MUX_TOKEN_SECRET;
-  return `Basic ${Buffer.from(`${tokenId}:${tokenSecret}`).toString('base64')}`;
-}
-
 export async function moderateAndSummarize(assetId: string) {
   "use workflow";
 
   console.log('Processing AI workflow for asset:', assetId); // eslint-disable-line no-console
 
-  const authHeader = await getRobotsAuthHeader();
-
   // 1. Start moderation job and poll for result
-  const { jobId: moderationJobId } = await createModerationJob(workflowFetch, authHeader, assetId, {
-    thresholds: MODERATION_THRESHOLDS,
-    maxSamples: MODERATION_MAX_SAMPLES,
+  const { id: moderationJobId } = await mux.robots.jobs.moderate.create({
+    parameters: {
+      asset_id: assetId,
+      thresholds: MODERATION_THRESHOLDS,
+      max_samples: MODERATION_MAX_SAMPLES,
+    },
   });
 
-  const moderationResult = await pollRobotsJob<RobotsModerationOutputs>(
-    authHeader, 'moderate', moderationJobId, normalizeModerationOutputs
+  const moderationResult = await pollRobotsJob<ModerateJobOutputs>(
+    (id) => mux.robots.jobs.moderate.retrieve(id),
+    moderationJobId,
+    'moderate'
   );
 
   // 2. Handle moderation results + Slack notification
   await handleModerationAndNotify(assetId, moderationResult);
 
   // 3. If flagged, skip summarization
-  if (moderationResult.exceedsThreshold) {
+  if (moderationResult.exceeds_threshold) {
     console.log(`Asset ${assetId} flagged by moderation, skipping summarization`); // eslint-disable-line no-console
     return { assetId, moderationResult };
   }
 
   // 4. Start summarization + ask-questions jobs in parallel, poll for results
   console.log(`Running summarization for asset ${assetId}`); // eslint-disable-line no-console
-  const { jobId: summaryJobId } = await createSummarizeJob(workflowFetch, authHeader, assetId);
-  const { jobId: questionsJobId } = await createAskQuestionsJob(workflowFetch, authHeader, assetId, [
-    { question: "Is this a professionally produced full length movie or TV show, or a standalone segment from it?" },
-    { question: "Is this professionally produced footage of a cycling race?" },
-    { question: WATCH_PARTY_QUESTION },
-    { question: "Does this video use offensive language, and/or is likely to offend?" },
-    { question: "Does this contain explicit slurs, dehumanization, or threats toward a protected group (not general insults or political opinions)?" },
-    { question: "Is this video mostly of feet?" },
-  ]);
+  const { id: summaryJobId } = await mux.robots.jobs.summarize.create({
+    parameters: { asset_id: assetId },
+  });
+  const { id: questionsJobId } = await mux.robots.jobs.askQuestions.create({
+    parameters: {
+      asset_id: assetId,
+      questions: [
+        { question: "Is this a professionally produced full length movie or TV show, or a standalone segment from it?" },
+        { question: "Is this professionally produced footage of a cycling race?" },
+        { question: WATCH_PARTY_QUESTION },
+        { question: "Does this video use offensive language, and/or is likely to offend?" },
+        { question: "Does this contain explicit slurs, dehumanization, or threats toward a protected group (not general insults or political opinions)?" },
+        { question: "Is this video mostly of feet?" },
+      ],
+    },
+  });
 
   // Poll sequentially to avoid interleaved steps that break workflow replay
-  const summaryResult = await pollRobotsJob<RobotsSummaryOutputs>(authHeader, 'summarize', summaryJobId, normalizeSummaryOutputs);
-  const questionsResult = await pollRobotsJob<RobotsAskQuestionsOutputs>(authHeader, 'ask-questions', questionsJobId, normalizeAskQuestionsOutputs);
+  const summaryResult = await pollRobotsJob<SummarizeJobOutputs>(
+    (id) => mux.robots.jobs.summarize.retrieve(id),
+    summaryJobId,
+    'summarize'
+  );
+  const questionsResult = await pollRobotsJob<AskQuestionsJobOutputs>(
+    (id) => mux.robots.jobs.askQuestions.retrieve(id),
+    questionsJobId,
+    'ask-questions'
+  );
 
   console.log('AI Summarization Result:', JSON.stringify(summaryResult, null, 2)); // eslint-disable-line no-console
   console.log('AI Ask Questions Result:', JSON.stringify(questionsResult, null, 2)); // eslint-disable-line no-console

@@ -3,7 +3,7 @@
  */
 import nock from 'nock';
 import { checkAndAutoDelete, checkAndAutoDeleteWatchParty } from './moderation-action';
-import type { RobotsModerationOutputs } from '../types/robots';
+import type { ModerateJobOutputs } from '@mux/mux-node/resources/robots/jobs/moderate';
 
 const assetId = 'test-asset-123';
 const playbackId = 'test-playback-456';
@@ -22,9 +22,10 @@ afterEach(() => {
 });
 
 test('returns false when AUTO_DELETE_ENABLED is not set, even if moderation exceeds', async () => {
-  const moderationResult: RobotsModerationOutputs = {
-    exceedsThreshold: true,
-    maxScores: { sexual: 0.95, violence: 0.92 },
+  const moderationResult: ModerateJobOutputs = {
+    exceeds_threshold: true,
+    max_scores: { sexual: 0.95, violence: 0.92 },
+    thumbnail_scores: [],
   };
 
   const didDelete = await checkAndAutoDelete({
@@ -47,9 +48,10 @@ test('deletes and records when AUTO_DELETE_ENABLED=1 and moderation exceeds', as
     .post('/v0/test-base-id/Auto%20Deleted')
     .reply(200, { records: [] });
 
-  const moderationResult: RobotsModerationOutputs = {
-    exceedsThreshold: true,
-    maxScores: { sexual: 0.95, violence: 0.92 },
+  const moderationResult: ModerateJobOutputs = {
+    exceeds_threshold: true,
+    max_scores: { sexual: 0.95, violence: 0.92 },
+    thumbnail_scores: [],
   };
 
   const didDelete = await checkAndAutoDelete({
@@ -66,9 +68,10 @@ test('deletes and records when AUTO_DELETE_ENABLED=1 and moderation exceeds', as
 test('does not delete when moderation does not exceed threshold', async () => {
   process.env.AUTO_DELETE_ENABLED = '1';
 
-  const moderationResult: RobotsModerationOutputs = {
-    exceedsThreshold: false,
-    maxScores: { sexual: 0.40, violence: 0.25 },
+  const moderationResult: ModerateJobOutputs = {
+    exceeds_threshold: false,
+    max_scores: { sexual: 0.40, violence: 0.25 },
+    thumbnail_scores: [],
   };
 
   const didDelete = await checkAndAutoDelete({
@@ -91,9 +94,10 @@ test('still returns true if Airtable recording fails', async () => {
     .post('/v0/test-base-id/Auto%20Deleted')
     .reply(500, { error: 'Internal error' });
 
-  const moderationResult: RobotsModerationOutputs = {
-    exceedsThreshold: true,
-    maxScores: { sexual: 0.95, violence: 0.92 },
+  const moderationResult: ModerateJobOutputs = {
+    exceeds_threshold: true,
+    max_scores: { sexual: 0.95, violence: 0.92 },
+    thumbnail_scores: [],
   };
 
   const didDelete = await checkAndAutoDelete({

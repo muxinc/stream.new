@@ -1,4 +1,4 @@
-import type { RobotsModerationOutputs } from '../types/robots';
+import type { ModerateJobOutputs } from '@mux/mux-node/resources/robots/jobs/moderate';
 import Mux from '@mux/mux-node';
 
 const mux = new Mux();
@@ -45,16 +45,16 @@ export async function checkAndAutoDeleteWatchParty({ assetId, playbackId, answer
   return false;
 }
 
-export async function checkAndAutoDelete({ assetId, playbackId, moderationResult }: { assetId: string, playbackId: string, moderationResult: RobotsModerationOutputs }): Promise<boolean> {
+export async function checkAndAutoDelete({ assetId, playbackId, moderationResult }: { assetId: string, playbackId: string, moderationResult: ModerateJobOutputs }): Promise<boolean> {
   const autoDeleteEnabled = process.env.AUTO_DELETE_ENABLED === '1';
-  const shouldDelete = moderationResult.exceedsThreshold;
+  const shouldDelete = moderationResult.exceeds_threshold;
 
   if (autoDeleteEnabled && shouldDelete) {
     await mux.video.assets.deletePlaybackId(assetId, playbackId);
 
     await saveDeletionRecordInAirtable({
       assetId,
-      notes: `Sexual: ${moderationResult.maxScores.sexual}, Violence: ${moderationResult.maxScores.violence}`
+      notes: `Sexual: ${moderationResult.max_scores.sexual}, Violence: ${moderationResult.max_scores.violence}`
     });
 
     return true;

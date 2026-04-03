@@ -1,6 +1,8 @@
 import { HOST_URL } from '../constants';
 import { getImageBaseUrl } from './urlutils';
-import type { RobotsModerationOutputs, RobotsSummaryOutputs, RobotsAskQuestionsOutputs } from '../types/robots';
+import type { ModerateJobOutputs } from '@mux/mux-node/resources/robots/jobs/moderate';
+import type { SummarizeJobOutputs } from '@mux/mux-node/resources/robots/jobs/summarize';
+import type { AskQuestionsJobOutputs } from '@mux/mux-node/resources/robots/jobs/ask-questions';
 
 const slackWebhook = process.env.SLACK_WEBHOOK_ASSET_READY;
 const moderatorPassword = process.env.SLACK_MODERATOR_PASSWORD;
@@ -113,7 +115,7 @@ export const sendSlackModerationResult = async ({
   playbackId: string;
   assetId: string;
   duration: number;
-  moderationResult: RobotsModerationOutputs;
+  moderationResult: ModerateJobOutputs;
 }): Promise<null> => {
   if (!slackWebhook) {
     console.log('No slack webhook configured'); // eslint-disable-line no-console
@@ -132,9 +134,9 @@ export const sendSlackModerationResult = async ({
 
   blocks.push(...baseBlocks({ playbackId, assetId, duration }));
 
-  if (moderationResult?.maxScores && blocks[1].fields) {
-    const { sexual, violence } = moderationResult.maxScores;
-    const emoji = moderationResult.exceedsThreshold ? '🚨' : '✅';
+  if (moderationResult?.max_scores && blocks[1].fields) {
+    const { sexual, violence } = moderationResult.max_scores;
+    const emoji = moderationResult.exceeds_threshold ? '🚨' : '✅';
 
     blocks[1].fields.push({
       type: 'mrkdwn',
@@ -170,8 +172,8 @@ export const sendSlackSummarizationResult = async ({
 }: {
   playbackId: string;
   assetId: string;
-  summaryResult: RobotsSummaryOutputs;
-  questionsResult: RobotsAskQuestionsOutputs;
+  summaryResult: SummarizeJobOutputs;
+  questionsResult: AskQuestionsJobOutputs;
 }): Promise<null> => {
   if (!slackWebhook) {
     console.log('No slack webhook configured'); // eslint-disable-line no-console
