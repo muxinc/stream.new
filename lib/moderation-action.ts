@@ -6,7 +6,7 @@ const mux = new Mux();
 async function saveDeletionRecordInAirtable ({ assetId, notes }: { assetId: string, notes: string }) {
   if (process.env.AIRTABLE_KEY && process.env.AIRTABLE_BASE_ID) {
     try {
-      const res = await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Auto Deleted`, {
+      const res = await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Auto%20Deleted`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${process.env.AIRTABLE_KEY}`,

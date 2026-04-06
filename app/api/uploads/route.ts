@@ -14,7 +14,6 @@ export async function POST(_request: NextRequest) {
           {
             generated_subtitles: [
               {
-                // @ts-expect-error - generated_subtitles with language_code: 'auto' is supported but not in types yet
                 language_code: 'auto',
               },
             ],
