@@ -32,7 +32,7 @@ export async function checkAndAutoDeleteWatchParty({ assetId, playbackId, answer
   const shouldDelete = answer === 'yes' && confidence > 0.8;
 
   if (autoDeleteEnabled && shouldDelete) {
-    await mux.video.assets.deletePlaybackId(assetId, playbackId);
+    await mux.video.assets.deletePlaybackId(playbackId, {ASSET_ID: assetId});
 
     await saveDeletionRecordInAirtable({
       assetId,
@@ -50,7 +50,7 @@ export async function checkAndAutoDelete({ assetId, playbackId, moderationResult
   const shouldDelete = moderationResult.exceeds_threshold;
 
   if (autoDeleteEnabled && shouldDelete) {
-    await mux.video.assets.deletePlaybackId(assetId, playbackId);
+    await mux.video.assets.deletePlaybackId(playbackId, {ASSET_ID: assetId});
 
     await saveDeletionRecordInAirtable({
       assetId,

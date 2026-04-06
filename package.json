@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@mux/blurup": "^1.0.2",
-    "@mux/mux-node": "file:vendor/mux-mux-node-14.0.0-alpha.0.tgz",
+    "@mux/mux-node": "file:vendor/mux-mux-node-v14.0.0-alpha.0.tgz",
     "@mux/mux-player-react": "^3.11.4",
     "@mux/mux-uploader-react": "^1.4.1",
     "@mux/mux-video-react": "^0.30.2",
