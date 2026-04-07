@@ -12,7 +12,7 @@ const ROBOTS_POLL_INTERVAL_MS = 5 * 1000; // 5 seconds
 const ROBOTS_JOB_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
 const ROBOTS_MAX_POLL_ATTEMPTS = Math.ceil(ROBOTS_JOB_TIMEOUT_MS / ROBOTS_POLL_INTERVAL_MS); // ~120 attempts
 
-const MODERATION_THRESHOLDS = { sexual: 0.9, violence: 0.9 };
+const MODERATION_THRESHOLDS = { sexual: 0.85, violence: 0.85 };
 const MODERATION_MAX_SAMPLES = 5;
 
 // --- Job creation steps ---
