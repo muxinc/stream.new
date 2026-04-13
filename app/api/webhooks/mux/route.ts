@@ -23,7 +23,7 @@ type RobotsJobStatus = 'completed' | 'errored' | 'cancelled';
 interface RobotsJobWebhookData {
   id: string;
   status: RobotsJobStatus | 'pending' | 'processing';
-  parameters: { asset_id: string };
+  resources?: { assets: Array<{ id: string }> };
   outputs?: unknown;
   errors?: Array<{ type: string; message: string; retryable?: boolean }>;
 }
@@ -99,10 +99,10 @@ export async function POST(request: NextRequest) {
     if (robotsMatch) {
       const [, workflow, status] = robotsMatch as unknown as [string, 'moderate' | 'summarize' | 'ask_questions', RobotsJobStatus];
       const jobData = data as RobotsJobWebhookData;
-      const assetId = jobData.parameters?.asset_id;
+      const assetId = jobData.resources?.assets?.[0]?.id;
 
       if (!assetId) {
-        console.log(`Robots ${workflow} webhook missing parameters.asset_id (job ${jobData.id})`); // eslint-disable-line no-console
+        console.log(`Robots ${workflow} webhook missing resources.assets[0].id (job ${jobData.id})`); // eslint-disable-line no-console
         return NextResponse.json({ message: 'Robots event missing asset id' });
       }
 
