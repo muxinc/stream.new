@@ -1,19 +1,32 @@
 import Mux from '@mux/mux-node';
-import { sleep } from 'workflow';
-import type { ModerateJobOutputs } from '@mux/mux-node/resources/robots/jobs/moderate';
-import type { SummarizeJobOutputs } from '@mux/mux-node/resources/robots/jobs/summarize';
-import type { AskQuestionsJobOutputs } from '@mux/mux-node/resources/robots/jobs/ask-questions';
+import { createHook, sleep } from 'workflow';
+import type { ModerateJob, ModerateJobOutputs } from '@mux/mux-node/resources/robots/jobs/moderate';
+import type { SummarizeJob, SummarizeJobOutputs } from '@mux/mux-node/resources/robots/jobs/summarize';
+import type { AskQuestionsJob, AskQuestionsJobOutputs } from '@mux/mux-node/resources/robots/jobs/ask-questions';
 import { sendSlackModerationResult, sendSlackSummarizationResult, sendSlackAutoDeleteMessage } from '../lib/slack-notifier';
 import { checkAndAutoDelete, checkAndAutoDeleteWatchParty } from '../lib/moderation-action';
+import type { ModerationHookPayload, SummarizeHookPayload, AskQuestionsHookPayload } from '../types';
 
 const mux = new Mux();
 
-const ROBOTS_POLL_INTERVAL_MS = 5 * 1000; // 5 seconds
 const ROBOTS_JOB_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
-const ROBOTS_MAX_POLL_ATTEMPTS = Math.ceil(ROBOTS_JOB_TIMEOUT_MS / ROBOTS_POLL_INTERVAL_MS); // ~120 attempts
 
 const MODERATION_THRESHOLDS = { sexual: 0.85, violence: 0.85 };
 const MODERATION_MAX_SAMPLES = 5;
+
+// --- Hook token helpers ---
+
+export function moderationHookToken(assetId: string) {
+  return `robots-moderate:${assetId}`;
+}
+
+export function summarizeHookToken(assetId: string) {
+  return `robots-summarize:${assetId}`;
+}
+
+export function askQuestionsHookToken(assetId: string) {
+  return `robots-ask-questions:${assetId}`;
+}
 
 // --- Job creation steps ---
 
@@ -41,62 +54,41 @@ async function startAskQuestionsJob(assetId: string, questions: Array<{ question
   return id;
 }
 
-// --- Job polling steps (return outputs when complete, null when still running) ---
+// --- Retrieve fallbacks (only used when the webhook was missed) ---
 
-async function pollModerationJob(jobId: string): Promise<ModerateJobOutputs | null> {
+async function retrieveModerationJob(jobId: string): Promise<ModerateJob> {
   "use step";
-  const job = await mux.robots.jobs.moderate.retrieve(jobId);
-  if (job.status === 'completed') return job.outputs ?? null;
-  if (job.status === 'errored') throw new Error(`Robots moderate job ${jobId} failed: ${job.errors?.[0]?.message ?? 'Unknown error'}`);
-  if (job.status === 'cancelled') throw new Error(`Robots moderate job ${jobId} was cancelled`);
-  return null;
+  return mux.robots.jobs.moderate.retrieve(jobId);
 }
 
-async function pollSummarizeJob(jobId: string): Promise<SummarizeJobOutputs | null> {
+async function retrieveSummarizeJob(jobId: string): Promise<SummarizeJob> {
   "use step";
-  const job = await mux.robots.jobs.summarize.retrieve(jobId);
-  if (job.status === 'completed') return job.outputs ?? null;
-  if (job.status === 'errored') throw new Error(`Robots summarize job ${jobId} failed: ${job.errors?.[0]?.message ?? 'Unknown error'}`);
-  if (job.status === 'cancelled') throw new Error(`Robots summarize job ${jobId} was cancelled`);
-  return null;
+  return mux.robots.jobs.summarize.retrieve(jobId);
 }
 
-async function pollAskQuestionsJob(jobId: string): Promise<AskQuestionsJobOutputs | null> {
+async function retrieveAskQuestionsJob(jobId: string): Promise<AskQuestionsJob> {
   "use step";
-  const job = await mux.robots.jobs.askQuestions.retrieve(jobId);
-  if (job.status === 'completed') return job.outputs ?? null;
-  if (job.status === 'errored') throw new Error(`Robots ask-questions job ${jobId} failed: ${job.errors?.[0]?.message ?? 'Unknown error'}`);
-  if (job.status === 'cancelled') throw new Error(`Robots ask-questions job ${jobId} was cancelled`);
-  return null;
+  return mux.robots.jobs.askQuestions.retrieve(jobId);
 }
 
-// --- Polling loop (runs in workflow context, calls step per attempt) ---
+// --- Payload unwrappers ---
 
-async function waitForModerationJob(jobId: string): Promise<ModerateJobOutputs> {
-  for (let attempt = 0; attempt < ROBOTS_MAX_POLL_ATTEMPTS; attempt++) {
-    await sleep(ROBOTS_POLL_INTERVAL_MS);
-    const result = await pollModerationJob(jobId);
-    if (result) return result;
-  }
-  throw new Error(`Robots moderate job ${jobId} timed out after ${ROBOTS_MAX_POLL_ATTEMPTS} attempts`);
+function unwrapModerationPayload(jobId: string, payload: ModerationHookPayload): ModerateJobOutputs {
+  if (payload.status === 'completed') return payload.outputs;
+  if (payload.status === 'errored') throw new Error(`Robots moderate job ${jobId} failed: ${payload.errorMessage}`);
+  throw new Error(`Robots moderate job ${jobId} was cancelled`);
 }
 
-async function waitForSummarizeJob(jobId: string): Promise<SummarizeJobOutputs> {
-  for (let attempt = 0; attempt < ROBOTS_MAX_POLL_ATTEMPTS; attempt++) {
-    await sleep(ROBOTS_POLL_INTERVAL_MS);
-    const result = await pollSummarizeJob(jobId);
-    if (result) return result;
-  }
-  throw new Error(`Robots summarize job ${jobId} timed out after ${ROBOTS_MAX_POLL_ATTEMPTS} attempts`);
+function unwrapSummarizePayload(jobId: string, payload: SummarizeHookPayload): SummarizeJobOutputs {
+  if (payload.status === 'completed') return payload.outputs;
+  if (payload.status === 'errored') throw new Error(`Robots summarize job ${jobId} failed: ${payload.errorMessage}`);
+  throw new Error(`Robots summarize job ${jobId} was cancelled`);
 }
 
-async function waitForAskQuestionsJob(jobId: string): Promise<AskQuestionsJobOutputs> {
-  for (let attempt = 0; attempt < ROBOTS_MAX_POLL_ATTEMPTS; attempt++) {
-    await sleep(ROBOTS_POLL_INTERVAL_MS);
-    const result = await pollAskQuestionsJob(jobId);
-    if (result) return result;
-  }
-  throw new Error(`Robots ask-questions job ${jobId} timed out after ${ROBOTS_MAX_POLL_ATTEMPTS} attempts`);
+function unwrapAskQuestionsPayload(jobId: string, payload: AskQuestionsHookPayload): AskQuestionsJobOutputs {
+  if (payload.status === 'completed') return payload.outputs;
+  if (payload.status === 'errored') throw new Error(`Robots ask-questions job ${jobId} failed: ${payload.errorMessage}`);
+  throw new Error(`Robots ask-questions job ${jobId} was cancelled`);
 }
 
 // --- Notification / moderation action steps ---
@@ -208,9 +200,34 @@ export async function moderateAndSummarize(assetId: string) {
 
   console.log('Processing AI workflow for asset:', assetId); // eslint-disable-line no-console
 
-  // 1. Start moderation job and poll for result
+  // 1. Moderation — create hook, fire job, wait on hook (with timeout fallback)
+  //
+  // The hook must be created BEFORE starting the job, otherwise the job could
+  // complete and fire its webhook before the hook is registered, losing the payload.
+  const moderationHook = createHook<ModerationHookPayload>({ token: moderationHookToken(assetId) });
   const moderationJobId = await startModerationJob(assetId);
-  const moderationResult = await waitForModerationJob(moderationJobId);
+
+  const moderationRaceResult = await Promise.race([
+    moderationHook.then((payload) => ({ source: 'hook' as const, payload })),
+    sleep(ROBOTS_JOB_TIMEOUT_MS).then(() => ({ source: 'timeout' as const })),
+  ]);
+
+  let moderationResult: ModerateJobOutputs;
+  if (moderationRaceResult.source === 'hook') {
+    moderationResult = unwrapModerationPayload(moderationJobId, moderationRaceResult.payload);
+  } else {
+    console.log(`Moderation hook timed out for job ${moderationJobId}, checking via API`); // eslint-disable-line no-console
+    const job = await retrieveModerationJob(moderationJobId);
+    if (job.status === 'completed' && job.outputs) {
+      moderationResult = job.outputs;
+    } else if (job.status === 'errored') {
+      throw new Error(`Robots moderate job ${moderationJobId} failed: ${job.errors?.[0]?.message ?? 'Unknown error'}`);
+    } else if (job.status === 'cancelled') {
+      throw new Error(`Robots moderate job ${moderationJobId} was cancelled`);
+    } else {
+      throw new Error(`Robots moderate job ${moderationJobId} timed out (status: ${job.status})`);
+    }
+  }
 
   // 2. Handle moderation results + Slack notification
   await handleModerationAndNotify(assetId, moderationResult);
@@ -221,9 +238,13 @@ export async function moderateAndSummarize(assetId: string) {
     return { assetId, moderationResult };
   }
 
-  // 4. Start summarization + ask-questions jobs in parallel, poll for results
+  // 4. Summarize + ask-questions in parallel — each has its own hook, fired before its job.
   console.log(`Running summarization for asset ${assetId}`); // eslint-disable-line no-console
-  const summaryJobId = await startSummarizeJob(assetId);
+
+  const summarizeHook = createHook<SummarizeHookPayload>({ token: summarizeHookToken(assetId) });
+  const askQuestionsHook = createHook<AskQuestionsHookPayload>({ token: askQuestionsHookToken(assetId) });
+
+  const summarizeJobId = await startSummarizeJob(assetId);
   const questionsJobId = await startAskQuestionsJob(assetId, [
     { question: "Is this a professionally produced full length movie or TV show, or a standalone segment from it?" },
     { question: "Is this professionally produced footage of a cycling race?" },
@@ -233,9 +254,49 @@ export async function moderateAndSummarize(assetId: string) {
     { question: "Is this video mostly of feet?" },
   ]);
 
-  // Poll sequentially to avoid interleaved steps that break workflow replay
-  const summaryResult = await waitForSummarizeJob(summaryJobId);
-  const questionsResult = await waitForAskQuestionsJob(questionsJobId);
+  const summarizeRaceResult = await Promise.race([
+    summarizeHook.then((payload) => ({ source: 'hook' as const, payload })),
+    sleep(ROBOTS_JOB_TIMEOUT_MS).then(() => ({ source: 'timeout' as const })),
+  ]);
+
+  let summaryResult: SummarizeJobOutputs;
+  if (summarizeRaceResult.source === 'hook') {
+    summaryResult = unwrapSummarizePayload(summarizeJobId, summarizeRaceResult.payload);
+  } else {
+    console.log(`Summarize hook timed out for job ${summarizeJobId}, checking via API`); // eslint-disable-line no-console
+    const job = await retrieveSummarizeJob(summarizeJobId);
+    if (job.status === 'completed' && job.outputs) {
+      summaryResult = job.outputs;
+    } else if (job.status === 'errored') {
+      throw new Error(`Robots summarize job ${summarizeJobId} failed: ${job.errors?.[0]?.message ?? 'Unknown error'}`);
+    } else if (job.status === 'cancelled') {
+      throw new Error(`Robots summarize job ${summarizeJobId} was cancelled`);
+    } else {
+      throw new Error(`Robots summarize job ${summarizeJobId} timed out (status: ${job.status})`);
+    }
+  }
+
+  const questionsRaceResult = await Promise.race([
+    askQuestionsHook.then((payload) => ({ source: 'hook' as const, payload })),
+    sleep(ROBOTS_JOB_TIMEOUT_MS).then(() => ({ source: 'timeout' as const })),
+  ]);
+
+  let questionsResult: AskQuestionsJobOutputs;
+  if (questionsRaceResult.source === 'hook') {
+    questionsResult = unwrapAskQuestionsPayload(questionsJobId, questionsRaceResult.payload);
+  } else {
+    console.log(`Ask-questions hook timed out for job ${questionsJobId}, checking via API`); // eslint-disable-line no-console
+    const job = await retrieveAskQuestionsJob(questionsJobId);
+    if (job.status === 'completed' && job.outputs) {
+      questionsResult = job.outputs;
+    } else if (job.status === 'errored') {
+      throw new Error(`Robots ask-questions job ${questionsJobId} failed: ${job.errors?.[0]?.message ?? 'Unknown error'}`);
+    } else if (job.status === 'cancelled') {
+      throw new Error(`Robots ask-questions job ${questionsJobId} was cancelled`);
+    } else {
+      throw new Error(`Robots ask-questions job ${questionsJobId} timed out (status: ${job.status})`);
+    }
+  }
 
   console.log('AI Summarization Result:', JSON.stringify(summaryResult, null, 2)); // eslint-disable-line no-console
   console.log('AI Ask Questions Result:', JSON.stringify(questionsResult, null, 2)); // eslint-disable-line no-console
