@@ -20,3 +20,12 @@ export type RobotsJobHookPayload =
   | { status: 'completed' }
   | { status: 'errored'; errorMessage: string }
   | { status: 'cancelled' };
+
+export interface CaptionHookPayload {
+  includeTranscript: boolean;
+}
+
+export interface CaptionStatus {
+  done: boolean;
+  includeTranscript: boolean;
+}

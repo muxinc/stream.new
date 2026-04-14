@@ -5,11 +5,12 @@ import type { SummarizeJob, SummarizeJobOutputs } from '@mux/mux-node/resources/
 import type { AskQuestionsJob, AskQuestionsJobOutputs } from '@mux/mux-node/resources/robots/jobs/ask-questions';
 import { sendSlackModerationResult, sendSlackSummarizationResult, sendSlackAutoDeleteMessage } from '../lib/slack-notifier';
 import { checkAndAutoDelete, checkAndAutoDeleteWatchParty } from '../lib/moderation-action';
-import type { RobotsJobHookPayload } from '../types';
+import type { RobotsJobHookPayload, CaptionHookPayload, CaptionStatus } from '../types';
 
 const mux = new Mux();
 
 const ROBOTS_JOB_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
+const CAPTION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
 
 const MODERATION_THRESHOLDS = { sexual: 0.85, violence: 0.85 };
 const MODERATION_MAX_SAMPLES = 5;
@@ -19,6 +20,7 @@ const MODERATION_MAX_SAMPLES = 5;
 export const moderationHook = defineHook<RobotsJobHookPayload>();
 export const summarizeHook = defineHook<RobotsJobHookPayload>();
 export const askQuestionsHook = defineHook<RobotsJobHookPayload>();
+export const captionHook = defineHook<CaptionHookPayload>();
 
 // --- Hook token helpers ---
 
@@ -32,6 +34,10 @@ export function summarizeHookToken(assetId: string) {
 
 export function askQuestionsHookToken(assetId: string) {
   return `robots-ask-questions:${assetId}`;
+}
+
+export function captionHookToken(assetId: string) {
+  return `captions:${assetId}`;
 }
 
 // --- Job creation steps ---
@@ -75,6 +81,32 @@ async function retrieveSummarizeJob(jobId: string): Promise<SummarizeJob> {
 async function retrieveAskQuestionsJob(jobId: string): Promise<AskQuestionsJob> {
   "use step";
   return mux.robots.jobs.askQuestions.retrieve(jobId);
+}
+
+// --- Caption status step ---
+
+async function checkCaptionStatus(assetId: string): Promise<CaptionStatus> {
+  "use step";
+
+  const asset = await mux.video.assets.retrieve(assetId);
+  const captionTrack = asset.tracks?.find(
+    (t) => t.type === 'text' && t.text_type === 'subtitles' && t.text_source === 'generated_vod'
+  );
+
+  if (!captionTrack) {
+    return { done: false, includeTranscript: false };
+  }
+
+  if (captionTrack.status === 'ready') {
+    return { done: true, includeTranscript: true };
+  }
+
+  if (captionTrack.status === 'errored') {
+    return { done: true, includeTranscript: false };
+  }
+
+  // Track exists but is still preparing
+  return { done: false, includeTranscript: false };
 }
 
 // --- Notification / moderation action steps ---
@@ -220,8 +252,35 @@ export async function moderateAndSummarize(assetId: string) {
     return { assetId, moderationResult };
   }
 
-  // 4. Summarize + ask-questions in parallel — each hook created before its job.
-  console.log(`Running summarization for asset ${assetId}`); // eslint-disable-line no-console
+  // 4. Wait for captions to be ready before firing summarize/ask-questions.
+  // Robots uses the caption track for transcript analysis — without it, results
+  // are visual-only. Create the hook before the API check to avoid missing the
+  // webhook between check and hook creation.
+  const capAction = captionHook.create({ token: captionHookToken(assetId) });
+
+  let captionStatus = await checkCaptionStatus(assetId);
+
+  if (!captionStatus.done) {
+    const captionOutcome = await Promise.race([
+      sleep(CAPTION_TIMEOUT_MS).then(() => ({ kind: 'timeout' as const, payload: null })),
+      capAction.then((payload: CaptionHookPayload) => ({ kind: 'hook' as const, payload })),
+    ]);
+
+    if (captionOutcome.kind === 'hook') {
+      captionStatus = { done: true, includeTranscript: captionOutcome.payload.includeTranscript };
+    } else {
+      // Timeout — final API check
+      console.log(`Caption hook timed out for asset ${assetId}, checking Mux API`); // eslint-disable-line no-console
+      captionStatus = await checkCaptionStatus(assetId);
+      if (!captionStatus.done) {
+        console.log(`Captions still not ready for asset ${assetId} after timeout, proceeding without transcript`); // eslint-disable-line no-console
+        captionStatus = { done: true, includeTranscript: false };
+      }
+    }
+  }
+
+  // 5. Summarize + ask-questions in parallel — each hook created before its job.
+  console.log(`Running summarization for asset ${assetId} (transcript available: ${captionStatus.includeTranscript})`); // eslint-disable-line no-console
 
   const sumAction = summarizeHook.create({ token: summarizeHookToken(assetId) });
   const aqAction = askQuestionsHook.create({ token: askQuestionsHookToken(assetId) });
