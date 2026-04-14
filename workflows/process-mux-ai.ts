@@ -1,5 +1,5 @@
 import Mux from '@mux/mux-node';
-import { createHook, sleep } from 'workflow';
+import { createHook } from 'workflow';
 import type { ModerateJob, ModerateJobOutputs } from '@mux/mux-node/resources/robots/jobs/moderate';
 import type { SummarizeJob, SummarizeJobOutputs } from '@mux/mux-node/resources/robots/jobs/summarize';
 import type { AskQuestionsJob, AskQuestionsJobOutputs } from '@mux/mux-node/resources/robots/jobs/ask-questions';
@@ -8,8 +8,6 @@ import { checkAndAutoDelete, checkAndAutoDeleteWatchParty } from '../lib/moderat
 import type { RobotsJobHookPayload } from '../types';
 
 const mux = new Mux();
-
-const ROBOTS_JOB_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
 
 const MODERATION_THRESHOLDS = { sexual: 0.85, violence: 0.85 };
 const MODERATION_MAX_SAMPLES = 5;
@@ -186,11 +184,8 @@ export async function moderateAndSummarize(assetId: string) {
   const moderationHook = createHook<RobotsJobHookPayload>({ token: moderationHookToken(assetId) });
   const moderationJobId = await startModerationJob(assetId);
 
-  const moderationRace = await Promise.race([
-    moderationHook.then((payload: RobotsJobHookPayload) => ({ source: 'hook' as const, payload })),
-    sleep(ROBOTS_JOB_TIMEOUT_MS).then(() => ({ source: 'timeout' as const, payload: null })),
-  ]);
-  if (moderationRace.source === 'hook' && moderationRace.payload?.status === 'cancelled') {
+  const moderationHookResult = await moderationHook;
+  if (moderationHookResult.status === 'cancelled') {
     throw new Error(`Robots moderate job ${moderationJobId} was cancelled`);
   }
 
@@ -233,11 +228,8 @@ export async function moderateAndSummarize(assetId: string) {
   ]);
 
   // Summarize
-  const summarizeRace = await Promise.race([
-    summarizeHook.then((payload: RobotsJobHookPayload) => ({ source: 'hook' as const, payload })),
-    sleep(ROBOTS_JOB_TIMEOUT_MS).then(() => ({ source: 'timeout' as const, payload: null })),
-  ]);
-  if (summarizeRace.source === 'hook' && summarizeRace.payload?.status === 'cancelled') {
+  const summarizeHookResult = await summarizeHook;
+  if (summarizeHookResult.status === 'cancelled') {
     throw new Error(`Robots summarize job ${summarizeJobId} was cancelled`);
   }
 
@@ -254,11 +246,8 @@ export async function moderateAndSummarize(assetId: string) {
   const summaryResult = summarizeJob.outputs;
 
   // Ask-questions
-  const questionsRace = await Promise.race([
-    askQuestionsHook.then((payload: RobotsJobHookPayload) => ({ source: 'hook' as const, payload })),
-    sleep(ROBOTS_JOB_TIMEOUT_MS).then(() => ({ source: 'timeout' as const, payload: null })),
-  ]);
-  if (questionsRace.source === 'hook' && questionsRace.payload?.status === 'cancelled') {
+  const questionsHookResult = await askQuestionsHook;
+  if (questionsHookResult.status === 'cancelled') {
     throw new Error(`Robots ask-questions job ${questionsJobId} was cancelled`);
   }
 
