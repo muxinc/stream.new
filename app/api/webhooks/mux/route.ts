@@ -7,38 +7,33 @@ import {
   summarizeHookToken,
   askQuestionsHookToken,
 } from '../../../../workflows/process-mux-ai';
-import type {
-  ModerationHookPayload,
-  SummarizeHookPayload,
-  AskQuestionsHookPayload,
-} from '../../../../types';
+import type { RobotsJobHookPayload } from '../../../../types';
 
 const webhookSignatureSecret = process.env.MUX_WEBHOOK_SIGNATURE_SECRET;
 const mux = new Mux();
 
 type RobotsJobStatus = 'completed' | 'errored' | 'cancelled';
 
-// Robots job webhook data has this shape (see https://www.mux.com/webhook-spec.json).
-// We only care about the fields we use — everything else is passed through untouched.
+// Robots job webhook data — we only read the fields we need. Everything else is
+// ignored; the workflow calls `.retrieve()` for authoritative outputs rather than
+// trusting the webhook body shape.
 interface RobotsJobWebhookData {
   id: string;
-  status: RobotsJobStatus | 'pending' | 'processing';
   resources?: { assets: Array<{ id: string }> };
-  outputs?: unknown;
   errors?: Array<{ type: string; message: string; retryable?: boolean }>;
 }
 
-function buildRobotsHookPayload(data: RobotsJobWebhookData, terminalStatus: RobotsJobStatus) {
-  if (terminalStatus === 'completed') {
-    return { status: 'completed' as const, outputs: data.outputs };
-  }
+function buildRobotsHookPayload(data: RobotsJobWebhookData, terminalStatus: RobotsJobStatus): RobotsJobHookPayload {
   if (terminalStatus === 'errored') {
     return {
-      status: 'errored' as const,
+      status: 'errored',
       errorMessage: data.errors?.[0]?.message ?? 'Unknown error',
     };
   }
-  return { status: 'cancelled' as const };
+  if (terminalStatus === 'cancelled') {
+    return { status: 'cancelled' };
+  }
+  return { status: 'completed' };
 }
 
 export async function POST(request: NextRequest) {
@@ -90,11 +85,9 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Handle Robots job terminal events — resume the workflow's corresponding hook.
-    //
-    // Event types are of the form `robots.job.<workflow>.<status>`, e.g.
-    // `robots.job.moderate.completed`. We only care about terminal statuses
-    // (completed / errored / cancelled) because those are what the workflow awaits.
+    // Handle Robots job terminal events — resume the workflow's matching hook.
+    // Event type form: `robots.job.<workflow>.<status>`, e.g. `robots.job.moderate.completed`.
+    // We only care about terminal statuses; pending/processing fall through.
     const robotsMatch = /^robots\.job\.(moderate|summarize|ask_questions)\.(completed|errored|cancelled)$/.exec(type);
     if (robotsMatch) {
       const [, workflow, status] = robotsMatch as unknown as [string, 'moderate' | 'summarize' | 'ask_questions', RobotsJobStatus];
@@ -106,17 +99,15 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ message: 'Robots event missing asset id' });
       }
 
+      const token =
+        workflow === 'moderate' ? moderationHookToken(assetId)
+        : workflow === 'summarize' ? summarizeHookToken(assetId)
+        : askQuestionsHookToken(assetId);
+
+      const payload = buildRobotsHookPayload(jobData, status);
+
       try {
-        if (workflow === 'moderate') {
-          const payload = buildRobotsHookPayload(jobData, status) as ModerationHookPayload;
-          await resumeHook<ModerationHookPayload>(moderationHookToken(assetId), payload);
-        } else if (workflow === 'summarize') {
-          const payload = buildRobotsHookPayload(jobData, status) as SummarizeHookPayload;
-          await resumeHook<SummarizeHookPayload>(summarizeHookToken(assetId), payload);
-        } else {
-          const payload = buildRobotsHookPayload(jobData, status) as AskQuestionsHookPayload;
-          await resumeHook<AskQuestionsHookPayload>(askQuestionsHookToken(assetId), payload);
-        }
+        await resumeHook<RobotsJobHookPayload>(token, payload);
       } catch (e) {
         // Hook may not exist (stale workflow run, redelivered webhook after the workflow moved on, etc.)
         console.log(`Could not resume robots ${workflow} hook for asset ${assetId}: ${(e as Error).message}`); // eslint-disable-line no-console

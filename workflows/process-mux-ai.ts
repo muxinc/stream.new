@@ -5,7 +5,7 @@ import type { SummarizeJob, SummarizeJobOutputs } from '@mux/mux-node/resources/
 import type { AskQuestionsJob, AskQuestionsJobOutputs } from '@mux/mux-node/resources/robots/jobs/ask-questions';
 import { sendSlackModerationResult, sendSlackSummarizationResult, sendSlackAutoDeleteMessage } from '../lib/slack-notifier';
 import { checkAndAutoDelete, checkAndAutoDeleteWatchParty } from '../lib/moderation-action';
-import type { ModerationHookPayload, SummarizeHookPayload, AskQuestionsHookPayload } from '../types';
+import type { RobotsJobHookPayload } from '../types';
 
 const mux = new Mux();
 
@@ -54,7 +54,7 @@ async function startAskQuestionsJob(assetId: string, questions: Array<{ question
   return id;
 }
 
-// --- Retrieve fallbacks (only used when the webhook was missed) ---
+// --- Job retrieve steps — called once per job to get authoritative outputs ---
 
 async function retrieveModerationJob(jobId: string): Promise<ModerateJob> {
   "use step";
@@ -69,26 +69,6 @@ async function retrieveSummarizeJob(jobId: string): Promise<SummarizeJob> {
 async function retrieveAskQuestionsJob(jobId: string): Promise<AskQuestionsJob> {
   "use step";
   return mux.robots.jobs.askQuestions.retrieve(jobId);
-}
-
-// --- Payload unwrappers ---
-
-function unwrapModerationPayload(jobId: string, payload: ModerationHookPayload): ModerateJobOutputs {
-  if (payload.status === 'completed') return payload.outputs;
-  if (payload.status === 'errored') throw new Error(`Robots moderate job ${jobId} failed: ${payload.errorMessage}`);
-  throw new Error(`Robots moderate job ${jobId} was cancelled`);
-}
-
-function unwrapSummarizePayload(jobId: string, payload: SummarizeHookPayload): SummarizeJobOutputs {
-  if (payload.status === 'completed') return payload.outputs;
-  if (payload.status === 'errored') throw new Error(`Robots summarize job ${jobId} failed: ${payload.errorMessage}`);
-  throw new Error(`Robots summarize job ${jobId} was cancelled`);
-}
-
-function unwrapAskQuestionsPayload(jobId: string, payload: AskQuestionsHookPayload): AskQuestionsJobOutputs {
-  if (payload.status === 'completed') return payload.outputs;
-  if (payload.status === 'errored') throw new Error(`Robots ask-questions job ${jobId} failed: ${payload.errorMessage}`);
-  throw new Error(`Robots ask-questions job ${jobId} was cancelled`);
 }
 
 // --- Notification / moderation action steps ---
@@ -200,49 +180,47 @@ export async function moderateAndSummarize(assetId: string) {
 
   console.log('Processing AI workflow for asset:', assetId); // eslint-disable-line no-console
 
-  // 1. Moderation — create hook, fire job, wait on hook (with timeout fallback)
-  //
-  // The hook must be created BEFORE starting the job, otherwise the job could
-  // complete and fire its webhook before the hook is registered, losing the payload.
-  const moderationHook = createHook<ModerationHookPayload>({ token: moderationHookToken(assetId) });
+  // 1. Moderation.
+  // Create the hook BEFORE firing the job, so the webhook can't arrive before
+  // the hook exists.
+  const moderationHook = createHook<RobotsJobHookPayload>({ token: moderationHookToken(assetId) });
   const moderationJobId = await startModerationJob(assetId);
 
-  const moderationRaceResult = await Promise.race([
-    moderationHook.then((payload) => ({ source: 'hook' as const, payload })),
-    sleep(ROBOTS_JOB_TIMEOUT_MS).then(() => ({ source: 'timeout' as const })),
+  const moderationRace = await Promise.race([
+    moderationHook.then((payload: RobotsJobHookPayload) => ({ source: 'hook' as const, payload })),
+    sleep(ROBOTS_JOB_TIMEOUT_MS).then(() => ({ source: 'timeout' as const, payload: null })),
   ]);
-
-  let moderationResult: ModerateJobOutputs;
-  if (moderationRaceResult.source === 'hook') {
-    moderationResult = unwrapModerationPayload(moderationJobId, moderationRaceResult.payload);
-  } else {
-    console.log(`Moderation hook timed out for job ${moderationJobId}, checking via API`); // eslint-disable-line no-console
-    const job = await retrieveModerationJob(moderationJobId);
-    if (job.status === 'completed' && job.outputs) {
-      moderationResult = job.outputs;
-    } else if (job.status === 'errored') {
-      throw new Error(`Robots moderate job ${moderationJobId} failed: ${job.errors?.[0]?.message ?? 'Unknown error'}`);
-    } else if (job.status === 'cancelled') {
-      throw new Error(`Robots moderate job ${moderationJobId} was cancelled`);
-    } else {
-      throw new Error(`Robots moderate job ${moderationJobId} timed out (status: ${job.status})`);
-    }
+  if (moderationRace.source === 'hook' && moderationRace.payload?.status === 'cancelled') {
+    throw new Error(`Robots moderate job ${moderationJobId} was cancelled`);
   }
 
-  // 2. Handle moderation results + Slack notification
+  // Retrieve the job to get authoritative outputs (regardless of how we woke up).
+  const moderationJob = await retrieveModerationJob(moderationJobId);
+  if (moderationJob.status === 'errored') {
+    throw new Error(`Robots moderate job ${moderationJobId} failed: ${moderationJob.errors?.[0]?.message ?? 'Unknown error'}`);
+  }
+  if (moderationJob.status === 'cancelled') {
+    throw new Error(`Robots moderate job ${moderationJobId} was cancelled`);
+  }
+  if (moderationJob.status !== 'completed' || !moderationJob.outputs) {
+    throw new Error(`Robots moderate job ${moderationJobId} did not complete (status: ${moderationJob.status})`);
+  }
+  const moderationResult = moderationJob.outputs;
+
+  // 2. Handle moderation results + Slack notification.
   await handleModerationAndNotify(assetId, moderationResult);
 
-  // 3. If flagged, skip summarization
+  // 3. If flagged, skip summarization.
   if (moderationResult.exceeds_threshold) {
     console.log(`Asset ${assetId} flagged by moderation, skipping summarization`); // eslint-disable-line no-console
     return { assetId, moderationResult };
   }
 
-  // 4. Summarize + ask-questions in parallel — each has its own hook, fired before its job.
+  // 4. Summarize + ask-questions in parallel — each hook created before its job.
   console.log(`Running summarization for asset ${assetId}`); // eslint-disable-line no-console
 
-  const summarizeHook = createHook<SummarizeHookPayload>({ token: summarizeHookToken(assetId) });
-  const askQuestionsHook = createHook<AskQuestionsHookPayload>({ token: askQuestionsHookToken(assetId) });
+  const summarizeHook = createHook<RobotsJobHookPayload>({ token: summarizeHookToken(assetId) });
+  const askQuestionsHook = createHook<RobotsJobHookPayload>({ token: askQuestionsHookToken(assetId) });
 
   const summarizeJobId = await startSummarizeJob(assetId);
   const questionsJobId = await startAskQuestionsJob(assetId, [
@@ -254,54 +232,52 @@ export async function moderateAndSummarize(assetId: string) {
     { question: "Is this video mostly of feet?" },
   ]);
 
-  const summarizeRaceResult = await Promise.race([
-    summarizeHook.then((payload) => ({ source: 'hook' as const, payload })),
-    sleep(ROBOTS_JOB_TIMEOUT_MS).then(() => ({ source: 'timeout' as const })),
+  // Summarize
+  const summarizeRace = await Promise.race([
+    summarizeHook.then((payload: RobotsJobHookPayload) => ({ source: 'hook' as const, payload })),
+    sleep(ROBOTS_JOB_TIMEOUT_MS).then(() => ({ source: 'timeout' as const, payload: null })),
   ]);
-
-  let summaryResult: SummarizeJobOutputs;
-  if (summarizeRaceResult.source === 'hook') {
-    summaryResult = unwrapSummarizePayload(summarizeJobId, summarizeRaceResult.payload);
-  } else {
-    console.log(`Summarize hook timed out for job ${summarizeJobId}, checking via API`); // eslint-disable-line no-console
-    const job = await retrieveSummarizeJob(summarizeJobId);
-    if (job.status === 'completed' && job.outputs) {
-      summaryResult = job.outputs;
-    } else if (job.status === 'errored') {
-      throw new Error(`Robots summarize job ${summarizeJobId} failed: ${job.errors?.[0]?.message ?? 'Unknown error'}`);
-    } else if (job.status === 'cancelled') {
-      throw new Error(`Robots summarize job ${summarizeJobId} was cancelled`);
-    } else {
-      throw new Error(`Robots summarize job ${summarizeJobId} timed out (status: ${job.status})`);
-    }
+  if (summarizeRace.source === 'hook' && summarizeRace.payload?.status === 'cancelled') {
+    throw new Error(`Robots summarize job ${summarizeJobId} was cancelled`);
   }
 
-  const questionsRaceResult = await Promise.race([
-    askQuestionsHook.then((payload) => ({ source: 'hook' as const, payload })),
-    sleep(ROBOTS_JOB_TIMEOUT_MS).then(() => ({ source: 'timeout' as const })),
-  ]);
-
-  let questionsResult: AskQuestionsJobOutputs;
-  if (questionsRaceResult.source === 'hook') {
-    questionsResult = unwrapAskQuestionsPayload(questionsJobId, questionsRaceResult.payload);
-  } else {
-    console.log(`Ask-questions hook timed out for job ${questionsJobId}, checking via API`); // eslint-disable-line no-console
-    const job = await retrieveAskQuestionsJob(questionsJobId);
-    if (job.status === 'completed' && job.outputs) {
-      questionsResult = job.outputs;
-    } else if (job.status === 'errored') {
-      throw new Error(`Robots ask-questions job ${questionsJobId} failed: ${job.errors?.[0]?.message ?? 'Unknown error'}`);
-    } else if (job.status === 'cancelled') {
-      throw new Error(`Robots ask-questions job ${questionsJobId} was cancelled`);
-    } else {
-      throw new Error(`Robots ask-questions job ${questionsJobId} timed out (status: ${job.status})`);
-    }
+  const summarizeJob = await retrieveSummarizeJob(summarizeJobId);
+  if (summarizeJob.status === 'errored') {
+    throw new Error(`Robots summarize job ${summarizeJobId} failed: ${summarizeJob.errors?.[0]?.message ?? 'Unknown error'}`);
   }
+  if (summarizeJob.status === 'cancelled') {
+    throw new Error(`Robots summarize job ${summarizeJobId} was cancelled`);
+  }
+  if (summarizeJob.status !== 'completed' || !summarizeJob.outputs) {
+    throw new Error(`Robots summarize job ${summarizeJobId} did not complete (status: ${summarizeJob.status})`);
+  }
+  const summaryResult = summarizeJob.outputs;
+
+  // Ask-questions
+  const questionsRace = await Promise.race([
+    askQuestionsHook.then((payload: RobotsJobHookPayload) => ({ source: 'hook' as const, payload })),
+    sleep(ROBOTS_JOB_TIMEOUT_MS).then(() => ({ source: 'timeout' as const, payload: null })),
+  ]);
+  if (questionsRace.source === 'hook' && questionsRace.payload?.status === 'cancelled') {
+    throw new Error(`Robots ask-questions job ${questionsJobId} was cancelled`);
+  }
+
+  const questionsJob = await retrieveAskQuestionsJob(questionsJobId);
+  if (questionsJob.status === 'errored') {
+    throw new Error(`Robots ask-questions job ${questionsJobId} failed: ${questionsJob.errors?.[0]?.message ?? 'Unknown error'}`);
+  }
+  if (questionsJob.status === 'cancelled') {
+    throw new Error(`Robots ask-questions job ${questionsJobId} was cancelled`);
+  }
+  if (questionsJob.status !== 'completed' || !questionsJob.outputs) {
+    throw new Error(`Robots ask-questions job ${questionsJobId} did not complete (status: ${questionsJob.status})`);
+  }
+  const questionsResult = questionsJob.outputs;
 
   console.log('AI Summarization Result:', JSON.stringify(summaryResult, null, 2)); // eslint-disable-line no-console
   console.log('AI Ask Questions Result:', JSON.stringify(questionsResult, null, 2)); // eslint-disable-line no-console
 
-  // 5. Check for watch party content and auto-delete if flagged
+  // 5. Check for watch party content and auto-delete if flagged.
   const watchPartyDeleted = await handleWatchPartyModeration(assetId, questionsResult);
 
   if (!watchPartyDeleted) {
