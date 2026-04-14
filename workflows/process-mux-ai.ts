@@ -1,5 +1,5 @@
 import Mux from '@mux/mux-node';
-import { createHook } from 'workflow';
+import { defineHook, sleep } from 'workflow';
 import type { ModerateJob, ModerateJobOutputs } from '@mux/mux-node/resources/robots/jobs/moderate';
 import type { SummarizeJob, SummarizeJobOutputs } from '@mux/mux-node/resources/robots/jobs/summarize';
 import type { AskQuestionsJob, AskQuestionsJobOutputs } from '@mux/mux-node/resources/robots/jobs/ask-questions';
@@ -9,8 +9,16 @@ import type { RobotsJobHookPayload } from '../types';
 
 const mux = new Mux();
 
+const ROBOTS_JOB_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
+
 const MODERATION_THRESHOLDS = { sexual: 0.85, violence: 0.85 };
 const MODERATION_MAX_SAMPLES = 5;
+
+// --- Hook definitions (module-level, following the defineHook pattern) ---
+
+export const moderationHook = defineHook<RobotsJobHookPayload>();
+export const summarizeHook = defineHook<RobotsJobHookPayload>();
+export const askQuestionsHook = defineHook<RobotsJobHookPayload>();
 
 // --- Hook token helpers ---
 
@@ -178,16 +186,14 @@ export async function moderateAndSummarize(assetId: string) {
 
   console.log('Processing AI workflow for asset:', assetId); // eslint-disable-line no-console
 
-  // 1. Moderation.
-  // Create the hook BEFORE firing the job, so the webhook can't arrive before
-  // the hook exists.
-  const moderationHook = createHook<RobotsJobHookPayload>({ token: moderationHookToken(assetId) });
+  // 1. Moderation — create hook before firing the job, race against timeout.
+  const modAction = moderationHook.create({ token: moderationHookToken(assetId) });
   const moderationJobId = await startModerationJob(assetId);
 
-  const moderationHookResult = await moderationHook;
-  if (moderationHookResult.status === 'cancelled') {
-    throw new Error(`Robots moderate job ${moderationJobId} was cancelled`);
-  }
+  const moderationOutcome = await Promise.race([
+    sleep(ROBOTS_JOB_TIMEOUT_MS).then(() => ({ kind: 'timeout' as const })),
+    modAction.then((payload) => ({ kind: 'hook' as const, payload })),
+  ]);
 
   // Retrieve the job to get authoritative outputs (regardless of how we woke up).
   const moderationJob = await retrieveModerationJob(moderationJobId);
@@ -198,6 +204,9 @@ export async function moderateAndSummarize(assetId: string) {
     throw new Error(`Robots moderate job ${moderationJobId} was cancelled`);
   }
   if (moderationJob.status !== 'completed' || !moderationJob.outputs) {
+    if (moderationOutcome.kind === 'timeout') {
+      throw new Error(`Robots moderate job ${moderationJobId} timed out (status: ${moderationJob.status})`);
+    }
     throw new Error(`Robots moderate job ${moderationJobId} did not complete (status: ${moderationJob.status})`);
   }
   const moderationResult = moderationJob.outputs;
@@ -214,8 +223,8 @@ export async function moderateAndSummarize(assetId: string) {
   // 4. Summarize + ask-questions in parallel — each hook created before its job.
   console.log(`Running summarization for asset ${assetId}`); // eslint-disable-line no-console
 
-  const summarizeHook = createHook<RobotsJobHookPayload>({ token: summarizeHookToken(assetId) });
-  const askQuestionsHook = createHook<RobotsJobHookPayload>({ token: askQuestionsHookToken(assetId) });
+  const sumAction = summarizeHook.create({ token: summarizeHookToken(assetId) });
+  const aqAction = askQuestionsHook.create({ token: askQuestionsHookToken(assetId) });
 
   const summarizeJobId = await startSummarizeJob(assetId);
   const questionsJobId = await startAskQuestionsJob(assetId, [
@@ -227,11 +236,11 @@ export async function moderateAndSummarize(assetId: string) {
     { question: "Is this video mostly of feet?" },
   ]);
 
-  // Summarize
-  const summarizeHookResult = await summarizeHook;
-  if (summarizeHookResult.status === 'cancelled') {
-    throw new Error(`Robots summarize job ${summarizeJobId} was cancelled`);
-  }
+  // Summarize — race hook against timeout
+  await Promise.race([
+    sleep(ROBOTS_JOB_TIMEOUT_MS).then(() => ({ kind: 'timeout' as const })),
+    sumAction.then((payload) => ({ kind: 'hook' as const, payload })),
+  ]);
 
   const summarizeJob = await retrieveSummarizeJob(summarizeJobId);
   if (summarizeJob.status === 'errored') {
@@ -245,11 +254,11 @@ export async function moderateAndSummarize(assetId: string) {
   }
   const summaryResult = summarizeJob.outputs;
 
-  // Ask-questions
-  const questionsHookResult = await askQuestionsHook;
-  if (questionsHookResult.status === 'cancelled') {
-    throw new Error(`Robots ask-questions job ${questionsJobId} was cancelled`);
-  }
+  // Ask-questions — race hook against timeout
+  await Promise.race([
+    sleep(ROBOTS_JOB_TIMEOUT_MS).then(() => ({ kind: 'timeout' as const })),
+    aqAction.then((payload) => ({ kind: 'hook' as const, payload })),
+  ]);
 
   const questionsJob = await retrieveAskQuestionsJob(questionsJobId);
   if (questionsJob.status === 'errored') {
