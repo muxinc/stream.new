@@ -44,7 +44,7 @@ export function captionHookToken(assetId: string) {
 
 async function startModerationJob(assetId: string): Promise<string> {
 
-  callToUndefinedFunction();
+  throw new Error("I am blowing up!");
 
   "use step";
   const { id } = await mux.robots.jobs.moderate.create({
