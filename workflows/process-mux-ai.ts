@@ -44,9 +44,6 @@ export function captionHookToken(assetId: string) {
 
 async function startModerationJob(assetId: string): Promise<string> {
   "use step";
-
-  throw new Error("I am blowing up!");
-
   const { id } = await mux.robots.jobs.moderate.create({
     parameters: { asset_id: assetId, thresholds: MODERATION_THRESHOLDS, max_samples: MODERATION_MAX_SAMPLES },
   });

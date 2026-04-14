@@ -38,6 +38,8 @@ function buildRobotsHookPayload(data: RobotsJobWebhookData, terminalStatus: Robo
 }
 
 export async function POST(request: NextRequest) {
+  throw new Error("I am blowing up!");
+
   // Get raw body as text (NOT json) for signature verification and parsing
   const rawBody = await request.text();
 
