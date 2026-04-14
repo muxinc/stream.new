@@ -1,26 +1,28 @@
-import type { ModerationResult } from '@mux/ai/workflows';
+import type { ModerateJobOutputs } from '@mux/mux-node/resources/robots/jobs/moderate';
 import Mux from '@mux/mux-node';
-import { RequestError } from 'got';
-import got from './got-client';
 
 const mux = new Mux();
 
 async function saveDeletionRecordInAirtable ({ assetId, notes }: { assetId: string, notes: string }) {
   if (process.env.AIRTABLE_KEY && process.env.AIRTABLE_BASE_ID) {
     try {
-      await got.post(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Auto Deleted`, {
+      const res = await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Auto%20Deleted`, {
+        method: 'POST',
         headers: {
-          Authorization: `Bearer ${process.env.AIRTABLE_KEY}`
+          Authorization: `Bearer ${process.env.AIRTABLE_KEY}`,
+          'Content-Type': 'application/json',
         },
-        json: {
+        body: JSON.stringify({
           records: [
             {fields: { assetId, notes } },
           ]
-        }
+        }),
       });
+      if (!res.ok) {
+        console.error('Airtable responded with', res.status, await res.text()); // eslint-disable-line no-console
+      }
     } catch (e) {
-      const err = (e as RequestError);
-      console.error('Error reporting to airtable', err.response?.body, e); // eslint-disable-line no-console
+      console.error('Error reporting to airtable', e); // eslint-disable-line no-console
     }
   }
 }
@@ -43,24 +45,16 @@ export async function checkAndAutoDeleteWatchParty({ assetId, playbackId, answer
   return false;
 }
 
-export async function checkAndAutoDelete({ assetId, playbackId, openaiResult, hiveResult }: { assetId: string, playbackId: string, openaiResult: ModerationResult, hiveResult: ModerationResult }): Promise<boolean> {
+export async function checkAndAutoDelete({ assetId, playbackId, moderationResult }: { assetId: string, playbackId: string, moderationResult: ModerateJobOutputs }): Promise<boolean> {
   const autoDeleteEnabled = process.env.AUTO_DELETE_ENABLED === '1';
-
-  // Check if either moderation service flags the content
-  const openaiExceeds = openaiResult.exceedsThreshold;
-  const hiveExceeds = hiveResult.exceedsThreshold;
-  const shouldDelete = openaiExceeds || hiveExceeds;
+  const shouldDelete = moderationResult.exceeds_threshold;
 
   if (autoDeleteEnabled && shouldDelete) {
     await mux.video.assets.deletePlaybackId(assetId, playbackId);
 
-    const flaggedBy = [];
-    if (openaiExceeds) flaggedBy.push('OpenAI');
-    if (hiveExceeds) flaggedBy.push('Hive');
-
     await saveDeletionRecordInAirtable({
       assetId,
-      notes: `Flagged by: ${flaggedBy.join(', ')} | OpenAI - Sexual: ${openaiResult.maxScores.sexual}, Violence: ${openaiResult.maxScores.violence} | Hive - Sexual: ${hiveResult.maxScores.sexual}, Violence: ${hiveResult.maxScores.violence}`
+      notes: `Sexual: ${moderationResult.max_scores.sexual}, Violence: ${moderationResult.max_scores.violence}`
     });
 
     return true;

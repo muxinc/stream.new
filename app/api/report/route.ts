@@ -1,24 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { RequestError } from 'got';
-import got from '../../../lib/got-client';
 import { sendAbuseReport } from '../../../lib/slack-notifier';
 
 const notify = async ({playbackId, reason, comment }: { playbackId: string, reason: string, comment?: string }) => {
   if (process.env.AIRTABLE_KEY && process.env.AIRTABLE_BASE_ID) {
     try {
-      await got.post(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Reported`, {
+      const res = await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Reported`, {
+        method: 'POST',
         headers: {
-          Authorization: `Bearer ${process.env.AIRTABLE_KEY}`
+          Authorization: `Bearer ${process.env.AIRTABLE_KEY}`,
+          'Content-Type': 'application/json',
         },
-        json: {
+        body: JSON.stringify({
           records: [
             {fields: { playbackId, reason, comment, status: "Pending" } },
           ]
-        }
+        }),
       });
+      if (!res.ok) {
+        console.error('Airtable responded with', res.status, await res.text()); // eslint-disable-line no-console
+      }
     } catch (e) {
-      const err = (e as RequestError);
-      console.error('Error reporting to airtable', err.response?.body, e); // eslint-disable-line no-console
+      console.error('Error reporting to airtable', e); // eslint-disable-line no-console
     }
   }
   try {
