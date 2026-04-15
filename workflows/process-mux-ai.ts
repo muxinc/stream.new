@@ -53,7 +53,7 @@ async function startModerationJob(assetId: string): Promise<string> {
 async function startSummarizeJob(assetId: string): Promise<string> {
   "use step";
   const { id } = await mux.robots.jobs.summarize.create({
-    parameters: { asset_id: assetId },
+    parameters: { asset_id: assetId, "output_language_code" : "en" },
   });
   return id;
 }
