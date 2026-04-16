@@ -3,7 +3,7 @@
  */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { sendSlackModerationResult } from './slack-notifier';
-import type { ModerateJobOutputs } from '@mux/mux-node/resources/robots/jobs/moderate';
+import type { ModerateJobOutputs } from '@mux/mux-node/resources/robots-preview/jobs/moderate';
 import nock from 'nock';
 
 test('it sends a moderation result request to the slack webhook', async () => {

@@ -1,8 +1,8 @@
 import { HOST_URL } from '../constants';
 import { getImageBaseUrl } from './urlutils';
-import type { ModerateJobOutputs } from '@mux/mux-node/resources/robots/jobs/moderate';
-import type { SummarizeJobOutputs } from '@mux/mux-node/resources/robots/jobs/summarize';
-import type { AskQuestionsJobOutputs } from '@mux/mux-node/resources/robots/jobs/ask-questions';
+import type { ModerateJobOutputs } from '@mux/mux-node/resources/robots-preview/jobs/moderate';
+import type { SummarizeJobOutputs } from '@mux/mux-node/resources/robots-preview/jobs/summarize';
+import type { AskQuestionsJobOutputs } from '@mux/mux-node/resources/robots-preview/jobs/ask-questions';
 
 const slackWebhook = process.env.SLACK_WEBHOOK_ASSET_READY;
 const moderatorPassword = process.env.SLACK_MODERATOR_PASSWORD;

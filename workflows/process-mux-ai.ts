@@ -1,8 +1,8 @@
 import Mux from '@mux/mux-node';
 import { defineHook, sleep } from 'workflow';
-import type { ModerateJob, ModerateJobOutputs } from '@mux/mux-node/resources/robots/jobs/moderate';
-import type { SummarizeJob, SummarizeJobOutputs } from '@mux/mux-node/resources/robots/jobs/summarize';
-import type { AskQuestionsJob, AskQuestionsJobOutputs } from '@mux/mux-node/resources/robots/jobs/ask-questions';
+import type { ModerateJob, ModerateJobOutputs } from '@mux/mux-node/resources/robots-preview/jobs/moderate';
+import type { SummarizeJob, SummarizeJobOutputs } from '@mux/mux-node/resources/robots-preview/jobs/summarize';
+import type { AskQuestionsJob, AskQuestionsJobOutputs } from '@mux/mux-node/resources/robots-preview/jobs/ask-questions';
 import { sendSlackModerationResult, sendSlackSummarizationResult, sendSlackAutoDeleteMessage } from '../lib/slack-notifier';
 import { checkAndAutoDelete, checkAndAutoDeleteWatchParty } from '../lib/moderation-action';
 import type { RobotsJobHookPayload, CaptionHookPayload, CaptionStatus } from '../types';
@@ -44,7 +44,7 @@ export function captionHookToken(assetId: string) {
 
 async function startModerationJob(assetId: string): Promise<string> {
   "use step";
-  const { id } = await mux.robots.jobs.moderate.create({
+  const { id } = await mux.robotsPreview.jobs.moderate.create({
     parameters: { asset_id: assetId, thresholds: MODERATION_THRESHOLDS, max_samples: MODERATION_MAX_SAMPLES },
   });
   return id;
@@ -52,7 +52,7 @@ async function startModerationJob(assetId: string): Promise<string> {
 
 async function startSummarizeJob(assetId: string): Promise<string> {
   "use step";
-  const { id } = await mux.robots.jobs.summarize.create({
+  const { id } = await mux.robotsPreview.jobs.summarize.create({
     parameters: { asset_id: assetId, "output_language_code" : "en" },
   });
   return id;
@@ -60,7 +60,7 @@ async function startSummarizeJob(assetId: string): Promise<string> {
 
 async function startAskQuestionsJob(assetId: string, questions: Array<{ question: string }>): Promise<string> {
   "use step";
-  const { id } = await mux.robots.jobs.askQuestions.create({
+  const { id } = await mux.robotsPreview.jobs.askQuestions.create({
     parameters: { asset_id: assetId, questions },
   });
   return id;
@@ -70,17 +70,17 @@ async function startAskQuestionsJob(assetId: string, questions: Array<{ question
 
 async function retrieveModerationJob(jobId: string): Promise<ModerateJob> {
   "use step";
-  return mux.robots.jobs.moderate.retrieve(jobId);
+  return mux.robotsPreview.jobs.moderate.retrieve(jobId);
 }
 
 async function retrieveSummarizeJob(jobId: string): Promise<SummarizeJob> {
   "use step";
-  return mux.robots.jobs.summarize.retrieve(jobId);
+  return mux.robotsPreview.jobs.summarize.retrieve(jobId);
 }
 
 async function retrieveAskQuestionsJob(jobId: string): Promise<AskQuestionsJob> {
   "use step";
-  return mux.robots.jobs.askQuestions.retrieve(jobId);
+  return mux.robotsPreview.jobs.askQuestions.retrieve(jobId);
 }
 
 // --- Caption status step ---
