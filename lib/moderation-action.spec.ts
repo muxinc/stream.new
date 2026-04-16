@@ -3,7 +3,7 @@
  */
 import nock from 'nock';
 import { checkAndAutoDelete, checkAndAutoDeleteWatchParty } from './moderation-action';
-import type { ModerateJobOutputs } from '@mux/mux-node/resources/robots/jobs/moderate';
+import type { ModerateJobOutputs } from '@mux/mux-node/resources/robots-preview/jobs/moderate';
 
 const assetId = 'test-asset-123';
 const playbackId = 'test-playback-456';

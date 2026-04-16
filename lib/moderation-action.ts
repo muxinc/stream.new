@@ -1,4 +1,4 @@
-import type { ModerateJobOutputs } from '@mux/mux-node/resources/robots/jobs/moderate';
+import type { ModerateJobOutputs } from '@mux/mux-node/resources/robots-preview/jobs/moderate';
 import Mux from '@mux/mux-node';
 
 const mux = new Mux();
