@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     );
   } else {
     console.log('Skipping webhook sig verification because no secret is configured'); // eslint-disable-line no-console
-    event = JSON.parse(rawBody)
+    event = JSON.parse(rawBody);
   }
 
   // Handle video.asset.ready - start unified AI workflow
