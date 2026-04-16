@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
     });
 
     try {
-      const event = mux.webhooks.unwrap(rawBody, headers, webhookSignatureSecret);
+      const event = await mux.webhooks.unwrap(rawBody, headers, webhookSignatureSecret);
 
       // Handle video.asset.ready - start unified AI workflow
       if (event.type === 'video.asset.ready') {
