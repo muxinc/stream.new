@@ -7,7 +7,6 @@ import useSwr from 'swr';
 import Layout from './layout';
 import Button from './button';
 import Cookies from 'js-cookie';
-import { reportUploadTelemetry, UploadTelemetry } from '../lib/telemetry';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 const MAX_VIDEO_DURATION_MIN = 60;
@@ -21,8 +20,6 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
   const router = useRouter();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadId, setUploadId] = useState('');
-   // Add this ref to store the current upload ID
-   const currentUploadIdRef = useRef('');
   const [progress, setProgress] = useState(0);
   const [isPreparing, setIsPreparing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -40,7 +37,6 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
       const res = await fetch('/api/uploads', { method: 'POST' });
       const { id, url } = await res.json();
       setUploadId(id);
-      currentUploadIdRef.current = id; // Store the current upload ID in the ref
       return url;
     } catch (e) {
       console.error('Error in createUpload', e); // eslint-disable-line no-console
@@ -65,36 +61,8 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
         dynamicChunkSize,
       });
 
-      const uploadAnalytics: UploadTelemetry = {
-        fileSize: _file.size,
-        chunkSize: upChunk.chunkSize,
-        uploadStarted: Date.now(),
-        dynamicChunkSize,
-        chunks: [],
-      };
-
-      upChunk.on('attempt', ({ detail }) => {
-        uploadAnalytics.chunks[detail.chunkNumber] = {
-          size: detail.chunkSize,
-          uploadStarted: Date.now(),
-        };
-      });
-
-      upChunk.on('chunkSuccess', ({ detail }) => {
-        uploadAnalytics.chunks[detail.chunk].uploadFinished = Date.now();
-        // chunk size may have changed due to dynamic chunk sizes
-        uploadAnalytics.chunks[detail.chunk].size = detail.chunkSize;
-      });
-
       upChunk.on('error', (err) => {
         setErrorMessage(err.detail);
-        reportUploadTelemetry({
-          ...uploadAnalytics,
-          uploadId: currentUploadIdRef.current,
-          uploadFinished: Date.now(),
-          uploadErrored: true,
-          message: err.detail,
-        });
       });
 
       upChunk.on('progress', (progressEvt) => {
@@ -102,11 +70,6 @@ const UploadProgressFullpage: React.FC<Props> = ({ file, resetPage }) => {
       });
 
       upChunk.on('success', () => {
-        reportUploadTelemetry({
-          ...uploadAnalytics,
-          uploadId: currentUploadIdRef.current,
-          uploadFinished: Date.now(),
-        });
         setIsPreparing(true);
       });
     } catch (err) {

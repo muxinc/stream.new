@@ -9,7 +9,6 @@ import useSwr from 'swr';
 import Button from '../components/button';
 import Layout from '../components/layout';
 import { breakpoints } from '../style-vars';
-import { reportUploadTelemetry, UploadTelemetry, ChunkInfo } from '../lib/telemetry';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -19,7 +18,6 @@ export default function Home() {
   const [uploadId, setUploadId] = useState<string>('');
   const [isPreparing, setIsPreparing] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const [uploadAnalytics, setUploadAnalytics] = useState<Partial<UploadTelemetry> & Pick<UploadTelemetry, 'chunks'>>({ chunks: []});
 
   const { data } = useSwr(
     () => (isPreparing ? `/api/uploads/${uploadId}` : null),
@@ -42,62 +40,16 @@ export default function Home() {
     }
   };
 
-  const handleUpload: MuxUploaderProps['onUploadStart'] = ({ detail }) => {
+  const handleUpload: MuxUploaderProps['onUploadStart'] = () => {
     setIsUploading(true);
-
-    const initialUploadAnalytics: UploadTelemetry = {
-      fileSize: detail.file.size,
-      chunkSize: detail.chunkSize,
-      uploadStarted: Date.now(),
-      dynamicChunkSize: isDynamicChunkSizeSet,
-      chunks: [],
-    };
-
-    setUploadAnalytics(initialUploadAnalytics);
-  };
-
-  const handleChunkAttempt: MuxUploaderProps['onChunkAttempt'] = ({ detail }) => {
-    const chunks: ChunkInfo[] = [...uploadAnalytics.chunks];
-    chunks[detail.chunkNumber] = {
-      size: detail.chunkSize,
-      uploadStarted: Date.now(),
-    };
-
-    setUploadAnalytics({
-      ...uploadAnalytics,
-      chunks,
-    });
-  };
-
-  const handleChunkSuccess: MuxUploaderProps['onChunkSuccess'] = ({ detail }) => {
-    const chunks = [...uploadAnalytics.chunks];
-    chunks[detail.chunk].uploadFinished = Date.now();
-    chunks[detail.chunk].size = detail.chunkSize;
-
-    setUploadAnalytics({
-      ...uploadAnalytics,
-      chunks,
-    });
   };
 
   const handleSuccess: MuxUploaderProps['onSuccess'] = () => {
-    reportUploadTelemetry({
-      ...uploadAnalytics,
-      uploadFinished: Date.now(),
-      uploadId,
-    });
     setIsPreparing(true);
   };
 
-  const handleUploadError: MuxUploaderProps['onUploadError'] = ({ detail }) => {
+  const handleUploadError: MuxUploaderProps['onUploadError'] = () => {
     setIsUploading(false);
-    reportUploadTelemetry({
-      ...uploadAnalytics,
-      uploadId,
-      uploadFinished: Date.now(),
-      uploadErrored: true,
-      message: detail.message,
-    });
   };
 
 
@@ -145,8 +97,6 @@ export default function Home() {
             id="uploader"
             noDrop
             onUploadStart={handleUpload}
-            onChunkAttempt={handleChunkAttempt}
-            onChunkSuccess={handleChunkSuccess}
             onSuccess={handleSuccess}
             onUploadError={handleUploadError}
             dynamicChunkSize={isDynamicChunkSizeSet}
