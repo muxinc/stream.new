@@ -24,25 +24,6 @@ type BlockItem = {
     type: string,
     text: string,
   }>,
-  accessory?: {
-    type: string,
-    text: {
-      type: string,
-      text: string,
-    },
-    url: string,
-    style: string
-  },
-  elements?: [{
-    type: string,
-    text: {
-      type: string,
-      emoji: boolean,
-      text: string
-    },
-    style: string,
-    url: string,
-  }]
 };
 
 const baseBlocks = ({ playbackId, assetId, duration }: {playbackId: string, assetId: string, duration: number}): BlockItem[] => ([
@@ -74,19 +55,11 @@ const baseBlocks = ({ playbackId, assetId, duration }: {playbackId: string, asse
     alt_text: 'storyboard',
   },
   {
-    type: 'actions',
-    elements: [
-      {
-        type: 'button',
-        text: {
-          type: 'plain_text',
-          emoji: true,
-          text: 'View on stream.new',
-        },
-        style: 'primary',
-        url: `${HOST_URL}/v/${playbackId}`,
-      },
-    ],
+    type: 'section',
+    text: {
+      type: 'mrkdwn',
+      text: `<${HOST_URL}/v/${playbackId}|View on stream.new>`,
+    },
   }]);
 
 const deleteButtonBlock = (assetId: string): BlockItem => ({
@@ -217,21 +190,13 @@ export const sendSlackSummarizationResult = async ({
     });
   }
 
-  // Add view button
+  // Add view link
   blocks.push({
-    type: 'actions',
-    elements: [
-      {
-        type: 'button',
-        text: {
-          type: 'plain_text',
-          emoji: true,
-          text: 'View on stream.new',
-        },
-        style: 'primary',
-        url: `${HOST_URL}/v/${playbackId}`,
-      },
-    ],
+    type: 'section',
+    text: {
+      type: 'mrkdwn',
+      text: `<${HOST_URL}/v/${playbackId}|View on stream.new>`,
+    },
   });
 
   // Always include delete button
