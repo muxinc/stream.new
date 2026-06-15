@@ -66,7 +66,7 @@ const deleteButtonBlock = (assetId: string): BlockItem => ({
   type: 'section',
   text: {
     type: 'mrkdwn',
-    text: `If this is bad, it can be <${HOST_URL}/moderator/delete-asset?asset_id=${assetId}&slack_moderator_password=${moderatorPassword}|deleted with 1 click>.`,
+    text: `If this is bad, it can be <${HOST_URL}/moderator/delete-asset?asset_id=${assetId}&amp;slack_moderator_password=${moderatorPassword}|deleted with 1 click>.`,
   },
 });
 
