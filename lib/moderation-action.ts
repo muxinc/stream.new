@@ -27,7 +27,7 @@ async function saveDeletionRecordInAirtable ({ assetId, notes }: { assetId: stri
   }
 }
 
-export async function checkAndAutoDeleteQuestion({ assetId, playbackId, question, answer, confidence }: { assetId: string, playbackId: string, question: string, answer: string, confidence: number }): Promise<boolean> {
+export async function checkAndAutoDeleteQuestion({ assetId, playbackId, question, answer, confidence }: { assetId: string, playbackId: string, question: string, answer: string | null, confidence: number }): Promise<boolean> {
   const autoDeleteEnabled = process.env.AUTO_DELETE_ENABLED === '1';
   const shouldDelete = answer === 'yes' && confidence > 0.8;
 
