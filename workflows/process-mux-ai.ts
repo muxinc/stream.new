@@ -4,7 +4,7 @@ import type { ModerateJob, ModerateJobOutputs } from '@mux/mux-node/resources/ro
 import type { SummarizeJob, SummarizeJobOutputs } from '@mux/mux-node/resources/robots-preview/jobs/summarize';
 import type { AskQuestionsJob, AskQuestionsJobOutputs } from '@mux/mux-node/resources/robots-preview/jobs/ask-questions';
 import { sendSlackModerationResult, sendSlackSummarizationResult, sendSlackAutoDeleteMessage } from '../lib/slack-notifier';
-import { checkAndAutoDelete, checkAndAutoDeleteWatchParty } from '../lib/moderation-action';
+import { checkAndAutoDelete, checkAndAutoDeleteQuestion } from '../lib/moderation-action';
 import type { RobotsJobHookPayload, CaptionHookPayload, CaptionStatus } from '../types';
 
 const mux = new Mux();
@@ -170,20 +170,23 @@ async function notifySlackSummarization(
   });
 }
 
+const FULL_LENGTH_CONTENT_QUESTION = "Is this a professionally produced full length movie or TV show, or a standalone segment from it?";
 const WATCH_PARTY_QUESTION = "Is this a watchalong-style video where a person or small group is actively watching and reacting to a full-length movie or TV episode as the main focus of the clip?";
-const WATCH_PARTY_CONFIDENCE_THRESHOLD = 0.8;
 
-async function handleWatchPartyModeration(
+const AUTO_DELETE_QUESTIONS = [FULL_LENGTH_CONTENT_QUESTION, WATCH_PARTY_QUESTION];
+const AUTO_DELETE_CONFIDENCE_THRESHOLD = 0.8;
+
+async function handleQuestionModeration(
   assetId: string,
   questionsResult: AskQuestionsJobOutputs
 ): Promise<boolean> {
   "use step";
 
-  const watchPartyAnswer = questionsResult.answers.find(
-    (qa) => qa.question === WATCH_PARTY_QUESTION
+  const flaggedAnswer = questionsResult.answers.find(
+    (qa) => AUTO_DELETE_QUESTIONS.includes(qa.question) && qa.answer === 'yes' && qa.confidence > AUTO_DELETE_CONFIDENCE_THRESHOLD
   );
 
-  if (!watchPartyAnswer || watchPartyAnswer.answer !== 'yes' || watchPartyAnswer.confidence <= WATCH_PARTY_CONFIDENCE_THRESHOLD) {
+  if (!flaggedAnswer) {
     return false;
   }
 
@@ -191,14 +194,15 @@ async function handleWatchPartyModeration(
   const playbackId = asset.playback_ids?.[0]?.id;
 
   if (!playbackId) {
-    throw new Error(`No playback ID found for asset ${assetId}. Cannot proceed with watch party moderation.`);
+    throw new Error(`No playback ID found for asset ${assetId}. Cannot proceed with question moderation.`);
   }
 
-  const didAutoDelete = await checkAndAutoDeleteWatchParty({
+  const didAutoDelete = await checkAndAutoDeleteQuestion({
     assetId,
     playbackId,
-    answer: watchPartyAnswer.answer,
-    confidence: watchPartyAnswer.confidence,
+    question: flaggedAnswer.question,
+    answer: flaggedAnswer.answer,
+    confidence: flaggedAnswer.confidence,
   });
 
   if (didAutoDelete) {
@@ -206,7 +210,7 @@ async function handleWatchPartyModeration(
     await sendSlackAutoDeleteMessage({
       assetId,
       duration,
-      moderationDetails: `Flagged by: AI Question — "${WATCH_PARTY_QUESTION}" — Answer: ${watchPartyAnswer.answer}, Confidence: ${watchPartyAnswer.confidence.toFixed(3)} | Reasoning: ${watchPartyAnswer.reasoning}`,
+      moderationDetails: `Flagged by: AI Question — "${flaggedAnswer.question}" — Answer: ${flaggedAnswer.answer}, Confidence: ${flaggedAnswer.confidence.toFixed(3)} | Reasoning: ${flaggedAnswer.reasoning}`,
     });
   }
 
@@ -287,7 +291,7 @@ export async function moderateAndSummarize(assetId: string) {
 
   const summarizeJobId = await startSummarizeJob(assetId);
   const questionsJobId = await startAskQuestionsJob(assetId, [
-    { question: "Is this a professionally produced full length movie or TV show, or a standalone segment from it?" },
+    { question: FULL_LENGTH_CONTENT_QUESTION },
     { question: "Is this professionally produced footage of a cycling race?" },
     { question: WATCH_PARTY_QUESTION },
     { question: "Does this video use offensive language, and/or is likely to offend?" },
@@ -334,10 +338,10 @@ export async function moderateAndSummarize(assetId: string) {
   console.log('AI Summarization Result:', JSON.stringify(summaryResult, null, 2)); // eslint-disable-line no-console
   console.log('AI Ask Questions Result:', JSON.stringify(questionsResult, null, 2)); // eslint-disable-line no-console
 
-  // 5. Check for watch party content and auto-delete if flagged.
-  const watchPartyDeleted = await handleWatchPartyModeration(assetId, questionsResult);
+  // 5. Check auto-delete questions and delete if any are flagged.
+  const questionDeleted = await handleQuestionModeration(assetId, questionsResult);
 
-  if (!watchPartyDeleted) {
+  if (!questionDeleted) {
     await notifySlackSummarization(assetId, summaryResult, questionsResult);
   }
 

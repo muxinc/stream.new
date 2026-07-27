@@ -27,7 +27,7 @@ async function saveDeletionRecordInAirtable ({ assetId, notes }: { assetId: stri
   }
 }
 
-export async function checkAndAutoDeleteWatchParty({ assetId, playbackId, answer, confidence }: { assetId: string, playbackId: string, answer: string, confidence: number }): Promise<boolean> {
+export async function checkAndAutoDeleteQuestion({ assetId, playbackId, question, answer, confidence }: { assetId: string, playbackId: string, question: string, answer: string | null, confidence: number }): Promise<boolean> {
   const autoDeleteEnabled = process.env.AUTO_DELETE_ENABLED === '1';
   const shouldDelete = answer === 'yes' && confidence > 0.8;
 
@@ -36,7 +36,7 @@ export async function checkAndAutoDeleteWatchParty({ assetId, playbackId, answer
 
     await saveDeletionRecordInAirtable({
       assetId,
-      notes: `Flagged by: AI watch-party detection — Answer: ${answer}, Confidence: ${confidence.toFixed(3)}`
+      notes: `Flagged by: AI Question — "${question}" — Answer: ${answer}, Confidence: ${confidence.toFixed(3)}`
     });
 
     return true;

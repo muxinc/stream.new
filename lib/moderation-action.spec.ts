@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 import nock from 'nock';
-import { checkAndAutoDelete, checkAndAutoDeleteWatchParty } from './moderation-action';
+import { checkAndAutoDelete, checkAndAutoDeleteQuestion } from './moderation-action';
 import type { ModerateJobOutputs } from '@mux/mux-node/resources/robots-preview/jobs/moderate';
 
 const assetId = 'test-asset-123';
@@ -112,9 +112,11 @@ test('still returns true if Airtable recording fails', async () => {
   // Airtable error should be logged but not prevent deletion
 });
 
-// Watch party moderation tests
+// Question-based moderation tests
 
-test('watch party: deletes when answer is yes and confidence > 0.8', async () => {
+const question = 'Is this a professionally produced full length movie or TV show, or a standalone segment from it?';
+
+test('question: deletes when answer is yes and confidence > 0.8', async () => {
   process.env.AUTO_DELETE_ENABLED = '1';
 
   const scopeMux = nock('https://api.mux.com')
@@ -125,9 +127,10 @@ test('watch party: deletes when answer is yes and confidence > 0.8', async () =>
     .post('/v0/test-base-id/Auto%20Deleted')
     .reply(200, { records: [] });
 
-  const didDelete = await checkAndAutoDeleteWatchParty({
+  const didDelete = await checkAndAutoDeleteQuestion({
     assetId,
     playbackId,
+    question,
     answer: 'yes',
     confidence: 0.85,
   });
@@ -137,12 +140,13 @@ test('watch party: deletes when answer is yes and confidence > 0.8', async () =>
   expect(scopeAirtable.isDone()).toBe(true);
 });
 
-test('watch party: does not delete when confidence is exactly 0.8', async () => {
+test('question: does not delete when confidence is exactly 0.8', async () => {
   process.env.AUTO_DELETE_ENABLED = '1';
 
-  const didDelete = await checkAndAutoDeleteWatchParty({
+  const didDelete = await checkAndAutoDeleteQuestion({
     assetId,
     playbackId,
+    question,
     answer: 'yes',
     confidence: 0.8,
   });
@@ -150,12 +154,13 @@ test('watch party: does not delete when confidence is exactly 0.8', async () => 
   expect(didDelete).toBe(false);
 });
 
-test('watch party: does not delete when confidence <= 0.8', async () => {
+test('question: does not delete when confidence <= 0.8', async () => {
   process.env.AUTO_DELETE_ENABLED = '1';
 
-  const didDelete = await checkAndAutoDeleteWatchParty({
+  const didDelete = await checkAndAutoDeleteQuestion({
     assetId,
     playbackId,
+    question,
     answer: 'yes',
     confidence: 0.75,
   });
@@ -163,12 +168,13 @@ test('watch party: does not delete when confidence <= 0.8', async () => {
   expect(didDelete).toBe(false);
 });
 
-test('watch party: does not delete when answer is no', async () => {
+test('question: does not delete when answer is no', async () => {
   process.env.AUTO_DELETE_ENABLED = '1';
 
-  const didDelete = await checkAndAutoDeleteWatchParty({
+  const didDelete = await checkAndAutoDeleteQuestion({
     assetId,
     playbackId,
+    question,
     answer: 'no',
     confidence: 0.95,
   });
@@ -176,10 +182,11 @@ test('watch party: does not delete when answer is no', async () => {
   expect(didDelete).toBe(false);
 });
 
-test('watch party: does not delete when AUTO_DELETE_ENABLED is not set', async () => {
-  const didDelete = await checkAndAutoDeleteWatchParty({
+test('question: does not delete when AUTO_DELETE_ENABLED is not set', async () => {
+  const didDelete = await checkAndAutoDeleteQuestion({
     assetId,
     playbackId,
+    question,
     answer: 'yes',
     confidence: 0.95,
   });
@@ -187,7 +194,7 @@ test('watch party: does not delete when AUTO_DELETE_ENABLED is not set', async (
   expect(didDelete).toBe(false);
 });
 
-test('watch party: still returns true if Airtable recording fails', async () => {
+test('question: still returns true if Airtable recording fails', async () => {
   process.env.AUTO_DELETE_ENABLED = '1';
 
   const scopeMux = nock('https://api.mux.com')
@@ -198,9 +205,10 @@ test('watch party: still returns true if Airtable recording fails', async () => 
     .post('/v0/test-base-id/Auto%20Deleted')
     .reply(500, { error: 'Internal error' });
 
-  const didDelete = await checkAndAutoDeleteWatchParty({
+  const didDelete = await checkAndAutoDeleteQuestion({
     assetId,
     playbackId,
+    question,
     answer: 'yes',
     confidence: 0.9,
   });
