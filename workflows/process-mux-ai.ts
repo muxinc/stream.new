@@ -13,7 +13,8 @@ const ROBOTS_JOB_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
 const CAPTION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
 
 const MODERATION_THRESHOLDS = { sexual: 0.85, violence: 0.85 };
-const MODERATION_MAX_SAMPLES = 5;
+const MODERATION_SAMPLING_INTERVAL_SECONDS = 10;
+const MODERATION_MAX_SAMPLES = 25;
 
 // --- Hook definitions (module-level, following the defineHook pattern) ---
 
@@ -45,7 +46,12 @@ export function captionHookToken(assetId: string) {
 async function startModerationJob(assetId: string): Promise<string> {
   "use step";
   const { id } = await mux.robotsPreview.jobs.moderate.create({
-    parameters: { asset_id: assetId, thresholds: MODERATION_THRESHOLDS, max_samples: MODERATION_MAX_SAMPLES },
+    parameters: {
+      asset_id: assetId,
+      thresholds: MODERATION_THRESHOLDS,
+      sampling_interval: MODERATION_SAMPLING_INTERVAL_SECONDS,
+      max_samples: MODERATION_MAX_SAMPLES,
+    },
   });
   return id;
 }
