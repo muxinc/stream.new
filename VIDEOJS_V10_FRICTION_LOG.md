@@ -105,12 +105,18 @@ same geometry as `mux-player`'s (390×694, centered, no overflow) — the skin c
 same `aspect-ratio`/`height:100%`/`max-width:100%` style `mux-player` uses. (Simulated
 via style override; worth re-verifying with a real portrait asset.)
 
-**Pre-existing app finding (out of scope, not v10's fault).** In **production**, *every*
-player route shifts ≈ 1.4 — the "Loading player" centered layout → player layout swap is
-inherent to `PlayerPage`'s `videoExists → tryToLoadPlayer → onLoaded` client-side chain,
-and dev only masked it for the SSR'd players via warm chunks. The v10 routes are now at
-parity with `mux-player`; fixing the swap itself (e.g. reserving the final layout during
-the loading state) would be an app-level change benefiting all players.
+**Pre-existing app finding (out of scope for this item, not v10's fault).** In
+**production**, *every* player route shifted ≈ 1.4. This was initially attributed to the
+"Loading player" centered layout → player layout swap in `PlayerPage`'s client-side
+chain — but the item-3 spike (round 2) found the dominant cause: **styled-jsx was not
+SSR'd at all**. The App Router migration lost styled-jsx server rendering (server HTML
+carried `jsx-*` class names with no rules; App Router needs the registry from the Next.js
+CSS-in-JS guide, which pages router never did), so every styled-jsx page painted unstyled
+and shifted when styles landed at hydration. Fixed app-wide on the spike branch
+(`components/styled-jsx-registry.tsx` + `app/layout.tsx`): all five `/v` players dropped
+1.42–1.48 → 0.41–0.49. The remaining ~0.45 *is* the client-gated `FullpageLoader` →
+player swap, which the server-first page shape from the item-3 spike eliminates
+by construction (measured CLS **0.003**).
 
 **Upstream candidates.**
 - Docs: a "layout stability" note — the skin has no intrinsic size before media/poster
@@ -119,22 +125,33 @@ the loading state) would be an app-level change benefiting all players.
 - Docs (Next.js guide): `next/dynamic` works *without* `{ ssr: false }`; recommend against
   client-only loading for CLS reasons.
 
-## 3. `'use client'` / dynamic-import assumptions 🔜 open follow-up (separate branch)
+## 3. `'use client'` / dynamic-import assumptions ✅ answered by spike (branch `videojs-v10-use-client-spike`)
 
 stream.new renders every player inside a `'use client'` `PlayerPage` and loads all of them
-via `next/dynamic`, so this integration never validated what v10 actually *requires*:
+via `next/dynamic`, so this integration never validated what v10 actually *requires*.
+A parameterized spike route (`/vjs-spike/[variant]?playbackId=&engine=`) tested three
+boundary strategies — no app boundary at all (`rsc-static`), explicit `'use client'`
+(`client-static`), and the current `next/dynamic` approach (`client-dynamic`); see
+`app/vjs-spike/README.md`.
 
-- Can the v10 components be imported statically (no `next/dynamic`) from a server
-  component page, with the RSC boundary at the component itself? (Would our component
-  modules then need their own `'use client'`?)
-- What does v10 actually render on the server? (In this app the players only mount
-  client-side post-hydration, so SSR output was never exercised — item 2 only proved the
-  modules *evaluate* safely in a server context.)
-- Bundle implications of static vs dynamic import for multi-player pages.
+**Findings** (`@videojs/react@10.0.0-beta.27`, Next 16.1.6):
 
-Partial answers from item 2's ablations: the components evaluate server-side without
-errors, hydrate cleanly via plain `next/dynamic`, and need no `'use client'` banner of
-their own *when imported from an existing client tree* (measured no-op; removed).
+- **No app-level `'use client'` is needed.** The package self-declares `'use client'`
+  throughout its dist (entry points and the `media/mux-video/*` flavors included), so RSC
+  treats the components as client components automatically — a server component page can
+  statically import and render them directly.
+- **v10 SSRs real markup**: the full skin (role/a11y attributes, inline sizing) plus the
+  `<video>` element shell (`crossorigin`, `playsinline`; no `src` — source resolution and
+  engine attach happen client-side). All variants hydrate and play with zero console
+  errors on both engines.
+- **`next/dynamic` is a code-splitting choice, not a requirement** — appropriate for
+  multi-player pages like `/v/[id]/[playerType]`, unnecessary otherwise.
+- The real constraint is the standard RSC one: a server-component host can pass only
+  serializable props, so app-layer interactivity (seek-to-`?time=`, `onLoaded` wiring)
+  still needs a client component somewhere.
+
+Still unexplored: fair bundle-size comparison of static vs dynamic import; whether
+upstream SSR-ing the `source`-derived `src`/poster would improve first paint.
 
 ## 4. No declarative start time on the media components ✅ answered (kept the ref)
 

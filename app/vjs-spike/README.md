@@ -41,3 +41,42 @@ Exploratory spike for friction-log item 3: **do the video.js v10 use cases need
   both engine flavors per module, so it's not a fair bundle testbed as-is).
 - Whether SSR'ing a `source`-derived `src`/poster on the video element upstream
   would improve first-paint (currently client-resolved).
+
+## Round 2: server-first mirror of `/v/[id]/[playerType]`
+
+`/vjs-spike/v/[id]/[playerType]` (and `/vjs-spike/v/[id]`, redirecting to the SPF
+player) re-creates the real player page server-first — same props derivation
+(`getPropsFromPlaybackId`), metadata, `Layout` chrome, sizing, Mux Data, poster +
+blur-up placeholder — with app-level client code reduced to ONE leaf
+(`spike-actions.tsx`: copy-URL + report-abuse). Query params (`?time=`, `?color=`)
+deliberately ignored for now. The client `Layout` is composed from the server page
+via the RSC children pattern; the v10 player and `MuxData` render directly from
+server components (serializable props only).
+
+**Results (prod):**
+
+| Route | CLS |
+|---|---|
+| `/vjs-spike/v/.../videojs-v10-spf` | **0.003** |
+| `/vjs-spike/v/.../videojs-v10-hlsjs` | **0.003** |
+| `/v/...` (all five players, after the styled-jsx fix below) | 0.41–0.49 |
+| `/v/...` (all five players, before it) | 1.42–1.48 |
+
+Both engines play, the actions leaf hydrates and works (report form toggles), no
+console errors. The remaining ~0.45 on the current `/v` routes is `PlayerPage`'s
+client-gated render (`FullpageLoader` → player swap), which the server-first shape
+eliminates by construction — the player is in the initial HTML.
+
+**Major incidental discovery: styled-jsx wasn't SSR'd at all.** The server HTML
+carried `jsx-*` class names with no style rules — the App Router migration lost
+styled-jsx SSR (pages router did it automatically; App Router needs the registry
+from the Next.js CSS-in-JS guide). Every styled-jsx page painted unstyled and
+shifted when styles landed at hydration; this — not the loading-state swap — was
+the dominant cause of the universal ~1.4 CLS measured across ALL /v players in
+production. Fixed app-wide in `components/styled-jsx-registry.tsx` +
+`app/layout.tsx`.
+
+**Known deviations from PlayerPage** (candidates for later rounds): no `?time=`
+seek / `?color=` accent, opening the report form doesn't unmount the player, no
+FullpageLoader/`onLoaded` phase (unnecessary under SSR), errors left to the skin's
+error dialog.
