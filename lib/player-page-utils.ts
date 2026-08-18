@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { getImageDimensions } from './image-dimensions';
 import { createBlurUp } from '@mux/blurup';
 import { getImageBaseUrl, getStreamBaseUrl } from './urlutils';
@@ -21,7 +22,12 @@ const getVideoExistsAsync = async (playbackId: string) => {
   });
 };
 
-export async function getPropsFromPlaybackId(
+/*
+ * Wrapped in React cache() so generateMetadata and the page render share one
+ * result per request instead of repeating the upstream image-probe, blur-up,
+ * and existence-check round trips (previously ran twice per request). (CJP)
+ */
+export const getPropsFromPlaybackId = cache(async function getPropsFromPlaybackId(
   playbackId: string
 ): Promise<Props> {
   const poster = `${getImageBaseUrl()}/${playbackId}/thumbnail.jpg`;
@@ -45,4 +51,4 @@ export async function getPropsFromPlaybackId(
     props.aspectRatio = dimensions.aspectRatio;
   }
   return props;
-}
+});
