@@ -195,6 +195,13 @@ const PlayerPage: React.FC<PageProps> = ({ playbackId, videoExists, shareUrl, po
               display: flex;
               flex-direction: column;
               height: 100%;
+              /*
+               * The centered flex parent sizes this wrapper shrink-to-fit, so players
+               * whose width resolves late (e.g. aspect-ratio boxes with no intrinsic
+               * width) cause a large layout shift when their content arrives. Full
+               * width up front avoids that and matches the steady-state layout. (CJP)
+               */
+              width: 100%;
               justify-content: center;
             }
           `}

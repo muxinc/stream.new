@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import '@videojs/react/video/skin.css';
 import { VideoPlayer, VideoSkin } from '@videojs/react/video';
@@ -14,7 +14,6 @@ type Props = {
   playbackId: string;
   poster: string;
   currentTime?: number;
-  aspectRatio: number;
   blurDataURL?: string;
   onLoaded: () => void;
   onError: (error: ErrorEvent) => void;
@@ -24,18 +23,23 @@ const VideojsV10Hlsjs: React.FC<Props> = ({
   playbackId,
   poster,
   currentTime,
-  aspectRatio,
   blurDataURL,
   onLoaded,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // NOTE: Like the other player components, fire onLoaded on mount rather than on
+  // loadedmetadata. PlayerPage keeps its 'centered loading' layout until onLoaded,
+  // so firing it later causes a large visible layout shift. (CJP)
+  useEffect(() => {
+    onLoaded();
+  }, []);
 
   const onLoadedMetadata = () => {
     const video = videoRef.current;
     if (video && currentTime) {
       video.currentTime = currentTime;
     }
-    onLoaded();
   };
 
   const onError = (evt: React.SyntheticEvent<HTMLVideoElement, Event>) => {
@@ -50,16 +54,8 @@ const VideojsV10Hlsjs: React.FC<Props> = ({
       <VideoSkin
         poster={poster}
         placeholder={blurDataURL}
-        style={{
-          aspectRatio: `${aspectRatio}`,
-          maxWidth: '100%',
-          maxHeight: '100%',
-          width: 'auto',
-          display: 'block',
-          marginLeft: 'auto',
-          marginRight: 'auto',
-          height: '100%',
-        }}
+        // Sizing is reserved by the wrapper in PlayerLoader (CLS avoidance); fill it. (CJP)
+        style={{ width: '100%', height: '100%' }}
       >
         <MuxVideo
           ref={videoRef}

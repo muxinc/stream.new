@@ -25,8 +25,8 @@ const MuxVideo = dynamic(() => import('./mux-video'));
 const MuxPlayer = dynamic(() => import('./mux-player'));
 const MuxPlayerClassic = dynamic(() => import('./mux-player-classic'));
 const WinampPlayer = dynamic(() => import('./winamp-player'));
-const VideojsV10Spf = dynamic(() => import('./videojs-v10-spf'), { ssr: false });
-const VideojsV10Hlsjs = dynamic(() => import('./videojs-v10-hlsjs'), { ssr: false });
+const VideojsV10Spf = dynamic(() => import('./videojs-v10-spf'));
+const VideojsV10Hlsjs = dynamic(() => import('./videojs-v10-hlsjs'));
 
 type Props = {
   blurDataURL?: string;
@@ -45,6 +45,26 @@ type Props = {
 const PlayerLoader = forwardRef<PlayerElement, Props>(({ playbackId, poster, currentTime, aspectRatio, playerType, color, blurDataURL, onLoaded, onError }, ref) => {
   const isAMuxPlayer = () => [MUX_PLAYER_CLASSIC_TYPE, MUX_PLAYER_TYPE].includes(playerType);
 
+  /*
+   * Reserves the correctly-sized layout box for the video.js v10 players; their skin
+   * fills it (width/height 100%). Keeping the sizing here (rather than on the skin)
+   * means the box exists as soon as PlayerLoader renders, so a slow-mounting player
+   * can't cause a layout shift. NOTE: These players must NOT be loaded with
+   * { ssr: false } — client-only loading defers the chunk past hydration, which
+   * paints the page's 'centered loading' layout and causes a large CLS when the
+   * player finally mounts (measured ~1.4; ~0.02 without ssr: false). (CJP)
+   */
+  const videojsV10SizingStyle: React.CSSProperties = {
+    aspectRatio: `${aspectRatio}`,
+    maxWidth: '100%',
+    maxHeight: '100%',
+    width: 'auto',
+    display: 'block',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    height: '100%',
+  };
+
   return (
     <>
       <div className='video-container'>
@@ -53,8 +73,8 @@ const PlayerLoader = forwardRef<PlayerElement, Props>(({ playbackId, poster, cur
         {playerType === MUX_PLAYER_TYPE && <MuxPlayer forwardedRef={ref as ForwardedRef<MuxPlayerElement>} playbackId={playbackId} aspectRatio={aspectRatio} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} blurDataURL={blurDataURL} color={color} />}
         {playerType === MUX_PLAYER_CLASSIC_TYPE && <MuxPlayerClassic forwardedRef={ref as ForwardedRef<MuxPlayerElement>} playbackId={playbackId} aspectRatio={aspectRatio} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} blurDataURL={blurDataURL} color={color} />}
         {playerType === WINAMP_PLAYER_TYPE && <WinampPlayer playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
-        {playerType === VIDEOJS_V10_SPF_TYPE && <VideojsV10Spf playbackId={playbackId} poster={poster} currentTime={currentTime} aspectRatio={aspectRatio} blurDataURL={blurDataURL} onLoaded={onLoaded} onError={onError} />}
-        {playerType === VIDEOJS_V10_HLSJS_TYPE && <VideojsV10Hlsjs playbackId={playbackId} poster={poster} currentTime={currentTime} aspectRatio={aspectRatio} blurDataURL={blurDataURL} onLoaded={onLoaded} onError={onError} />}
+        {playerType === VIDEOJS_V10_SPF_TYPE && <div style={videojsV10SizingStyle}><VideojsV10Spf playbackId={playbackId} poster={poster} currentTime={currentTime} blurDataURL={blurDataURL} onLoaded={onLoaded} onError={onError} /></div>}
+        {playerType === VIDEOJS_V10_HLSJS_TYPE && <div style={videojsV10SizingStyle}><VideojsV10Hlsjs playbackId={playbackId} poster={poster} currentTime={currentTime} blurDataURL={blurDataURL} onLoaded={onLoaded} onError={onError} /></div>}
       </div>
       <style jsx>{`
         .video-container {
