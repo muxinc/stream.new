@@ -7,17 +7,23 @@ export const MUX_VIDEO_TYPE = 'mux-video';
 export const MUX_PLAYER_TYPE = 'mux-player';
 export const MUX_PLAYER_CLASSIC_TYPE = 'classic';
 export const WINAMP_PLAYER_TYPE = 'winamp';
+export const VIDEOJS_V10_SPF_TYPE = 'videojs-v10-spf';
+export const VIDEOJS_V10_HLSJS_TYPE = 'videojs-v10-hlsjs';
 export const VALID_PLAYER_TYPES = [
   PLYR_TYPE,
   MUX_VIDEO_TYPE,
   MUX_PLAYER_TYPE,
   MUX_PLAYER_CLASSIC_TYPE,
   WINAMP_PLAYER_TYPE,
+  VIDEOJS_V10_SPF_TYPE,
+  VIDEOJS_V10_HLSJS_TYPE,
 ];
 export type PlayerTypes =
   | typeof PLYR_TYPE
   | typeof MUX_VIDEO_TYPE
   | typeof MUX_PLAYER_TYPE
   | typeof MUX_PLAYER_CLASSIC_TYPE
-  | typeof WINAMP_PLAYER_TYPE;
+  | typeof WINAMP_PLAYER_TYPE
+  | typeof VIDEOJS_V10_SPF_TYPE
+  | typeof VIDEOJS_V10_HLSJS_TYPE;
 export const MUX_DATA_CUSTOM_DOMAIN = 'data.stream.new';
