@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
 import PlayerPage from '../../../../components/player-page';
+import ServerPlayerPage from '../../../../components/server-player-page';
 import { getPropsFromPlaybackId } from '../../../../lib/player-page-utils';
+import { SERVER_RENDERED_PLAYER_TYPES } from '../../../../constants';
 import type { PlayerTypes } from '../../../../constants';
 
 export const dynamicParams = true;
@@ -30,6 +32,12 @@ export default async function PlayerTypePage({
 
   if (!props.videoExists) {
     notFound();
+  }
+
+  // The video.js v10 player types render fully on the server; the rest render
+  // client-side via PlayerPage/PlayerLoader. (CJP)
+  if (SERVER_RENDERED_PLAYER_TYPES.includes(playerType)) {
+    return <ServerPlayerPage {...props} playerType={playerType} />;
   }
 
   return (

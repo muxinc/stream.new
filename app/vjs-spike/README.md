@@ -42,10 +42,16 @@ Exploratory spike for friction-log item 3: **do the video.js v10 use cases need
 - Whether SSR'ing a `source`-derived `src`/poster on the video element upstream
   would improve first-paint (currently client-resolved).
 
-## Round 2: server-first mirror of `/v/[id]/[playerType]`
+## Round 2: server-first mirror of `/v/[id]/[playerType]` — PROMOTED
 
-`/vjs-spike/v/[id]/[playerType]` (and `/vjs-spike/v/[id]`, redirecting to the SPF
-player) re-creates the real player page server-first — same props derivation
+> **Update:** round 2's routes and components were promoted out of the spike:
+> `components/server-player-page.tsx` + `components/player-actions.tsx` are now
+> used by the real `/v/[id]` and `/v/[id]/[playerType]` routes for the
+> `videojs-v10-*` player types (see `SERVER_RENDERED_PLAYER_TYPES` in
+> `constants.ts`), and the `/vjs-spike/v/*` mirror routes were removed. The
+> boundary-variant route below remains for future boundary tests.
+
+The round-2 mirror re-created the real player page server-first — same props derivation
 (`getPropsFromPlaybackId`), metadata, `Layout` chrome, sizing, Mux Data, poster +
 blur-up placeholder — with app-level client code reduced to ONE leaf
 (`spike-actions.tsx`: copy-URL + report-abuse). Query params (`?time=`, `?color=`)
@@ -80,3 +86,14 @@ production. Fixed app-wide in `components/styled-jsx-registry.tsx` +
 seek / `?color=` accent, opening the report form doesn't unmount the player, no
 FullpageLoader/`onLoaded` phase (unnecessary under SSR), errors left to the skin's
 error dialog.
+
+### Post-promotion note: engine chunk splitting
+
+With both `MuxVideo` flavors statically imported in `server-player-page.tsx`, both
+engines shipped to every route (identical 2,063KB uncompressed JS measured on the
+spf and hlsjs `/v` routes). Switching the server component to a conditional
+`await import(...)` of just the rendered flavor restored the split: 357KB (spf) /
+333KB (hlsjs) total route JS under the same measurement, CLS still 0.003, both
+engines playing. This answers the "bundle implications of static vs dynamic
+import" question left open in round 1 — in a server component, use a conditional
+dynamic import when only one of several client components will render.

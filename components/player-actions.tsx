@@ -1,21 +1,21 @@
 'use client';
 
 /*
- * The one genuinely interactive piece of the /v player page: copy-URL +
- * report-abuse. Kept as a single small client leaf so the rest of the page can
- * be server components. Unlike PlayerPage, opening the report form does not
- * unmount the (server-rendered) player — accepted deviation for the spike. (CJP)
+ * The one genuinely interactive piece of the server-rendered player page:
+ * copy-URL + report-abuse. Kept as a single small client leaf so the rest of
+ * the page can be server components. Unlike PlayerPage, opening the report
+ * form does not unmount the (server-rendered) player. (CJP)
  */
 import { useEffect, useRef, useState } from 'react';
 import copy from 'copy-to-clipboard';
-import ReportForm from '../report-form';
+import ReportForm from './report-form';
 
 type Props = {
   playbackId: string;
   shareUrl: string;
 };
 
-const SpikeActions: React.FC<Props> = ({ playbackId, shareUrl }) => {
+const PlayerActions: React.FC<Props> = ({ playbackId, shareUrl }) => {
   const [isCopied, setIsCopied] = useState(false);
   const [openReport, setOpenReport] = useState(false);
   const copyTimeoutRef = useRef<number | null>(null);
@@ -62,4 +62,4 @@ const SpikeActions: React.FC<Props> = ({ playbackId, shareUrl }) => {
   );
 };
 
-export default SpikeActions;
+export default PlayerActions;

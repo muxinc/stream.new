@@ -1,24 +1,24 @@
 /*
- * Server-first re-creation of the /v/[id]/[playerType] player page for the
- * video.js v10 use cases. NO 'use client' here: the page chrome (Layout) is an
- * existing client component composed with server children, the v10 player is
+ * Server-first player page for the video.js v10 use cases, used by /v/[id] and
+ * /v/[id]/[playerType] for the videojs-v10-* player types.
+ *
+ * NO 'use client' here: the page chrome (Layout) is an existing client
+ * component composed with server children, the v10 player is
  * server-rendered directly (the package self-declares 'use client'), and the
- * only app-level client code is the SpikeActions leaf.
+ * only app-level client code is the PlayerActions leaf.
  *
  * Deliberate deviations from PlayerPage (for now): no ?time= seek or ?color=
  * params, no onLoaded/FullpageLoader loading state (SSR makes it unnecessary —
  * the player markup is in the initial HTML), errors are left to the skin's own
- * error dialog. (CJP)
+ * error dialog, and opening the report form doesn't unmount the player. (CJP)
  */
-import Layout from '../layout';
-import SpikeActions from './spike-actions';
-import { MUX_DATA_CUSTOM_DOMAIN, VIDEOJS_V10_HLSJS_TYPE } from '../../constants';
-import type { Props as PlaybackProps } from '../../lib/player-page-utils';
+import Layout from './layout';
+import PlayerActions from './player-actions';
+import { MUX_DATA_CUSTOM_DOMAIN, VIDEOJS_V10_HLSJS_TYPE } from '../constants';
+import type { Props as PlaybackProps } from '../lib/player-page-utils';
 
 import '@videojs/react/video/skin.css';
 import { VideoPlayer, VideoSkin } from '@videojs/react/video';
-import { MuxVideo as MuxVideoSpf } from '@videojs/react/media/mux-video/spf';
-import { MuxVideo as MuxVideoHlsjs } from '@videojs/react/media/mux-video/hls-js';
 import { MuxData } from '@videojs/react/media/mux-data';
 
 const META_TITLE = 'View this video created on stream.new';
@@ -27,9 +27,16 @@ type Props = Omit<PlaybackProps, 'playerType'> & {
   playerType: string;
 };
 
-const ServerPlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, shareUrl, playerType }: Props) => {
+const ServerPlayerPage = async ({ playbackId, poster, blurDataURL, aspectRatio, shareUrl, playerType }: Props) => {
   const isHlsjs = playerType === VIDEOJS_V10_HLSJS_TYPE;
-  const MuxVideo = isHlsjs ? MuxVideoHlsjs : MuxVideoSpf;
+  /*
+   * Conditional dynamic import so each engine flavor stays in its own client
+   * chunk — importing both statically ships both engines to every route
+   * (measured: identical 2MB transfers for the spf and hlsjs routes). (CJP)
+   */
+  const { MuxVideo } = isHlsjs
+    ? await import('@videojs/react/media/mux-video/hls-js')
+    : await import('@videojs/react/media/mux-video/spf');
 
   return (
     <Layout metaTitle={META_TITLE} image={poster} aspectRatio={aspectRatio} darkMode>
@@ -75,7 +82,7 @@ const ServerPlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, shareU
             </VideoSkin>
           </VideoPlayer>
         </div>
-        <SpikeActions playbackId={playbackId} shareUrl={shareUrl} />
+        <PlayerActions playbackId={playbackId} shareUrl={shareUrl} />
       </div>
     </Layout>
   );
