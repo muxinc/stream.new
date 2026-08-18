@@ -87,13 +87,28 @@ seek / `?color=` accent, opening the report form doesn't unmount the player, no
 FullpageLoader/`onLoaded` phase (unnecessary under SSR), errors left to the skin's
 error dialog.
 
-### Post-promotion note: engine chunk splitting
+### Post-promotion note: engine chunk splitting (corrected)
 
 With both `MuxVideo` flavors statically imported in `server-player-page.tsx`, both
-engines shipped to every route (identical 2,063KB uncompressed JS measured on the
-spf and hlsjs `/v` routes). Switching the server component to a conditional
-`await import(...)` of just the rendered flavor restored the split: 357KB (spf) /
-333KB (hlsjs) total route JS under the same measurement, CLS still 0.003, both
-engines playing. This answers the "bundle implications of static vs dynamic
-import" question left open in round 1 — in a server component, use a conditional
-dynamic import when only one of several client components will render.
+engines shipped to every route. A first fix attempt — a conditional
+`await import(...)` in the server component — **did not work**: client references
+reachable from a route's server module graph are merged into the route's client
+chunks whether or not they render. (An initial measurement suggesting it worked
+was a warm-cache artifact; a cold-cache, in-page `performance` measurement showed
+both routes loading the identical 21 chunks / 2,065KB decoded, with hls.js's
+590KB chunk in the "shared" set.)
+
+The working fix is `components/v10-media.tsx`: a small client leaf that selects
+the engine flavor via `next/dynamic` (SSR stays on — no `ssr: false`). Cold-cache
+results, decoded (transferred):
+
+| Route | engine-only chunk | total route JS |
+|---|---|---|
+| spf | 79KB (24KB) — SPF engine | 1,476KB (424KB) |
+| hlsjs | 590KB (182KB) — hls.js | 1,987KB (582KB) |
+
+Two lessons for the log: (1) in App Router, conditional client rendering does not
+imply conditional client *bundling* — `next/dynamic` inside a client component is
+what creates the split point; (2) measure bundles cold-cache from in-page
+resource timing (`decodedBodySize`/`transferSize`), not from a network listener
+on a reused browser context.
