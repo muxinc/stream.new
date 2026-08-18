@@ -44,41 +44,65 @@ diagnostic and the strict-flag CLI run are now clean.
 first rendered much smaller, then jumped to full size. Measured CLS ≈ **1.44** (dev)
 vs ≈ 0.02 for `mux-player`.
 
-**Root causes (three stacked, found via `PerformanceObserver` layout-shift attribution).**
+**Final resolution — two small changes:**
 
-1. **`{ ssr: false }` on the `next/dynamic` imports** (cargo-culted from the Plyr player).
-   Client-only loading defers the player chunk past hydration, so the page paints its
-   "centered loading" layout and re-layouts when the chunk mounts (shift ≈ 0.94). The
-   v10 React components hydrate cleanly through plain `next/dynamic` — `ssr: false` was
-   never needed. Plyr has the same measured problem (CLS ≈ 0.95) for the same reason.
-2. **`onLoaded` timing.** stream.new's `PlayerPage` keeps a `centered={showLoading}`
-   layout until the player calls `onLoaded`. The established players call it on *mount*;
-   wiring it to `loadedmetadata` (which reads as more "correct") makes the layout swap
-   visibly late. Convention followed: fire on mount.
-3. **Intrinsic-width starvation.** `PlayerPage`'s `.wrapper` was shrink-to-fit inside a
-   centered flex parent, and a box sized by `aspect-ratio` + `height: 100%` contributes
-   **zero intrinsic width** — so the wrapper sat at the width of the actions row (272px)
-   until real content (poster/video) arrived (shift ≈ 0.31). `mux-player` dodges this only
-   because its custom element has intrinsic size at upgrade. Fixed generically with
-   `width: 100%` on `.wrapper`.
+1. **Drop `{ ssr: false }` from the `next/dynamic` imports** (it was cargo-culted from the
+   Plyr player). Client-only loading defers the player chunk past hydration, so the page
+   paints its "centered loading" layout and re-layouts when the chunk mounts (shift ≈
+   0.94). The v10 React components load and hydrate cleanly through plain `next/dynamic` —
+   `ssr: false` was never needed. Plyr has the same measured problem (dev CLS ≈ 0.95) for
+   the same reason.
+2. **Fire `onLoaded` on mount** (like the established player components), not on
+   `loadedmetadata`. `PlayerPage` keeps a `centered={showLoading}` layout until
+   `onLoaded`; firing it at mount folds the layout swap into the hydration commit, and
+   also closes the window in which a mounted-but-empty skin sits inside the centered
+   (shrink-to-fit) layout with no intrinsic width — the cause of a secondary
+   "272px-wide player" collapse (≈ 0.31 + 0.11 shifts).
 
-Additionally, sizing for the v10 players now lives on a wrapper `<div>` in `PlayerLoader`
-(which renders immediately) rather than on the skin — the skin fills it at
-`width/height: 100%` — so the box exists regardless of when the player mounts.
+That's the whole fix. Everything else tried along the way was backed out (see the
+iteration history below).
 
 **Measured results** (CLS, playback ID `BV3Y…`, 1200×897 viewport):
 
-| Route | dev before | dev after | prod after |
+| Route | dev before | dev after | prod after (also throttled) |
 |---|---|---|---|
-| videojs-v10-spf | 1.44 | **0.02** | 1.44 |
-| videojs-v10-hlsjs | 1.44 | **0.02** | 1.44 |
-| mux-player (control) | 0.02 | 0.02 | 1.44 |
+| videojs-v10-spf | 1.44 | **0.02** | 1.44 (= control) |
+| videojs-v10-hlsjs | 1.44 | **0.02** | 1.44 (= control) |
+| mux-player (control) | 0.02 | 0.02 | 1.42–1.44 |
 | mux-video (control) | — | — | 1.48 |
 | plyr | 0.96 | 0.96 | 0.95 |
 
-**Portrait/vertical.** Verified: forcing a 9:16 aspect ratio resolves the v10 box to the
-same geometry as `mux-player`'s (390×694, centered, no overflow) — the reserve box uses
-the same `aspect-ratio`/`height:100%`/`max-width:100%` style `mux-player` uses. (Simulated
+### Iteration history / ablation (part of the process, kept deliberately)
+
+The first working resolution layered **five** changes. A later ablation pass — fresh
+production build per variant, `mux-player` as in-run control, normal + CDP-throttled
+(1 MB/s, 40 ms) runs, plus a geometry-timeline probe (sampling the skin's bounding box
+every 100 ms) — showed most were unnecessary:
+
+| Change | Kept? | Ablation result |
+|---|---|---|
+| Remove `{ ssr: false }` | ✅ **kept** | The fundamental fix; dev CLS 1.44 → 0.02 |
+| `onLoaded` on mount (not `loadedmetadata`) | ✅ **kept** | CLS-neutral in prod *while the reserve wrapper existed*, but it closes the centered+empty-skin collapse window once the wrapper is gone; also repo convention, and it's what kept dev at parity when the control could reach 0.02 |
+| `'use client'` in the v10 component modules | ❌ backed out | No effect (they only ever load inside `PlayerPage`'s client tree). A dev re-measure *appeared* to show it mattered — see the measurement lesson below |
+| Reserve wrapper `<div>` in `PlayerLoader` + skin at `width/height:100%` | ❌ backed out | Geometry probe: skin mounts at full size (1160×694) immediately with sizing back on the skin, prod + throttled — identical timeline to `mux-player` |
+| `width: 100%` on `PlayerPage`'s `.wrapper` | ❌ backed out | Same probe after removal: still no narrow phase. The 272px collapse it addressed only reproduces in combination with `loadedmetadata`-timed `onLoaded` (the centered layout is the shrink-to-fit culprit) |
+
+**Measurement lesson.** Mid-ablation, the long-running dev server drifted: routes that had
+repeatedly measured 0.02 (including `mux-player`) all started measuring ~1.44, which
+briefly made the `'use client'` ablation look like a real regression. Dev CLS numbers are
+not stable across a long dev-server session (recompiles, `.next` cache churn from
+interleaved `next build` runs). Conclusions were re-established against fresh production
+builds with an in-run control; treat dev numbers as directional only.
+
+**Diagnostic that cracked it:** `PerformanceObserver` `layout-shift` entries carry
+`sources` (node + previous/current rects) — attribution pinpointed each mechanism
+(`main.content-wrapper-centered` swap ≈ 0.94; `.wrapper` 272→1160 px collapse ≈ 0.31)
+where CLS totals alone were ambiguous, since the totals are near-identical sums of
+different shift combinations.
+
+**Portrait/vertical.** Verified: forcing a 9:16 aspect ratio resolves the v10 skin to the
+same geometry as `mux-player`'s (390×694, centered, no overflow) — the skin carries the
+same `aspect-ratio`/`height:100%`/`max-width:100%` style `mux-player` uses. (Simulated
 via style override; worth re-verifying with a real portrait asset.)
 
 **Pre-existing app finding (out of scope, not v10's fault).** In **production**, *every*
@@ -100,17 +124,17 @@ the loading state) would be an app-level change benefiting all players.
 stream.new renders every player inside a `'use client'` `PlayerPage` and loads all of them
 via `next/dynamic`, so this integration never validated what v10 actually *requires*:
 
-- Is `'use client'` needed at the importing boundary, or do the components self-declare?
-  (Both our components carry their own `'use client'` banner; untested without it.)
 - Can the v10 components be imported statically (no `next/dynamic`) from a server
-  component page, with the RSC boundary at the component itself?
+  component page, with the RSC boundary at the component itself? (Would our component
+  modules then need their own `'use client'`?)
 - What does v10 actually render on the server? (In this app the players only mount
   client-side post-hydration, so SSR output was never exercised — item 2 only proved the
   modules *evaluate* safely in a server context.)
 - Bundle implications of static vs dynamic import for multi-player pages.
 
-Partial answers from item 2: the components evaluate server-side without errors and
-hydrate cleanly via plain `next/dynamic`.
+Partial answers from item 2's ablations: the components evaluate server-side without
+errors, hydrate cleanly via plain `next/dynamic`, and need no `'use client'` banner of
+their own *when imported from an existing client tree* (measured no-op; removed).
 
 ## Also observed during the initial one-shot (2026-08-18)
 
