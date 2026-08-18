@@ -136,6 +136,32 @@ Partial answers from item 2's ablations: the components evaluate server-side wit
 errors, hydrate cleanly via plain `next/dynamic`, and need no `'use client'` banner of
 their own *when imported from an existing client tree* (measured no-op; removed).
 
+## 4. No declarative start time on the media components ✅ answered (kept the ref)
+
+**Question.** Can the "start at `?time=`" behavior be passed via `source` (or similar)
+instead of the `useRef` + `loadedmetadata` seek?
+
+**Findings.**
+- The hls.js-backed `MuxVideo`'s `source` inherits `HlsSource`, whose `engine.hlsJs` is a
+  full `Partial<HlsConfig>` passthrough — so `source={{ playbackId, engine: { hlsJs:
+  { startPosition } } }}` works **on the MSE path only**.
+- The native-HLS path (Safari) has no equivalent: `NativeHlsConfig` is `drmSystems`-only,
+  and `startPosition` is never read there. A source-only approach is not cross-browser.
+- The SPF flavor exposes no engine-config surface at all (`HlsVideoMediaProps` is
+  `src`/`preload`/`disableRemotePlayback`/`streamType`), so it needs the imperative seek
+  regardless.
+- Near-miss: Mux's `playback.assetStartTime` param is **instant clipping** — it trims the
+  asset (duration/timeline change), not "begin playback at t".
+
+**Resolution.** Kept the `useRef` + seek-on-`loadedmetadata` approach: it's the only
+mechanism uniform across both engines (MSE + native) and both flavors (SPF + hls.js), and
+using `startPosition` would still require the ref as a Safari fallback.
+
+**Upstream candidate.** `@mux/mux-video` (media-chrome) has a first-class `startTime`
+attribute; the v10 media components have no declarative equivalent. A `startTime` prop on
+the media components (or on the skin/player) that handles the engine differences
+internally would remove this boilerplate from every host app.
+
 ## Also observed during the initial one-shot (2026-08-18)
 
 - **Flavor discoverability**: the SPF vs hls.js `MuxVideo` split
