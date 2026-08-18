@@ -20,6 +20,7 @@ import type { Props as PlaybackProps } from '../lib/player-page-utils';
 import '@videojs/react/video/skin.css';
 import { VideoPlayer, VideoSkin } from '@videojs/react/video';
 import { MuxData } from '@videojs/react/media/mux-data';
+import V10Media from './v10-media';
 
 const META_TITLE = 'View this video created on stream.new';
 
@@ -27,16 +28,8 @@ type Props = Omit<PlaybackProps, 'playerType'> & {
   playerType: string;
 };
 
-const ServerPlayerPage = async ({ playbackId, poster, blurDataURL, aspectRatio, shareUrl, playerType }: Props) => {
+const ServerPlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, shareUrl, playerType }: Props) => {
   const isHlsjs = playerType === VIDEOJS_V10_HLSJS_TYPE;
-  /*
-   * Conditional dynamic import so each engine flavor stays in its own client
-   * chunk — importing both statically ships both engines to every route
-   * (measured: identical 2MB transfers for the spf and hlsjs routes). (CJP)
-   */
-  const { MuxVideo } = isHlsjs
-    ? await import('@videojs/react/media/mux-video/hls-js')
-    : await import('@videojs/react/media/mux-video/spf');
 
   return (
     <Layout metaTitle={META_TITLE} image={poster} aspectRatio={aspectRatio} darkMode>
@@ -57,7 +50,8 @@ const ServerPlayerPage = async ({ playbackId, poster, blurDataURL, aspectRatio, 
                 height: '100%',
               }}
             >
-              <MuxVideo
+              <V10Media
+                engine={isHlsjs ? 'hlsjs' : 'spf'}
                 source={{
                   playbackId,
                   customDomain: process.env.NEXT_PUBLIC_MUX_BYO_DOMAIN || undefined,
