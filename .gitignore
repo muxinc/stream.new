@@ -35,3 +35,6 @@ npm-debug.log*
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Playwright MCP browser-test artifacts
+.playwright-mcp/
