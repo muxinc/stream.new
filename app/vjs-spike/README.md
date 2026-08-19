@@ -136,3 +136,35 @@ page component vs. a dedicated hints component vs. **upstream in the v10 media
 component**, which knows its manifest URL and `preload` semantics at SSR time)?
 Should manifest preload respect `preload="none"`? Is `cache()` on shared
 `lib/player-page-utils.ts` the right dedupe seam?
+
+### Route shape: static per-engine segments — explored and backed out (2026-08-19)
+
+An alternative to the `V10Media` next/dynamic leaf was implemented, verified, and
+**backed out by choice** (never committed): static route segments
+`/v/[id]/videojs-v10-{spf,hlsjs}` alongside the dynamic `[playerType]` sibling, each
+statically importing its own `MuxVideo` flavor and composing it into `ServerPlayerPage`
+via a `media` slot. What the exploration established, kept for the record:
+
+- **It's valid and it works**: static segments take precedence over the dynamic sibling;
+  SSR of the skin + `<video>` shell is unchanged; a production build showed each route's
+  chunk set contains exactly one engine (spf route 1,420KB total with a 78KB SPF chunk;
+  hls.js route 1,931KB with a 589KB hls.js chunk; zero cross-engine leakage).
+- **Performance is a wash vs. the dynamic leaf.** The leaf never used `ssr: false` and
+  its engine chunk preloads with the page's initial scripts (no post-hydration
+  waterfall), so static imports only guarantee the module is executable when hydration
+  starts — a milliseconds-scale difference, not the headline win it looks like.
+- **Why parameterized won**: the routes are conceptually parameterized; the static shape
+  hard-codes the engine into the URL/route table and gives up request-time flavor
+  selection — a stated future goal is choosing the media flavor **server-side from
+  asset/source details**, which the dynamic leaf supports today.
+
+Options recorded for that future server-side flavor selection:
+1. Middleware/rewrite → per-flavor routes (selection logic server-side, chunks
+   build-time exact, no client-visible redirect) — needs selection inputs resolvable
+   before render.
+2. The current `V10Media` dynamic leaf (selection can use render-time data; one engine
+   fetched per request; the lazy-boundary cost is the milliseconds above).
+3. One route statically importing both flavors and rendering one — **hinges on an
+   unverified assumption**: the measured "both engines shipped, 2,065KB" result was with
+   a conditional `await import()` in the server component; the static-import-both /
+   render-one variant was never measured separately and is a cheap experiment.
