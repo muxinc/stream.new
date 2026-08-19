@@ -112,3 +112,27 @@ imply conditional client *bundling* — `next/dynamic` inside a client component
 what creates the split point; (2) measure bundles cold-cache from in-page
 resource timing (`decodedBodySize`/`transferSize`), not from a network listener
 on a reused browser context.
+
+### Initial-load optimization: measured findings, implementation TBD
+
+An optimization pass was implemented, measured, and then **backed out pending a
+discussion of the right implementation** (commits `75dc493` → reverted in
+`09e3084`; diff there shows the working version). What the measurements
+established, kept for the record:
+
+- The `V10Media` next/dynamic leaf keeps the media **server-rendered** (`<video>`,
+  skin, poster, blur-up in initial HTML) and the engine chunk preloads with the
+  page's initial scripts — no post-hydration waterfall. This part needs no change.
+- `ReactDOM.preload` of the HLS manifest (`as: 'fetch'`, anonymous) + `preconnect`
+  to the delivery domains moved the main-manifest fetch **~780ms → ~395ms**, with a
+  single fetch (`initiator: "link"`) — both SPF (fetch) and hls.js (XHR) hit the
+  preload cache.
+- `generateMetadata` and the page each run `getPropsFromPlaybackId`'s upstream
+  round-trips (2× per request, all /v routes); React `cache()` dedupes it.
+  Remaining TTFB (~390ms) is the serial upstream chain itself.
+
+Open implementation questions: where should the hints live (route level vs. player
+page component vs. a dedicated hints component vs. **upstream in the v10 media
+component**, which knows its manifest URL and `preload` semantics at SSR time)?
+Should manifest preload respect `preload="none"`? Is `cache()` on shared
+`lib/player-page-utils.ts` the right dedupe seam?
