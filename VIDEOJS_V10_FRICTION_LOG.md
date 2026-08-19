@@ -318,6 +318,82 @@ as an image, and `aspect-ratio` computes again.
   url-token-safe. The failure mode is brutal to notice: SSR-only, no error, and it takes
   unrelated sibling styles down with it.
 
+## 7. Mux Data via vjs-mux: cross-engine QoE comparisons are structurally skewed ⏳ documented; upstream candidates
+
+Found while running paired SPF-vs-hls.js QoE sessions (2026-08-19; same assets, same
+machine, alternating order, mirrored session shapes). The headline: with the current
+adapter, engine-vs-engine comparisons in Mux Data conflate real performance with
+measurement artifacts. Three distinct classes:
+
+**(a) Genuine gaps.**
+- SPF playback *failures* are invisible (see the item under "Also observed"): no
+  viewstart, no error beacon, no view.
+- `playing_time` undercounts on SPF: ~26.0s recorded for a fully-played 36s asset vs
+  ~32.0s via hls.js (both verifiably reached `ended` at ~35.9s media time). A ~17%
+  denominator error silently corrupts every derived rate metric. Cause unconfirmed
+  (element-only sampling and/or the monitor churn below).
+- Monitor lifecycle churn — see the loadstart analysis below.
+
+**(b) Definitional asymmetries.** `player_startup_time` measures MuxData-instance
+construction → `monitor()` ready, which effectively samples *when the engine attaches a
+MediaSource to the element*: hls.js attaches eagerly (element `loadstart` at ~+47ms,
+before its manifest returns), SPF resolves the presentation first and attaches after
+(`@videojs/spf` `setup-mediasource.js`: create/attach runs only once "a resolved
+presentation and a mediaElement are both in scope"; attaching runs `element.load()`).
+Measured: hls.js `playerready` +35ms; SPF +116ms with a reinit at +187ms. Same total
+work, opposite ordering — the metric awards the eager-attach architecture by
+construction. TTFF is similarly asymmetric (4–5ms engine-hooked vs 36–177ms
+element-only for identical warm playback).
+
+**(c) Inherent until SPF is hookable.** All rendition-level columns (upscale %,
+bitrates, request timing) are absent on SPF views — not skewed, void.
+
+Still comparable cross-engine today: watch time, element-level rebuffer counts/durations
+(measured near-identical), completion.
+
+### The `loadstart` → destroy/re-monitor problem (affects EVERY media integration)
+
+`vjs-mux` (`@videojs/media` `dom/mux/mux-data.js`): `#playerInitTime` is stamped at
+MuxData-instance construction; `attach(target)` runs `monitor()`; and `setMedia()` wires
+**`loadstart` → `#reinitialize`**, which *destroys the monitor and re-monitors* — with no
+distinction between the current source's **initial** load and an actual **source
+change**. Consequence, verified in beacon captures: whenever the monitor attaches before
+the element's first `loadstart` — which is the normal case — the first monitor instance
+(and its view) is created and thrown away, and a second one is built mid-load. Both
+engines hit it (hls.js reinit ~12ms after first ready; SPF ~70ms after), so
+`player_startup_time`/`playerready` semantics depend on churn timing, per engine.
+
+**This is not SPF-specific and not even MSE-specific.** The trigger condition is
+"Mux target attached before first `loadstart`". The basic `Video` media component hits
+one of two inconsistent outcomes depending on source timing: (1) src assigned
+client-side after the media surface registers → same double-monitor churn; (2) src
+present in SSR'd markup → the browser can begin loading before hydration, `loadstart`
+fires before `attach()`, and the monitor instead *misses* the early load lifecycle
+entirely. Either way, monitor lifecycle differs by integration and by load timing.
+
+**What the adapter should do (mux-embed's own contract):** call `monitor()` once per
+player lifetime; on an actual source change, keep the monitor and emit
+**`videochange`** (the API mux-embed ships for exactly this), updating `video_id`/
+metadata. The initial `loadstart` of a source should trigger nothing — mux-embed
+already tracks the element's load lifecycle. Concretely: replace the unconditional
+`loadstart → destroy+re-monitor` with source-identity tracking (compare
+`currentSrc`/resolved source id; first observation of a source is not a change).
+
+**Upstream candidates (ranked):**
+1. **A first-class mux-embed integration for SPF** (peer to the hls.js/dash.js ones).
+   One item fixes error invisibility, restores rendition data, and aligns milestone
+   definitions across engines.
+2. Adapter interim fix, independent of (1): vjs-mux already *has* the SVTA error when
+   the engine is unhookable (it drives the error dialog) — forward it to the monitor
+   (`mux.emit('error', …)`) so failed views exist at all.
+3. Adapter: `videochange` instead of destroy/re-monitor on `loadstart` (above), fixing
+   monitor churn and `player_startup_time` semantics uniformly across Video, native
+   HLS, hls.js, and SPF integrations.
+4. Mux Data docs: note that `player_startup_time` is sensitive to engine attach
+   ordering, and (pending 1–3) that cross-engine deltas in it are not comparable.
+5. Investigate the SPF `playing_time` undercount once (1)/(3) land — it may fall out
+   of the churn fix.
+
 ## Also observed during the initial one-shot (2026-08-18)
 
 - **Flavor discoverability**: the SPF vs hls.js `MuxVideo` split
