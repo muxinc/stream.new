@@ -234,3 +234,25 @@ assets only). Also: NIICE will make 100% of NEW ingest CMAF (plus tier last, tar
 stays necessary for the back catalog indefinitely. If playlist inspection ever becomes
 acceptable, the deterministic single-fetch check is the multivariant's audio GROUP-ID
 ("audio-*" → CMAF, "audN"/no-URI stub → TS) — cacheable per playback ID.
+
+### Behavior validation: TS-on-SPF failure mode, end to end (2026-08-19)
+
+The v10 e2e suite's SPF unsupported-source spec (its TS-ladder and fMP4 scenarios) was
+validated against stream.new's own /v routes with Playwright, using env assets matched
+to the scenarios via the Mux API. Key find: the env contains a deliberate matched pair —
+the same 654s video ingested at premium (fMP4: `JsDMLk…`) and plus (TS: `lPlSEQ…`) —
+the video analog of the audio-only CMAF/TS pair.
+
+| Case | Route | Result |
+|---|---|---|
+| TS VOD on SPF | `/v/lPlSEQ…/videojs-v10-spf` | ✅ error dialog opens with the exact `errors.unplayable` copy ("This media is unsupported by the player."), not the generic fallback; `readyState` stays 0 |
+| Same TS VOD on hls.js | `/v/lPlSEQ…/videojs-v10-hlsjs` | ✅ plays; `readyState` 4; no dialog |
+| Matched fMP4 VOD on SPF | `/v/JsDMLk…/videojs-v10-spf` | ✅ plays; no dialog; zero console errors |
+| Standard-latency live recording (TS) on SPF | `/v/INw9j7…/videojs-v10-spf` | ✅ same unplayable dialog |
+
+Console on the failing cases shows the full SVTA sequence in spec order — cause 1004
+(unsupported video format, per-rendition) before verdict 2011 (no supported video
+track) — and a developer-facing message that explicitly recommends importing the
+`hls-js` flavor in place of `spf`. This end-to-end confirms both the stakes of the
+engine-selection heuristic (TS on SPF fails loudly, not silently) and its correctness
+on these assets (plus→TS, premium→fMP4, standard-latency live→TS).
