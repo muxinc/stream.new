@@ -184,3 +184,53 @@ Options recorded for that future server-side flavor selection:
    unverified assumption**: the measured "both engines shipped, 2,065KB" result was with
    a conditional `await import()` in the server component; the static-import-both /
    render-one variant was never measured separately and is a cheap experiment.
+
+## Engine selection research: predicting TS vs CMAF from API metadata (2026-08-19)
+
+Motivation: SPF cannot play MPEG-TS segments (and never will by current plans); hls.js
+plays both. Goal: pick the engine server-side from asset/playback-ID metadata — playlist
+inspection deliberately excluded from the implementation for now (stacked-effort risk).
+Research: mux monorepo (checkout @ 2023-10, mechanics), Notion + Slack (2025-07 quoted
+production code + 2026 plans), docs.mux.com/openapi-specification (public field
+semantics), plus empirical manifest correlation over the stream.new env's 16 assets.
+
+**The production rule** (video/services/assetindex/renditionsets.go; container chosen
+per playback ID at creation, stable forever, never per-request): default TS; CMAF iff
+the asset is CMAF-compatible (ingest-computed, can silently fall back to TS on e.g.
+audio timing problems) AND (tier is basic/baseline or premium, OR a per-environment
+LaunchDarkly flag, OR internal test flag). Hard overrides: low-latency live → CMAF
+always (and its recorded assets stay CMAF "to avoid retranscoding"); DRM playback IDs →
+CMAF always. Hard TS (2023 mechanics; may have loosened since): clips
+(source_asset_id/on_demand_clip), normalize_audio, audio-only, no ready primary audio
+track, standard/reduced-latency live.
+
+**Derived heuristic** (verified against the env sample, 16/16 consistent):
+- SPF when `video_quality` (fall back: `encoding_tier` baseline→basic, smart→plus) is
+  `basic` or `premium`, AND ingest is on-demand non-clip, AND tracks include video+audio.
+  Tier membership encodes the rollout date for free: basic (2023-10) and premium
+  (2024-10) postdate CMAF, so no created-at cutoff is needed.
+- SPF when the asset has `live_stream_id` and the parent stream (if retrievable) has
+  `latency_mode: "low"`.
+- hls.js for everything else: plus/smart (the flag-gated coin-flip tier — TS by default),
+  clips, audio-only (empirically either container in 2026), standard/reduced live,
+  foreign playback IDs (no API visibility), missing fields (pre-2023-10 assets predate
+  tiers entirely), deleted parent streams, API errors. hls.js is always safe — it plays
+  CMAF too; SPF is only chosen on confident CMAF.
+- Known irreducible gap: rare basic/premium ingest fallback to TS is invisible in the
+  API; a runtime error→hls.js fallback (the internally-agreed VJS10 strategy) is the
+  eventual mitigation, out of scope for the first pass.
+
+**Practical notes.** `video_quality` is NOT required on the Asset schema (deprecated
+`encoding_tier` IS) — the fallback mapping is mandatory, not optional. `created_at` is
+string-of-epoch-seconds in the API but a bare integer in webhooks. `ingest_type` absent
+on pre-2024-02 assets. The asset does not echo its stream's latency_mode — requires the
+live_stream_id join. stream.new creates uploads with `video_quality: 'basic'`
+(app/api/uploads/route.ts), so native assets are the force-CMAF tier → SPF-eligible.
+
+**Future exit ramps** (agreed internally 2026-05, unshipped as of 2026-08): a TS-vs-CMAF
+response header on manifest requests, and an output-format field on API/webhooks (new
+assets only). Also: NIICE will make 100% of NEW ingest CMAF (plus tier last, target
+"within 6 months of launch"), but old assets will never be converted — the heuristic
+stays necessary for the back catalog indefinitely. If playlist inspection ever becomes
+acceptable, the deterministic single-fetch check is the multivariant's audio GROUP-ID
+("audio-*" → CMAF, "audN"/no-URI stub → TS) — cacheable per playback ID.
