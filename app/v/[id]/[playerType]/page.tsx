@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
 import PlayerPage from '../../../../components/player-page';
-import ServerPlayerPage from '../../../../components/server-player-page';
+import VideojsV10PlayerPage from '../../../../components/videojs-v10-player-page';
 import { getPropsFromPlaybackId, getColorFromQueryValue } from '../../../../lib/player-page-utils';
-import { SERVER_RENDERED_PLAYER_TYPES } from '../../../../constants';
+import { VIDEOJS_V10_PLAYER_TYPES } from '../../../../constants';
 import type { PlayerTypes } from '../../../../constants';
 
 export const dynamicParams = true;
@@ -38,9 +38,9 @@ export default async function PlayerTypePage({
 
   // The video.js v10 player types render fully on the server; the rest render
   // client-side via PlayerPage/PlayerLoader (which reads ?color= itself). (CJP)
-  if (SERVER_RENDERED_PLAYER_TYPES.includes(playerType)) {
+  if (VIDEOJS_V10_PLAYER_TYPES.includes(playerType)) {
     const color = getColorFromQueryValue((await searchParams).color);
-    return <ServerPlayerPage {...props} playerType={playerType} color={color} />;
+    return <VideojsV10PlayerPage {...props} playerType={playerType} color={color} />;
   }
 
   return (

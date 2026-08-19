@@ -24,9 +24,9 @@ type Props = Omit<ComponentProps<typeof MuxVideoSpf>, 'ref'> & {
   engine: 'spf' | 'hlsjs';
 };
 
-const V10Media = ({ engine, ...mediaProps }: Props) => {
+const VideojsV10Media = ({ engine, ...mediaProps }: Props) => {
   const MuxVideo = engine === 'hlsjs' ? MuxVideoHlsjs : MuxVideoSpf;
   return <MuxVideo {...mediaProps} />;
 };
 
-export default V10Media;
+export default VideojsV10Media;

@@ -10,7 +10,13 @@ tracks app-side architecture findings).
 > (`/vjs-spike/[variant]`) and `components/vjs-spike/*` were removed on
 > 2026-08-19 once the integration became the intended general implementation;
 > the sections below are kept verbatim as the record. References to spike
-> routes are historical.
+> routes are historical, and these components were renamed on 2026-08-19 to
+> reflect their v10 coupling (historical prose keeps the old names):
+> `components/server-player-page.tsx` (`ServerPlayerPage`) →
+> `components/videojs-v10-player-page.tsx` (`VideojsV10PlayerPage`),
+> `components/v10-media.tsx` (`V10Media`) → `components/videojs-v10-media.tsx`
+> (`VideojsV10Media`), and `SERVER_RENDERED_PLAYER_TYPES` →
+> `VIDEOJS_V10_PLAYER_TYPES` in `constants.ts`.
 
 ## Boundary spike (removed): do the v10 use cases need `'use client'` / `next/dynamic` in app code?
 
