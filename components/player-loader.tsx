@@ -7,8 +7,6 @@ import {
   MUX_PLAYER_TYPE,
   MUX_PLAYER_CLASSIC_TYPE,
   WINAMP_PLAYER_TYPE,
-  VIDEOJS_V10_SPF_TYPE,
-  VIDEOJS_V10_HLSJS_TYPE,
 } from '../constants';
 import dynamic from 'next/dynamic';
 import Script from 'next/script';
@@ -25,8 +23,6 @@ const MuxVideo = dynamic(() => import('./mux-video'));
 const MuxPlayer = dynamic(() => import('./mux-player'));
 const MuxPlayerClassic = dynamic(() => import('./mux-player-classic'));
 const WinampPlayer = dynamic(() => import('./winamp-player'));
-const VideojsV10Spf = dynamic(() => import('./videojs-v10-spf'));
-const VideojsV10Hlsjs = dynamic(() => import('./videojs-v10-hlsjs'));
 
 type Props = {
   blurDataURL?: string;
@@ -54,8 +50,6 @@ const PlayerLoader = forwardRef<PlayerElement, Props>(({ playbackId, poster, cur
         {playerType === MUX_PLAYER_TYPE && <MuxPlayer forwardedRef={ref as ForwardedRef<MuxPlayerElement>} playbackId={playbackId} aspectRatio={aspectRatio} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} blurDataURL={blurDataURL} color={color} />}
         {playerType === MUX_PLAYER_CLASSIC_TYPE && <MuxPlayerClassic forwardedRef={ref as ForwardedRef<MuxPlayerElement>} playbackId={playbackId} aspectRatio={aspectRatio} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} blurDataURL={blurDataURL} color={color} />}
         {playerType === WINAMP_PLAYER_TYPE && <WinampPlayer playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
-        {playerType === VIDEOJS_V10_SPF_TYPE && <VideojsV10Spf playbackId={playbackId} poster={poster} currentTime={currentTime} aspectRatio={aspectRatio} color={color} blurDataURL={blurDataURL} onLoaded={onLoaded} onError={onError} />}
-        {playerType === VIDEOJS_V10_HLSJS_TYPE && <VideojsV10Hlsjs playbackId={playbackId} poster={poster} currentTime={currentTime} aspectRatio={aspectRatio} color={color} blurDataURL={blurDataURL} onLoaded={onLoaded} onError={onError} />}
       </div>
       <style jsx>{`
         .video-container {
