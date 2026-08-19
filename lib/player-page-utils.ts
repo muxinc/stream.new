@@ -3,6 +3,7 @@ import { createBlurUp } from '@mux/blurup';
 import { getImageBaseUrl, getStreamBaseUrl } from './urlutils';
 import { HOST_URL } from '../constants';
 import type { PlayerTypes } from '../constants';
+import logger from './logger';
 
 export type Props = {
   blurDataURL?: string;
@@ -13,6 +14,21 @@ export type Props = {
   videoExists: boolean;
   playerType?: PlayerTypes;
 };
+
+/*
+ * Mirrors PlayerPage's client-side ?color= parsing (hex digits only, '#'
+ * prepended) for the server-rendered player pages. (CJP)
+ */
+export function getColorFromQueryValue(
+  value: string | string[] | undefined
+): string | undefined {
+  if (typeof value !== 'string' || !value) return undefined;
+  if (/^[0-9a-fA-F]+$/.test(value)) {
+    return `#${value}`;
+  }
+  logger.warn('Invalid color hex value param:', value);
+  return undefined;
+}
 
 const getVideoExistsAsync = async (playbackId: string) => {
   // NOTE: Would prefer to use a HEAD method request, but these appear to be not allowed (status 405) from Mux Video (CJP)

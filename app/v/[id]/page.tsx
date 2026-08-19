@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { MUX_PLAYER_TYPE, SERVER_RENDERED_PLAYER_TYPES } from '../../../constants';
 import PlayerPage from '../../../components/player-page';
 import ServerPlayerPage from '../../../components/server-player-page';
-import { getPropsFromPlaybackId } from '../../../lib/player-page-utils';
+import { getPropsFromPlaybackId, getColorFromQueryValue } from '../../../lib/player-page-utils';
 
 export const dynamicParams = true;
 
@@ -21,7 +21,13 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   };
 }
 
-export default async function PlaybackPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function PlaybackPage({
+  params,
+  searchParams
+}: {
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
   const { id } = await params;
   const props = await getPropsFromPlaybackId(id);
 
@@ -30,10 +36,12 @@ export default async function PlaybackPage({ params }: { params: Promise<{ id: s
   }
 
   // The video.js v10 player types render fully on the server; the rest render
-  // client-side via PlayerPage/PlayerLoader. Wired here symmetrically with
-  // /v/[id]/[playerType] in case the default player type ever changes. (CJP)
+  // client-side via PlayerPage/PlayerLoader (which reads ?color= itself). Wired
+  // here symmetrically with /v/[id]/[playerType] in case the default player
+  // type ever changes. (CJP)
   if (SERVER_RENDERED_PLAYER_TYPES.includes(MUX_PLAYER_TYPE)) {
-    return <ServerPlayerPage {...props} playerType={MUX_PLAYER_TYPE} />;
+    const color = getColorFromQueryValue((await searchParams).color);
+    return <ServerPlayerPage {...props} playerType={MUX_PLAYER_TYPE} color={color} />;
   }
 
   return (
