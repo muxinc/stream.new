@@ -7,8 +7,8 @@
  * server-rendered directly (the package self-declares 'use client'), and the
  * only app-level client code is the PlayerActions leaf.
  *
- * Deliberate deviations from PlayerPage (for now): no ?time= seek or ?color=
- * params, no onLoaded/FullpageLoader loading state (SSR makes it unnecessary —
+ * Deliberate deviations from PlayerPage (for now): no ?time= seek param,
+ * no onLoaded/FullpageLoader loading state (SSR makes it unnecessary —
  * the player markup is in the initial HTML), errors are left to the skin's own
  * error dialog, and opening the report form doesn't unmount the player. (CJP)
  */
@@ -26,9 +26,10 @@ const META_TITLE = 'View this video created on stream.new';
 
 type Props = Omit<PlaybackProps, 'playerType'> & {
   playerType: string;
+  color?: string;
 };
 
-const ServerPlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, shareUrl, playerType }: Props) => {
+const ServerPlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, shareUrl, playerType, color }: Props) => {
   const isHlsjs = playerType === VIDEOJS_V10_HLSJS_TYPE;
 
   return (
@@ -40,6 +41,7 @@ const ServerPlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, shareU
               poster={poster}
               placeholder={blurDataURL}
               style={{
+                '--media-accent-color': color,
                 aspectRatio: `${aspectRatio}`,
                 maxWidth: '100%',
                 maxHeight: '100%',

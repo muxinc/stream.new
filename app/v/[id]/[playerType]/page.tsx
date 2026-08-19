@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import PlayerPage from '../../../../components/player-page';
 import ServerPlayerPage from '../../../../components/server-player-page';
-import { getPropsFromPlaybackId } from '../../../../lib/player-page-utils';
+import { getPropsFromPlaybackId, getColorFromQueryValue } from '../../../../lib/player-page-utils';
 import { SERVER_RENDERED_PLAYER_TYPES } from '../../../../constants';
 import type { PlayerTypes } from '../../../../constants';
 
@@ -23,9 +23,11 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 }
 
 export default async function PlayerTypePage({
-  params
+  params,
+  searchParams
 }: {
   params: Promise<{ id: string; playerType: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
   const { id, playerType } = await params;
   const props = await getPropsFromPlaybackId(id);
@@ -35,9 +37,10 @@ export default async function PlayerTypePage({
   }
 
   // The video.js v10 player types render fully on the server; the rest render
-  // client-side via PlayerPage/PlayerLoader. (CJP)
+  // client-side via PlayerPage/PlayerLoader (which reads ?color= itself). (CJP)
   if (SERVER_RENDERED_PLAYER_TYPES.includes(playerType)) {
-    return <ServerPlayerPage {...props} playerType={playerType} />;
+    const color = getColorFromQueryValue((await searchParams).color);
+    return <ServerPlayerPage {...props} playerType={playerType} color={color} />;
   }
 
   return (
