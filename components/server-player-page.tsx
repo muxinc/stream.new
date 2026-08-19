@@ -12,12 +12,10 @@
  * the player markup is in the initial HTML), errors are left to the skin's own
  * error dialog, and opening the report form doesn't unmount the player. (CJP)
  */
-import { preconnect, preload } from 'react-dom';
 import Layout from './layout';
 import PlayerActions from './player-actions';
 import { MUX_DATA_CUSTOM_DOMAIN, VIDEOJS_V10_HLSJS_TYPE } from '../constants';
 import type { Props as PlaybackProps } from '../lib/player-page-utils';
-import { getStreamBaseUrl, getImageBaseUrl } from '../lib/urlutils';
 
 import '@videojs/react/video/skin.css';
 import { VideoPlayer, VideoSkin } from '@videojs/react/video';
@@ -32,16 +30,6 @@ type Props = Omit<PlaybackProps, 'playerType'> & {
 
 const ServerPlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, shareUrl, playerType }: Props) => {
   const isHlsjs = playerType === VIDEOJS_V10_HLSJS_TYPE;
-
-  /*
-   * Initial-load hints, emitted into the SSR'd <head>: warm the delivery
-   * connections and fetch the HLS manifest in parallel with hydration, so it's
-   * already in the preload cache when the engine attaches (~350ms after the
-   * HTML lands, measured). (CJP)
-   */
-  preconnect(getStreamBaseUrl());
-  preconnect(getImageBaseUrl());
-  preload(`${getStreamBaseUrl()}/${playbackId}.m3u8`, { as: 'fetch', crossOrigin: 'anonymous' });
 
   return (
     <Layout metaTitle={META_TITLE} image={poster} aspectRatio={aspectRatio} darkMode>

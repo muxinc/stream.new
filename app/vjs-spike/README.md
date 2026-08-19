@@ -112,24 +112,3 @@ imply conditional client *bundling* — `next/dynamic` inside a client component
 what creates the split point; (2) measure bundles cold-cache from in-page
 resource timing (`decodedBodySize`/`transferSize`), not from a network listener
 on a reused browser context.
-
-### Initial-load optimization pass
-
-Confirmed first: the `V10Media` next/dynamic leaf keeps the media **server-rendered**
-(`<video>`, skin, poster, blur-up all in initial HTML — `next/dynamic` without
-`ssr: false` still SSRs), and the engine chunk is preloaded with the page's initial
-scripts (starts ~430ms, alongside the first chunks — no post-hydration waterfall).
-
-Two additions in `server-player-page.tsx` / `lib/player-page-utils.ts`:
-
-1. `ReactDOM.preconnect` (stream + image domains) and `ReactDOM.preload` of the HLS
-   manifest (`as: 'fetch'`, anonymous) from the server component, emitted into the
-   SSR'd head. Measured: main-manifest fetch start **~780ms → ~395ms**, one single
-   fetch (`initiator: "link"`) — both SPF (fetch) and hls.js (XHR) hit the preload
-   cache, no duplicate request.
-2. `getPropsFromPlaybackId` wrapped in React `cache()` — `generateMetadata` and the
-   page render previously each ran the upstream image-probe/blur-up/existence
-   round-trips (2× per request). Wall-clock TTFB barely moves (they ran in
-   parallel), but upstream request count halves. Remaining TTFB (~390ms) is the
-   serial upstream chain itself — a per-playbackId cross-request cache would be the
-   next lever.
