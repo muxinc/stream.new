@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Mux from '@mux/mux-node';
+import { getV10EngineForAsset } from '../../../../lib/videojs-v10-engine';
 
 const mux = new Mux();
 
@@ -19,6 +20,9 @@ export async function GET(
         status: asset.status,
         errors: asset.errors,
         playback_id: asset.playback_ids[0].id,
+        // Predicted from the asset already in hand (no extra Mux API calls
+        // for on-demand assets) — see lib/videojs-v10-engine.ts.
+        videojs_v10_engine: await getV10EngineForAsset(asset),
       },
     });
   } catch (e) {
