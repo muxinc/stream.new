@@ -54,8 +54,8 @@ const PlayerLoader = forwardRef<PlayerElement, Props>(({ playbackId, poster, cur
         {playerType === MUX_PLAYER_TYPE && <MuxPlayer forwardedRef={ref as ForwardedRef<MuxPlayerElement>} playbackId={playbackId} aspectRatio={aspectRatio} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} blurDataURL={blurDataURL} color={color} />}
         {playerType === MUX_PLAYER_CLASSIC_TYPE && <MuxPlayerClassic forwardedRef={ref as ForwardedRef<MuxPlayerElement>} playbackId={playbackId} aspectRatio={aspectRatio} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} blurDataURL={blurDataURL} color={color} />}
         {playerType === WINAMP_PLAYER_TYPE && <WinampPlayer playbackId={playbackId} poster={poster} currentTime={currentTime} onLoaded={onLoaded} onError={onError} />}
-        {playerType === VIDEOJS_V10_SPF_TYPE && <VideojsV10Spf playbackId={playbackId} poster={poster} currentTime={currentTime} aspectRatio={aspectRatio} blurDataURL={blurDataURL} onLoaded={onLoaded} onError={onError} />}
-        {playerType === VIDEOJS_V10_HLSJS_TYPE && <VideojsV10Hlsjs playbackId={playbackId} poster={poster} currentTime={currentTime} aspectRatio={aspectRatio} blurDataURL={blurDataURL} onLoaded={onLoaded} onError={onError} />}
+        {playerType === VIDEOJS_V10_SPF_TYPE && <VideojsV10Spf playbackId={playbackId} poster={poster} currentTime={currentTime} aspectRatio={aspectRatio} color={color} blurDataURL={blurDataURL} onLoaded={onLoaded} onError={onError} />}
+        {playerType === VIDEOJS_V10_HLSJS_TYPE && <VideojsV10Hlsjs playbackId={playbackId} poster={poster} currentTime={currentTime} aspectRatio={aspectRatio} color={color} blurDataURL={blurDataURL} onLoaded={onLoaded} onError={onError} />}
       </div>
       <style jsx>{`
         .video-container {
