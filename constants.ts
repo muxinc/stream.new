@@ -9,6 +9,9 @@ export const MUX_PLAYER_CLASSIC_TYPE = 'classic';
 export const WINAMP_PLAYER_TYPE = 'winamp';
 export const VIDEOJS_V10_SPF_TYPE = 'videojs-v10-spf';
 export const VIDEOJS_V10_HLSJS_TYPE = 'videojs-v10-hlsjs';
+// Auto: the engine (SPF vs hls.js) is selected server-side per playback ID
+// (see lib/videojs-v10-engine.ts); the explicit types above stay as overrides.
+export const VIDEOJS_V10_TYPE = 'videojs-v10';
 export const VALID_PLAYER_TYPES = [
   PLYR_TYPE,
   MUX_VIDEO_TYPE,
@@ -24,6 +27,7 @@ export const VALID_PLAYER_TYPES = [
  * PlayerPage/PlayerLoader.
  */
 export const VIDEOJS_V10_PLAYER_TYPES: string[] = [
+  VIDEOJS_V10_TYPE,
   VIDEOJS_V10_SPF_TYPE,
   VIDEOJS_V10_HLSJS_TYPE,
 ];

@@ -14,9 +14,10 @@
  */
 import Layout from './layout';
 import PlayerActions from './player-actions';
-import { MUX_DATA_CUSTOM_DOMAIN, VIDEOJS_V10_HLSJS_TYPE } from '../constants';
+import { MUX_DATA_CUSTOM_DOMAIN } from '../constants';
 import { toCssUnquotedUrlSafe } from '../lib/css-url';
 import type { Props as PlaybackProps } from '../lib/player-page-utils';
+import type { VideojsV10Engine } from '../lib/videojs-v10-engine';
 
 import '@videojs/react/video/skin.css';
 import { VideoPlayer, VideoSkin } from '@videojs/react/video';
@@ -27,11 +28,12 @@ const META_TITLE = 'View this video created on stream.new';
 
 type Props = Omit<PlaybackProps, 'playerType'> & {
   playerType: string;
+  engine: VideojsV10Engine;
   color?: string;
 };
 
-const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, shareUrl, playerType, color }: Props) => {
-  const isHlsjs = playerType === VIDEOJS_V10_HLSJS_TYPE;
+const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, shareUrl, playerType, engine, color }: Props) => {
+  const isHlsjs = engine === 'hlsjs';
 
   return (
     <Layout metaTitle={META_TITLE} image={poster} aspectRatio={aspectRatio} darkMode>
@@ -54,7 +56,7 @@ const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, sh
               }}
             >
               <VideojsV10Media
-                engine={isHlsjs ? 'hlsjs' : 'spf'}
+                engine={engine}
                 source={{
                   playbackId,
                   customDomain: process.env.NEXT_PUBLIC_MUX_BYO_DOMAIN || undefined,
@@ -67,7 +69,7 @@ const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, sh
               <MuxData
                 beaconCollectionDomain={MUX_DATA_CUSTOM_DOMAIN}
                 envKey={process.env.NEXT_PUBLIC_MUX_ENV_KEY}
-                playerSoftwareName={isHlsjs ? 'videojs-v10-hlsjs-rsc' : 'videojs-v10-spf-rsc'}
+                playerSoftwareName={`${playerType}-rsc`}
                 metadata={{
                   video_id: playbackId,
                   video_title: playbackId,
