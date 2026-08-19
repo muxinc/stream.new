@@ -256,3 +256,44 @@ track) — and a developer-facing message that explicitly recommends importing t
 `hls-js` flavor in place of `spf`. This end-to-end confirms both the stakes of the
 engine-selection heuristic (TS on SPF fails loudly, not silently) and its correctness
 on these assets (plus→TS, premium→fMP4, standard-latency live→TS).
+
+### Auto engine selection: implemented (2026-08-19)
+
+The heuristic above is live as a third v10 player type, `videojs-v10`
+(`/v/[id]/videojs-v10`), alongside the explicit `-spf`/`-hlsjs` overrides.
+
+Shape (`lib/videojs-v10-engine.ts`):
+- `getV10EngineFromAsset(asset, { liveStreamLatencyMode? })` — the **synchronous
+  pure core** over an asset already in hand (DRM → hls.js; live-derived →
+  stream latency or hls.js when unknown; clips/audio-only/video-only → hls.js;
+  then basic|premium → SPF, else hls.js).
+- `getV10EngineForAsset(asset)` — async wrapper doing the parent-live-stream
+  join only when needed.
+- `getV10EngineForPlaybackId(id)` — full lookup for the /v pages (playback ID →
+  object → asset), every failure landing on hls.js.
+- `/api/assets/[id]` now includes `videojs_v10_engine` in its response `asset`
+  object, computed by the sync core from the asset it already retrieves (no
+  extra Mux calls for on-demand assets). The /v player pages do NOT call this
+  endpoint (it serves the post-upload status page); they use the async lookup.
+
+Validation:
+- A real stream.new upload (basic quality): auto route selected **SPF** (only
+  the spf engine chunk loaded), played; `/api/assets/{id}` reports
+  `"videojs_v10_engine": "spf"`. Its manifest has `EXT-X-MAP` — **empirically
+  closing the basic→CMAF sample gap** (no basic assets existed in the other
+  env).
+- 14-case table test of the sync core (premium/basic/plus, legacy
+  encoding_tier fallback, LL/standard/unknown live recordings, clips,
+  audio-only/video-only, DRM, missing tracks): all pass.
+- Foreign playback IDs (streamable but outside the app env) fall back to
+  hls.js and play — verified in-browser.
+
+**Environment mismatch discovered during validation:** the dev `.env.local`
+Mux credentials belong to a DIFFERENT environment than the one holding the
+premium/plus/live test assets used earlier in these notes ("Invalid playback
+ID, mismatching environment"). From the app's perspective those assets
+exercise the foreign-ID fallback (hls.js — safe and correct), and the
+tier/live rules are covered by the table test + the earlier container
+empirics. Full integration validation of the SPF-selection paths for
+premium/LL-live content would need env alignment or test assets created in
+the app's env — open item.
