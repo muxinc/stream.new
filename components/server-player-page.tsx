@@ -15,6 +15,7 @@
 import Layout from './layout';
 import PlayerActions from './player-actions';
 import { MUX_DATA_CUSTOM_DOMAIN, VIDEOJS_V10_HLSJS_TYPE } from '../constants';
+import { toCssUnquotedUrlSafe } from '../lib/css-url';
 import type { Props as PlaybackProps } from '../lib/player-page-utils';
 
 import '@videojs/react/video/skin.css';
@@ -39,7 +40,7 @@ const ServerPlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, shareU
           <VideoPlayer>
             <VideoSkin
               poster={poster}
-              placeholder={blurDataURL}
+              placeholder={blurDataURL && toCssUnquotedUrlSafe(blurDataURL)}
               style={{
                 '--media-accent-color': color,
                 aspectRatio: `${aspectRatio}`,
