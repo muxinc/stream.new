@@ -179,6 +179,144 @@ attribute; the v10 media components have no declarative equivalent. A `startTime
 the media components (or on the skin/player) that handles the engine differences
 internally would remove this boilerplate from every host app.
 
+## 5. `?color=` (accent color) support was missed in the initial integration ✅ resolved (app-side)
+
+**The miss.** stream.new's player routes accept `?color=<hex>`; `PlayerPage` parses it and
+`PlayerLoader` forwards it as `accentColor` (`mux-player`) / `primaryColor`
+(`mux-player-classic`). The v10 components were never given a `color` prop and
+`PlayerLoader` doesn't pass one — the gap went unnoticed through the whole initial
+integration because nothing fails: the skins silently keep their default accent.
+Caught only on a later friction-log review (2026-08-19).
+
+**What v10 actually supports (confirmed).** Both official skins (Default and Minimal) are
+themeable via CSS custom properties — documented in the package's
+`docs/how-to/customize-skins.md`:
+
+- `--media-accent-color` — "the color of slider fills and accented controls"
+- `--media-accent-text-color` — text/icons rendered *on* the accent color; when omitted,
+  the skins derive it with `contrast-color(var(--media-accent-color))`
+
+Verified in the shipped CSS (`dist/default/presets/video/skin.css` and
+`minimal-skin.css`, identical mechanism): `--accent-color: var(--media-accent-color,
+var(--default-accent-color))` with `--default-accent-color: oklch(1 0 0)` (white).
+
+There is **no prop-level API**: nothing on `VideoPlayer`/`VideoSkin` (or anywhere in the
+React surface) exposes accent color — the CSS custom property is the only mechanism, so
+it's invisible to prop/TS-driven discovery and lives only in the customize-skins guide.
+
+**Resolution here (small).**
+1. Added `color?: string` to both v10 components' props, set as
+   `'--media-accent-color': color` on the inline `style` object already passed to
+   `<VideoSkin>` (React drops `undefined` style values). Left
+   `--media-accent-text-color` unset so the skin's `contrast-color()` derivation picks the
+   readable text color, matching `mux-player`'s single-`accentColor` ergonomics.
+2. Forwarded `color={color}` from `PlayerLoader`, same as the other players. Also wired
+   `?color=` into the server-first path (this branch's live v10 routes): a shared
+   `getColorFromQueryValue` helper in `lib/player-page-utils.ts` mirrors `PlayerPage`'s
+   hex validation (note: the hex-digits-only restriction is stream.new's own
+   pre-existing `?color=` design — `#` can't ride in a query string, and the whitelist
+   guards the inline-style sink — not a v10 limitation; `--media-accent-color` accepts
+   any CSS `<color>`, as its docs state), both `/v` route pages read `searchParams`, and `ServerPlayerPage`
+   takes a `color` prop — removing one of its documented "deliberate deviations".
+   Verified in-browser on both engines (`?color=f5c518` → `--accent-color`
+   resolves to `#f5c518`, `media-slider__fill` renders it) — but only after
+   fixing item 6 below, which this verification flushed out.
+3. Typed the custom properties with the csstype-documented module augmentation
+   (`css-custom-properties.d.ts`) — the same "well-established standard" route as item
+   1's global `*.css` ambient module — since `@types/react@18.3`'s `CSSProperties` is
+   deliberately closed-typed (no `--*` index signature). The augmentation keeps closed
+   typing: `'--media-accent-color'` type-checks, `'--media-accent-colour'` still errors.
+
+**TS trap found on the way (cousin of item 1).** The augmentation *cannot* live in a
+global script file like `declarations.d.ts`: module augmentation only merges when the
+containing file is itself a module. In a script file, `declare module 'csstype' { ... }`
+is an *ambient module declaration* that silently **replaces** the real csstype for the
+whole program — and with `skipLibCheck: true` (Next.js default) the fallout is almost
+entirely hidden, surfacing only as three baffling app-side errors (`'fontSize' does not
+exist in type 'CSSProperties & …'`) in files untouched by the change. The fix is a
+dedicated `.d.ts` with a top-level `import type {} from 'csstype';` to make it a module
+(`declarations.d.ts` must stay a script file so its `interface Window` etc. remain
+global).
+
+**Upstream candidates.**
+- Parity/discoverability: `mux-player` exposes `accent-color`/`primary-color` as
+  first-class attributes/props; v10 theming is CSS-var-only and only discoverable via the
+  customize-skins doc. A `style`-adjacent note in the React docs (or a typed helper)
+  would surface it to TS users.
+- Package: ship the csstype `Properties` module augmentation for the documented theming
+  custom properties (`--media-accent-color`, `--media-accent-text-color`,
+  `--media-border-radius`, `--media-scale-unit`) so React/TS users get typed inline
+  `style` support out of the box — the direct analogue of item 1's "ship declaration
+  stubs for the exported CSS paths". Crucially, this can be **automatic on import** —
+  no consumer config — via either of two vehicles:
+  1. *Entry-carried*: a `css-properties.d.ts` in the package (`declare module 'csstype'
+     { interface Properties { '--media-accent-color'?: string; … } } export {};` — the
+     `export {}` is load-bearing, see the script-file trap above) side-effect-imported
+     from the `@videojs/react/video` entry's `index.d.ts`. Importing `VideoSkin` then
+     augments the consumer's program by itself. Works on any TS version.
+  2. *Stylesheet-carried* (TS ≥ 5.0 `allowArbitraryExtensions`): ship the same
+     augmentation as `skin.d.css.ts` beside each `skin.css`. The install guide's own
+     `import '@videojs/react/video/skin.css'` then both resolves (fixing item 1's
+     `ts(2882)` with no app-side wildcard module) *and* delivers the theming types
+     scoped per skin — import `minimal-skin.css`, get exactly its variables.
+  Either way the files can be **codegen'd from the built CSS** (scan for `--media-*`
+  declarations, emit the interface), so the types, the docs table, and the stylesheets
+  can never drift.
+- Docs: the customize-skins guide shows the custom properties but no React inline-`style`
+  example — the closed `CSSProperties` typing means the obvious approach type-errors, and
+  the standard fix (csstype augmentation) carries the script-file/ambient-module trap
+  described above; a copy-pasteable snippet would save every TS integrator this detour.
+
+## 6. `VideoSkin`'s `placeholder` prop silently invalidates the host's inline styles ✅ resolved (app-side workaround)
+
+**Found while verifying item 5:** the SSR'd `?color=` value was present in the skin's
+`style` *attribute* but never took effect — and neither did anything else in it:
+`el.style.length` was **0** and `aspect-ratio` computed to `auto`. The entire inline
+style attribute was invalid CSS, on every server-rendered v10 page, the whole time.
+
+**Root cause (upstream).** `VideoSkin` interpolates its `placeholder` prop verbatim into
+an unquoted CSS url token (`dist/*/presets/video/skin.js`):
+
+```js
+const containerStyle = placeholder ? {
+  "--media-poster-placeholder": `url(${placeholder})`,
+  ...style
+} : style;
+```
+
+`@mux/blurup`'s `blurDataURL` is an *unencoded* SVG data URI containing raw quotes,
+spaces, and parens — all forbidden in an unquoted `url()` token. The tokenizer bails into
+a bad-url-token at the first `"`, and the leftover quote pairing swallows every
+subsequent `;`, so **every declaration in the attribute dies** — the placeholder itself,
+the host's `aspect-ratio`/`max-width`/etc. sizing, and (item 5) `--media-accent-color`.
+
+**Why it went unnoticed.** Two compounding silences:
+- On the client-rendered path (`PlayerPage`/`PlayerLoader`), React sets style properties
+  *individually* (`style.setProperty(...)`), so only the malformed placeholder
+  declaration is dropped — everything else works. Only SSR serializes the styles into one
+  attribute that fails as a unit, and hydration never repairs it.
+- Nothing errors: no console message, no visual break once media metadata provides the
+  aspect ratio. The pre-metadata sizing the inline `aspect-ratio` was supposed to provide
+  was simply absent. (Caveat for item 2/3's CLS story: the server-first page measured CLS
+  0.003 *with this style attribute broken* — worth a re-measure now that the inline
+  sizing actually applies; if anything it should only improve.)
+
+**Resolution here.** `lib/css-url.ts` → `toCssUnquotedUrlSafe()`: percent-encodes the
+characters CSS forbids in an unquoted url token (whitespace, `"`, `'`, `(`, `)`, `\`) —
+percent-encoding is transparent to data-URI consumers. Applied at all three
+`placeholder={blurDataURL}` call sites (`ServerPlayerPage`, both v10 components).
+Verified: all 10 inline declarations now parse, the placeholder data URI still decodes
+as an image, and `aspect-ratio` computes again.
+
+**Upstream candidates.**
+- Code: `VideoSkin` should emit a *quoted* url with proper escaping (e.g.
+  `` `url("${placeholder.replaceAll('\\', '\\\\').replaceAll('"', '\\"')}")` ``), or
+  percent-encode as above. Any un-encoded data URI (a very common `blurDataURL` shape —
+  `@mux/blurup`, LQIP SVGs, `plaiceholder`) reproduces this.
+- Docs: until fixed, the `placeholder` prop docs should state the value must be
+  url-token-safe. The failure mode is brutal to notice: SSR-only, no error, and it takes
+  unrelated sibling styles down with it.
+
 ## Also observed during the initial one-shot (2026-08-18)
 
 - **Flavor discoverability**: the SPF vs hls.js `MuxVideo` split
