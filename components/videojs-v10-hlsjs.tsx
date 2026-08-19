@@ -7,6 +7,7 @@ import { VideoPlayer, VideoSkin } from '@videojs/react/video';
 import { MuxVideo } from '@videojs/react/media/mux-video/hls-js';
 import { MuxData } from '@videojs/react/media/mux-data';
 import { MUX_DATA_CUSTOM_DOMAIN } from '../constants';
+import { toCssUnquotedUrlSafe } from '../lib/css-url';
 
 type Props = {
   playbackId: string;
@@ -54,7 +55,7 @@ const VideojsV10Hlsjs: React.FC<Props> = ({
     <VideoPlayer>
       <VideoSkin
         poster={poster}
-        placeholder={blurDataURL}
+        placeholder={blurDataURL && toCssUnquotedUrlSafe(blurDataURL)}
         style={{
           '--media-accent-color': color,
           aspectRatio: `${aspectRatio}`,
