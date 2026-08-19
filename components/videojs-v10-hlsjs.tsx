@@ -13,6 +13,7 @@ type Props = {
   poster: string;
   currentTime?: number;
   aspectRatio: number;
+  color?: string;
   blurDataURL?: string;
   onLoaded: () => void;
   onError: (error: ErrorEvent) => void;
@@ -23,6 +24,7 @@ const VideojsV10Hlsjs: React.FC<Props> = ({
   poster,
   currentTime,
   aspectRatio,
+  color,
   blurDataURL,
   onLoaded,
 }) => {
@@ -54,6 +56,7 @@ const VideojsV10Hlsjs: React.FC<Props> = ({
         poster={poster}
         placeholder={blurDataURL}
         style={{
+          '--media-accent-color': color,
           aspectRatio: `${aspectRatio}`,
           maxWidth: '100%',
           maxHeight: '100%',
