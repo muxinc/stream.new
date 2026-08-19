@@ -386,9 +386,19 @@ already tracks the element's load lifecycle. Concretely: replace the uncondition
 2. Adapter interim fix, independent of (1): vjs-mux already *has* the SVTA error when
    the engine is unhookable (it drives the error dialog) — forward it to the monitor
    (`mux.emit('error', …)`) so failed views exist at all.
-3. Adapter: `videochange` instead of destroy/re-monitor on `loadstart` (above), fixing
-   monitor churn and `player_startup_time` semantics uniformly across Video, native
-   HLS, hls.js, and SPF integrations.
+3. Adapter: replace unconditional destroy/re-monitor on `loadstart` with a small
+   state derivation in the state-provider idiom — element events as the *when to
+   check*, the media surface's **logical** `media.src` as the *what to compare* (never
+   the element's `currentSrc`: MSE blob URLs change on every attach, so recovery
+   re-attaches would over-detect as source changes). `loadstart` checks identity and
+   acts only on a real change; `emptied` resets the identity so a reload-after-teardown
+   of even the same URL is a fresh view. Staged: (stage 1, near-identical assumptions)
+   gate the existing re-monitor on identity change — kills the universal initial-load
+   churn and makes recovery paths non-events; (stage 2) use mux-embed's `videochange`
+   for genuine changes instead of re-monitoring, which also fixes the latent
+   `player_init_time` bug (it's stamped once at construction and passed to every
+   `monitor()`, so a re-monitor after N minutes would report `player_startup_time ≈ N`
+   on the new view).
 4. Mux Data docs: note that `player_startup_time` is sensitive to engine attach
    ordering, and (pending 1–3) that cross-engine deltas in it are not comparable.
 5. Investigate the SPF `playing_time` undercount once (1)/(3) land — it may fall out
