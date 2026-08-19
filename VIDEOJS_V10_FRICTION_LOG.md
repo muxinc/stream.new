@@ -329,5 +329,13 @@ as an image, and `aspect-ratio` computes again.
 - **Mux Data can't hook the SPF engine**: `[vjs-mux] Mux Data could not hook this playback
   engine…` — SPF-backed views are monitored from the media element alone (no rendition
   switches / request timing). The hls.js flavor hooks cleanly.
+  - **Worse than missing detail — SPF playback failures are invisible to Mux Data
+    entirely** (found 2026-08-19 while analyzing view sessions): when SPF rejects a
+    source (e.g. the MPEG-TS unsupported-playback-feature verdict), the error lives in
+    the engine/store and the error dialog — the *media element* never errors and never
+    plays, so the media-element-only monitor sends no `viewstart` and no error beacon.
+    No view is recorded at all: the exact failures you'd most want EBVS/error metrics
+    for produce zero Mux Data footprint. (Verified empirically: TS-on-SPF error
+    sessions leave no view; the same asset played via hls.js records normally.)
 - **`source.customDomain` empty-string**: an env-driven `customDomain: ""` isn't treated as
   "unset"; the app must coerce to `undefined` (`process.env.X || undefined`).
