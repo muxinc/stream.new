@@ -21,7 +21,7 @@ import type { Props as PlaybackProps } from '../lib/player-page-utils';
 import '@videojs/react/video/skin.css';
 import { VideoPlayer, VideoSkin } from '@videojs/react/video';
 import { MuxData } from '@videojs/react/media/mux-data';
-import V10Media from './v10-media';
+import VideojsV10Media from './videojs-v10-media';
 
 const META_TITLE = 'View this video created on stream.new';
 
@@ -30,7 +30,7 @@ type Props = Omit<PlaybackProps, 'playerType'> & {
   color?: string;
 };
 
-const ServerPlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, shareUrl, playerType, color }: Props) => {
+const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, shareUrl, playerType, color }: Props) => {
   const isHlsjs = playerType === VIDEOJS_V10_HLSJS_TYPE;
 
   return (
@@ -53,7 +53,7 @@ const ServerPlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, shareU
                 height: '100%',
               }}
             >
-              <V10Media
+              <VideojsV10Media
                 engine={isHlsjs ? 'hlsjs' : 'spf'}
                 source={{
                   playbackId,
@@ -85,4 +85,4 @@ const ServerPlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, shareU
   );
 };
 
-export default ServerPlayerPage;
+export default VideojsV10PlayerPage;

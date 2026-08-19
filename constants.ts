@@ -20,10 +20,10 @@ export const VALID_PLAYER_TYPES = [
 ];
 /*
  * Player types whose /v pages are fully server-rendered (see
- * components/server-player-page.tsx) rather than rendered client-side via
+ * components/videojs-v10-player-page.tsx) rather than rendered client-side via
  * PlayerPage/PlayerLoader.
  */
-export const SERVER_RENDERED_PLAYER_TYPES: string[] = [
+export const VIDEOJS_V10_PLAYER_TYPES: string[] = [
   VIDEOJS_V10_SPF_TYPE,
   VIDEOJS_V10_HLSJS_TYPE,
 ];
