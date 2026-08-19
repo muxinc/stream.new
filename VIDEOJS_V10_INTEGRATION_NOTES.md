@@ -1,9 +1,20 @@
-# vjs-spike: video.js v10 client/server boundary spike
+# video.js v10 integration notes
 
-Exploratory spike for friction-log item 3: **do the video.js v10 use cases need
-`'use client'` (or `next/dynamic`) in app code?**
+Working notes and measured findings for stream.new's video.js v10 integration —
+the record behind the decisions in the current implementation. Companion to
+`VIDEOJS_V10_FRICTION_LOG.md` (which tracks upstream-facing friction; this file
+tracks app-side architecture findings).
 
-## Routes
+> **Provenance:** this began as `app/vjs-spike/README.md`, the notes for the
+> client/server boundary spike (friction-log item 3). The spike routes
+> (`/vjs-spike/[variant]`) and `components/vjs-spike/*` were removed on
+> 2026-08-19 once the integration became the intended general implementation;
+> the sections below are kept verbatim as the record. References to spike
+> routes are historical.
+
+## Boundary spike (removed): do the v10 use cases need `'use client'` / `next/dynamic` in app code?
+
+### Routes (removed 2026-08-19)
 
 `/vjs-spike/[variant]?playbackId=<id>&engine=spf|hlsjs`
 
@@ -13,8 +24,7 @@ Exploratory spike for friction-log item 3: **do the video.js v10 use cases need
 | `client-static` | Explicit `'use client'` wrapper, static imports. |
 | `client-dynamic` | `'use client'` + `next/dynamic` — stream.new's current PlayerLoader approach. |
 
-`playbackId` defaults to a public test asset; `engine` defaults to `spf`. Expand the
-`VARIANTS` map in `[variant]/page.tsx` as new strategies come up.
+`playbackId` defaulted to a public test asset; `engine` defaulted to `spf`.
 
 ## Findings (2026-08-18, @videojs/react@10.0.0-beta.27, Next 16.1.6)
 

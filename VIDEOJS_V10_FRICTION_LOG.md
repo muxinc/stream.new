@@ -129,10 +129,11 @@ by construction (measured CLS **0.003**).
 
 stream.new renders every player inside a `'use client'` `PlayerPage` and loads all of them
 via `next/dynamic`, so this integration never validated what v10 actually *requires*.
-A parameterized spike route (`/vjs-spike/[variant]?playbackId=&engine=`) tested three
+A parameterized spike route (`/vjs-spike/[variant]?playbackId=&engine=`, since removed —
+findings recorded in `VIDEOJS_V10_INTEGRATION_NOTES.md`) tested three
 boundary strategies — no app boundary at all (`rsc-static`), explicit `'use client'`
 (`client-static`), and the current `next/dynamic` approach (`client-dynamic`); see
-`app/vjs-spike/README.md`.
+`VIDEOJS_V10_INTEGRATION_NOTES.md`.
 
 **Findings** (`@videojs/react@10.0.0-beta.27`, Next 16.1.6):
 
