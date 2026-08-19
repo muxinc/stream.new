@@ -2,7 +2,8 @@ import { notFound } from 'next/navigation';
 import PlayerPage from '../../../../components/player-page';
 import VideojsV10PlayerPage from '../../../../components/videojs-v10-player-page';
 import { getPropsFromPlaybackId, getColorFromQueryValue } from '../../../../lib/player-page-utils';
-import { VIDEOJS_V10_PLAYER_TYPES } from '../../../../constants';
+import { getV10EngineForPlaybackId } from '../../../../lib/videojs-v10-engine';
+import { VIDEOJS_V10_PLAYER_TYPES, VIDEOJS_V10_HLSJS_TYPE, VIDEOJS_V10_SPF_TYPE } from '../../../../constants';
 import type { PlayerTypes } from '../../../../constants';
 
 export const dynamicParams = true;
@@ -40,7 +41,15 @@ export default async function PlayerTypePage({
   // client-side via PlayerPage/PlayerLoader (which reads ?color= itself). (CJP)
   if (VIDEOJS_V10_PLAYER_TYPES.includes(playerType)) {
     const color = getColorFromQueryValue((await searchParams).color);
-    return <VideojsV10PlayerPage {...props} playerType={playerType} color={color} />;
+    // Explicit engine types force their engine; the auto type
+    // (videojs-v10) resolves it server-side from the playback ID's metadata.
+    const engine =
+      playerType === VIDEOJS_V10_SPF_TYPE
+        ? 'spf'
+        : playerType === VIDEOJS_V10_HLSJS_TYPE
+          ? 'hlsjs'
+          : await getV10EngineForPlaybackId(id);
+    return <VideojsV10PlayerPage {...props} playerType={playerType} engine={engine} color={color} />;
   }
 
   return (
