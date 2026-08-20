@@ -331,3 +331,38 @@ both engines).
    views for a `playing`-event head start that doesn't translate to faster rendered
    frames; SPF's thrift costs nothing measurable at first-frame. Worth an upstream
    conversation about which behavior v10 *wants* as its default.
+
+### A/B campaign: cold + warm lanes, production build (2026-08-20)
+
+Instrumentation added to the v10 player page (testing affordances): `?autoplay`
+(muted autoplay on the media), `?preload=none|metadata|auto` (pass-through), `?perf`
+(`components/perf-marks.tsx` — nav-anchored element lifecycle marks + rVFC first frame
+at `window.__perfMarks`). Campaign: scripted Chrome (playwright-core, system channel),
+production server, same asset (BV3Y), alternating order.
+
+**Cold lane** (`?autoplay&perf`, fresh browser context per run = cold HTTP cache; n=8
+per engine; ms from navigation):
+
+| | loadstart med | first frame med | first frame p90 |
+|---|---|---|---|
+| SPF | 666 | **994** | 1234 |
+| hls.js | 585 | **1052** | 1219 |
+
+Each engine had exactly one ~2.2s outlier (CDN moment); distributions otherwise
+overlap. **Verdict: on the user-perceived cold path, SPF is at least as performant —
+~6% faster at the median, tie at p90** — despite attaching the element later
+(loadstart +80ms, the resolve-before-attach ordering).
+
+**Warm lane** (`?preload=auto`, settled 6s, scripted muted play; n=5): SPF play→frame
+median 126ms vs hls.js 61ms. But the lane FAILED as an equalizer, which is its real
+finding: `rsAtPlay` stayed 1 on SPF in all runs — see the preload item below. hls.js's
+warm advantage is entirely its 32s pre-buffer; SPF's number still contains on-demand
+segment fetches. This is a buffering-policy difference, not pipeline speed (the cold
+lane, where both fetch everything, shows parity-to-SPF-favor).
+
+**Preload prop verification** (prod, `?preload=auto`): hls.js flavor forwards it
+(element attr+prop `auto`, readyState 4, 32s buffered — though it also buffers under
+`metadata`, i.e., ignores the restrictive semantic); **SPF flavor drops the prop** —
+element `preload` stays `"metadata"`, no pre-buffering, no opt-in possible. Neither
+flavor honors the author's preload intent; they fail in opposite directions
+(friction log item 8).
