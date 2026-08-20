@@ -23,6 +23,7 @@ import '@videojs/react/video/skin.css';
 import { VideoPlayer, VideoSkin } from '@videojs/react/video';
 import { MuxData } from '@videojs/react/media/mux-data';
 import VideojsV10Media from './videojs-v10-media';
+import PerfMarks from './perf-marks';
 
 const META_TITLE = 'View this video created on stream.new';
 
@@ -30,9 +31,14 @@ type Props = Omit<PlaybackProps, 'playerType'> & {
   playerType: string;
   engine: VideojsV10Engine;
   color?: string;
+  // Testing affordances (?autoplay, ?preload=, ?perf) — see the integration
+  // notes' A/B methodology section. (CJP)
+  autoplay?: boolean;
+  preload?: 'none' | 'metadata' | 'auto';
+  perf?: boolean;
 };
 
-const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, shareUrl, playerType, engine, color }: Props) => {
+const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, shareUrl, playerType, engine, color, autoplay, preload, perf }: Props) => {
   const isHlsjs = engine === 'hlsjs';
 
   return (
@@ -63,7 +69,9 @@ const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, sh
                 }}
                 crossOrigin="anonymous"
                 streamType="on-demand"
-                preload="metadata"
+                preload={preload ?? 'metadata'}
+                autoPlay={autoplay || undefined}
+                muted={autoplay || undefined}
                 playsInline
               />
               <MuxData
@@ -82,6 +90,7 @@ const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, sh
           </VideoPlayer>
         </div>
         <PlayerActions playbackId={playbackId} shareUrl={shareUrl} />
+        {perf ? <PerfMarks /> : null}
       </div>
     </Layout>
   );

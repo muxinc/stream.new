@@ -40,7 +40,12 @@ export default async function PlayerTypePage({
   // The video.js v10 player types render fully on the server; the rest render
   // client-side via PlayerPage/PlayerLoader (which reads ?color= itself). (CJP)
   if (VIDEOJS_V10_PLAYER_TYPES.includes(playerType)) {
-    const color = getColorFromQueryValue((await searchParams).color);
+    const sp = await searchParams;
+    const color = getColorFromQueryValue(sp.color);
+    // Testing affordances for A/B measurement (integration notes, "A/B lanes").
+    const autoplay = sp.autoplay !== undefined;
+    const preload = sp.preload === 'none' || sp.preload === 'metadata' || sp.preload === 'auto' ? sp.preload : undefined;
+    const perf = sp.perf !== undefined;
     // Explicit engine types force their engine; the auto type
     // (videojs-v10) resolves it server-side from the playback ID's metadata.
     const engine =
@@ -49,7 +54,7 @@ export default async function PlayerTypePage({
         : playerType === VIDEOJS_V10_HLSJS_TYPE
           ? 'hlsjs'
           : await getV10EngineForPlaybackId(id);
-    return <VideojsV10PlayerPage {...props} playerType={playerType} engine={engine} color={color} />;
+    return <VideojsV10PlayerPage {...props} playerType={playerType} engine={engine} color={color} autoplay={autoplay} preload={preload} perf={perf} />;
   }
 
   return (
