@@ -297,3 +297,37 @@ tier/live rules are covered by the table test + the earlier container
 empirics. Full integration validation of the SPF-selection paths for
 premium/LL-live content would need env alignment or test assets created in
 the app's env — open item.
+
+### Symmetric warm-start harness: SPF vs hls.js without Mux Data (2026-08-19)
+
+Given friction item 7 (Mux Data cross-engine skew), an injected element-level harness:
+navigate → evaluate injects identical instrumentation on both engines — muted `play()`
+retry loop as the anchor, element events, `requestVideoFrameCallback` as engine-neutral
+first-frame ground truth, manifest fetch from resource timing (script-timing
+independent). Same asset (BV3Y), pre-warmed routes, alternating order, n=3 per engine,
+dev server. All ms from the play attempt:
+
+| Engine | rest readyState | play→`playing` | play→first frame (rVFC) | first frame mediaTime |
+|---|---|---|---|---|
+| SPF | 1 | 65 / 70 / 125 | 69 / 71 / 126 | 43ms ×3 |
+| hls.js | 4 | 57 / 16 / 17 | 186 / 64 / 76 | 0 / 0 / 42 |
+
+Manifest fetch (nav-anchored): statistically identical (~1.0–1.1s start, ~100ms duration
+both engines).
+
+**Findings:**
+1. **True warm-start time-to-first-frame is a tie** (medians ~71ms vs ~76ms). Neither
+   engine is meaningfully faster from a settled page.
+2. **The engines invert the meaning of element readiness events.** Under
+   `preload="metadata"`, hls.js buffers to readyState 4 at rest (`playing` fires ~17ms
+   after play, but the first *rendered* frame lags it by 50–130ms), while SPF holds
+   readyState 1 and fetches/appends on demand (`playing` fires essentially *with* the
+   first frame, 1–4ms apart). Any metric keyed on `playing`/readiness — including Mux
+   Data's element-derived TTFF (the 4–5ms hls.js readings) — tells the opposite story
+   from render truth. rVFC is the only symmetric first-frame signal.
+3. **Preload behavior differs materially**: hls.js effectively ignores
+   `preload="metadata"` semantics (buffers media to readyState 4); SPF honors it
+   (metadata only, readyState 1). Trade-off: hls.js spends bandwidth on never-played
+   views for a `playing`-event head start that doesn't translate to faster rendered
+   frames; SPF's thrift costs nothing measurable at first-frame. Worth an upstream
+   conversation about which behavior v10 *wants* as its default.
