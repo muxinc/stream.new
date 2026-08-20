@@ -404,6 +404,32 @@ already tracks the element's load lifecycle. Concretely: replace the uncondition
 5. Investigate the SPF `playing_time` undercount once (1)/(3) land — it may fall out
    of the churn fix.
 
+## 8. `preload` is non-functional on both MuxVideo flavors — in opposite directions ⏳ documented
+
+Found 2026-08-20 while building an A/B lane that needed equalized rest states
+(production build, element inspected after settle):
+
+- **hls.js flavor**: forwards the `preload` prop to the element, but buffers ~32s of
+  media even under `preload="metadata"` — the restrictive semantic is ignored (the
+  engine's buffer policy isn't wired to it). Cost: speculative bandwidth on every
+  never-played view.
+- **SPF flavor**: never pre-buffers (honoring "metadata" behavior), but **drops the
+  `preload` prop entirely** — the element stays pinned at `preload="metadata"` even when
+  the author passes `auto`, so there is no way to opt into pre-buffering at all.
+
+Net: an author's `preload` choice does nothing on either flavor, and the flavors'
+*effective* defaults differ (hls.js ≈ always-auto, SPF ≈ always-metadata). This is both
+a real QoE lever (measured: warm play→first-frame 61ms pre-buffered vs 126ms on-demand,
+median) and a real cost lever (32s of segments per idle view), currently outside app
+control.
+
+**Upstream candidates.**
+- SPF flavor: forward `preload` to the element and implement `auto` (buffer-ahead at
+  rest) so authors can choose the trade.
+- hls.js flavor: honor `preload="metadata"` by capping the engine's pre-play buffering
+  (map preload to `hls.config` autoStartLoad/maxBufferLength at rest).
+- Docs: state each flavor's effective preload behavior until aligned.
+
 ## Also observed during the initial one-shot (2026-08-18)
 
 - **Flavor discoverability**: the SPF vs hls.js `MuxVideo` split
