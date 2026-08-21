@@ -366,3 +366,28 @@ lane, where both fetch everything, shows parity-to-SPF-favor).
 element `preload` stays `"metadata"`, no pre-buffering, no opt-in possible. Neither
 flavor honors the author's preload intent; they fail in opposite directions
 (friction log item 8).
+
+### Planned (not built): local-server A/B lane + campaign protocol upgrades
+
+Parked 2026-08-21 to return to primary integration efforts. When resumed:
+
+- **Outlier forensics from the 2026-08-20 cold campaign**: both ~2.2s outliers (run 1
+  SPF — first-run effect — and run 7 hls.js) had `loadstart` itself inflated (~1200ms vs
+  ~550–770ms typical), i.e. the delay preceded any media work — environmental (machine
+  load burst / server transient), not engine variance. Interleaving spread it evenly;
+  verdict unchanged with outliers dropped (SPF ~980 vs hls.js ~1045 medians).
+- **Local-server lane** (isolates engine pipeline; removes CDN/network noise *and*
+  field realism — a third lane beside CDN-cold and an eventual throttled lane):
+  1. Test server: `~/dev/muxinc/simple-local-video-test-server` (`npm run start` →
+     http-server on :8789, correct HLS mimetypes, `/public` navigable).
+  2. App affordance: test-only `?src=` on the v10 page rendering the *generic* HLS
+     media components (`@videojs/react/media/hls-video` = SPF-backed,
+     `media/hlsjs-video` = hls.js-backed) — MuxVideo can't point at localhost
+     (customDomain can't express host:port/plain http).
+  3. Content: needs a CMAF/fMP4 ladder (SPF can't play TS); ideally a local mirror of
+     the same asset used in the CDN lane for comparability.
+  4. Protocol: discard run 1 by rule, n≥15/engine, quiesced machine, interleaved.
+- Campaign runner pattern (reusable): `npm i --no-save playwright-core` +
+  `chromium.launch({ channel: 'chrome' })`, fresh context per cold run, poll
+  `window.__perfMarks` (the `?perf` leaf). Script copy in the 2026-08-20 session
+  scratchpad; trivially re-derivable from the notes above.
