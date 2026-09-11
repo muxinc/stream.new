@@ -460,3 +460,11 @@ Verified on the production build (Playwright, Chrome): `/v/[id]` SSRs the v10 pa
 plays via hls.js, beacons to `data.stream.new`; `/v/[id]/mux-player` renders Mux Player;
 `/embed` unchanged.
 
+**Mux Data naming (2026-09-11, friction item 9).** The v10 page now reports
+`player_software_name` derived from the media import path — `videojs-react-mux-video-hls-js`
+/ `videojs-react-mux-video-spf` — with `player_name: 'stream.new'` like the other
+first-class players, and the version left to the library default (the `@videojs/mux-data`
+package version). The spike-era `${playerType}-rsc` name and descriptive `player_name`
+strings are gone; historical local views (through 2026-09-11) carry those. Follow-up:
+move render path (`rsc`/`client`), engine and stream.new player type into Mux Data custom
+dimensions (`custom_1..`) for bisecting.
