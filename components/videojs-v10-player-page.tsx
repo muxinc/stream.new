@@ -38,8 +38,20 @@ type Props = Omit<PlaybackProps, 'playerType'> & {
   perf?: boolean;
 };
 
-const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, shareUrl, playerType, engine, color, autoplay, preload, perf }: Props) => {
-  const isHlsjs = engine === 'hlsjs';
+/*
+ * Mux Data `player_software_name`, derived from the import path of the media
+ * component in use (façade + media + engine), mirroring how Mux Player reports
+ * its package name (`mux-player-react`). The v10 extension has no default of
+ * its own (friction log item 9); the version is left to the library default.
+ * Render path / engine / stream.new player type bisecting belongs in Mux Data
+ * custom dimensions (follow-up), not in this name. (CJP)
+ */
+const PLAYER_SOFTWARE_NAME: Record<VideojsV10Engine, string> = {
+  hlsjs: 'videojs-react-mux-video-hls-js',
+  spf: 'videojs-react-mux-video-spf',
+};
+
+const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, shareUrl, engine, color, autoplay, preload, perf }: Props) => {
 
   return (
     <Layout metaTitle={META_TITLE} image={poster} aspectRatio={aspectRatio} darkMode>
@@ -90,13 +102,11 @@ const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, sh
               <MuxData
                 beaconCollectionDomain={MUX_DATA_CUSTOM_DOMAIN}
                 envKey={process.env.NEXT_PUBLIC_MUX_ENV_KEY}
-                playerSoftwareName={`${playerType}-rsc`}
+                playerSoftwareName={PLAYER_SOFTWARE_NAME[engine]}
                 metadata={{
                   video_id: playbackId,
                   video_title: playbackId,
-                  player_name: isHlsjs
-                    ? 'video.js v10 (hls.js-backed MuxVideo, RSC)'
-                    : 'video.js v10 (SPF-backed MuxVideo, RSC)',
+                  player_name: 'stream.new',
                 }}
               />
             </VideoSkin>

@@ -438,6 +438,53 @@ control.
   (map preload to `hls.config` autoStartLoad/maxBufferLength at rest).
 - Docs: state each flavor's effective preload behavior until aligned.
 
+## 9. No default `playerSoftwareName` — v10 views are indistinguishable from a bare `<video>` ✅ app-side names applied (2026-09-11); upstream candidate
+
+Found 2026-09-11 while deciding what the default `/v/[id]` route should report to Mux
+Data (`@videojs/mux-data@10.0.0-rc.2`, verified in `dist/dev/mux-data.js` + `env.js`):
+
+- `MuxDataExtension.defaultProps.playerSoftwareName` is `undefined`, and `#monitor()`
+  spreads `player_software_name` / `player_software` only when truthy. Nothing else in
+  the stack fills it in: neither the media component (`MuxVideo`, either flavor) nor the
+  player advertises a name, and the extension reads the adapter only for `src`, the
+  playback ID and the hls.js/dash.js engine handle.
+- So an unconfigured `<MuxData />` lands in mux-embed's `VideoElementMonitor` default:
+  `player_software: "HTML5 Video Element"`, `player_mux_plugin_name:
+  "VideoElementMonitor"`. Every v10 view without an explicit name is bucketed with
+  hand-rolled `<video>` tags in the dashboard.
+- `playerSoftwareVersion` *does* default — to the `@videojs/mux-data` package version
+  (`"10.0.0-rc.2"`, a build-time constant; the reference doc says "Defaults to the
+  Video.js version"). Fine while the `@videojs/*` packages are lock-stepped; worth
+  noting it is the *extension's* version, not the façade's or the media's.
+- Engine flavor is not encoded in the software fields at all. The hls.js engine handle is
+  passed to the SDK separately (stream-level metrics), but SPF-backed and hls.js-backed
+  MuxVideo report identical `player_software*` unless the app names them apart.
+
+**Conventions to align with (verified in this repo's node_modules):**
+- Mux Player: `mux-player` (element) / `mux-player-react` (façade) + package version.
+- Mux Video: `mux-video` / `mux-video-react` + package version.
+- video.js v8 + `videojs-mux-kit`: `vjs-mux-kit-<major>` — v8 territory; a v10 name must
+  not read as the same product (`video.js`, `Video.js`, `vjs-*` are all taken/loaded).
+- stream.new's other players set no `playerSoftwareName` (they inherit the above) and use
+  `metadata.player_name` as the human label: `'stream.new'` (mux-player, classic),
+  `'Plyr'`, `'Winamp player'`, `'Mux Video React'`. Only the v10 page sets a software name
+  today (`${playerType}-rsc`, a spike-era discriminator).
+
+**Proposal (upstream).** Default `playerSoftwareName` by derivation from the import path,
+mirroring how `mux-player-react` is just the package name: façade + media + engine, i.e.
+`videojs-react-mux-video-hls-js`, `videojs-react-mux-video-spf`, `videojs-react-hls-video`
+(vanilla: `videojs-html-mux-video-…`). Mechanism: each media component advertises its
+own segment (`mux-video-spf`), the façade contributes its own (`videojs-react`), and the
+extension composes them unless the author overrides. This keeps the hls.js/SPF split
+visible in the dashboard without app code, and cannot be confused with v8.
+
+**App-side (applied 2026-09-11 in `components/videojs-v10-player-page.tsx`).** Adopt the same derived names now (they cost nothing to
+change later if upstream lands a different scheme), drop the `-rsc` suffix from the
+software name, set `player_name: 'stream.new'` like the other first-class players, and
+move the bisecting dimensions (render path `rsc`/`client`, engine, stream.new player
+type) to Mux Data custom dimensions (`custom_1..custom_10`) in a follow-up — they are
+filterable in the dashboard and don't pollute the software-name namespace.
+
 ## Also observed during the initial one-shot (2026-08-18)
 
 - **Flavor discoverability**: the SPF vs hls.js `MuxVideo` split
