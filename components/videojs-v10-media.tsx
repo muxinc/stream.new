@@ -25,8 +25,8 @@ const MuxVideoHlsjs = dynamic(() =>
 type Props = Omit<ComponentProps<typeof MuxVideoSpf>, 'ref'> & {
   engine: 'spf' | 'hlsjs';
   /*
-   * "Start at t seconds" (?time=). rc.2 has no declarative start time on the
-   * media components (v10 friction log item 4), so two mechanisms:
+   * "Start at t seconds" (?time=). The media components have no declarative
+   * start time (v10 friction log item 4), so two mechanisms:
    * - hls.js flavor: `source.engine.hlsJs.startPosition` — hls.js begins
    *   loading at t (no fragment-0 fetch, no visible seek). Applies on every
    *   MSE path (the adapter picks MSE whenever hls.js is supported), but not
