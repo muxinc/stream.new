@@ -450,7 +450,11 @@ the v10 skin + server-first page in production.
    `source.engine.hlsJs.startPosition`, plus a once-only `onLoadedMetadata` seek in
    `VideojsV10Media` as the fallback for SPF and iOS native HLS; friction item 4
    re-checked — rc.2 still has no declarative start time).
-3. **iOS Safari + portrait-asset pass** — all measurements so far are desktop Chrome.
+3. ~~**iOS Safari + portrait-asset pass**~~ ✅ done 2026-09-11 — manual smoke on a
+   current iPhone against the LAN production build (default route, `?time=`, SPF, Mux
+   Player control). Playback ran on **ManagedMediaSource**, i.e. hls.js's MSE path, which
+   is the expected path on iOS ≥ 17.1 — so `startPosition` applies there too and the
+   native-HLS fallback in `VideojsV10Media` is only exercised on pre-MMS iOS.
 4. **Reversible rollout affordance** — cookie/query override so Mux Player is one
    click away for support, then flip `DEFAULT_PLAYER_TYPE` to `videojs-v10`.
 

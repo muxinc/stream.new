@@ -183,7 +183,9 @@ using `startPosition` would still require the ref as a Safari fallback.
 > unless `preferPlayback: 'native'`, so this covers every MSE path incl. desktop Safari —
 > hls.js begins loading at t, no fragment-0 fetch, no visible seek), and both flavors get
 > a once-only seek in `onLoadedMetadata` as the fallback for iOS native HLS and SPF (safe
-> under SSR because every flavor sets `src` client-side after hydration).
+> under SSR because every flavor sets `src` client-side after hydration). iOS smoke on a
+> current iPhone (2026-09-11) ran on ManagedMediaSource — the MSE path — so the native
+> fallback is only reached on pre-MMS iOS (< 17.1).
 
 **Upstream candidate.** `@mux/mux-video` (media-chrome) has a first-class `startTime`
 attribute; the v10 media components have no declarative equivalent. A `startTime` prop on
