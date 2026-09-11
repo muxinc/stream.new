@@ -20,7 +20,9 @@ import type { Props as PlaybackProps } from '../lib/player-page-utils';
 import type { VideojsV10Engine } from '../lib/videojs-v10-engine';
 
 import '@videojs/react/video/skin.css';
+import '@videojs/react/live-video/skin.css';
 import { VideoPlayer, VideoSkin } from '@videojs/react/video';
+import { LiveVideoPlayer, LiveVideoSkin } from '@videojs/react/live-video';
 import { MuxData } from '@videojs/react/extensions/mux-data';
 import VideojsV10Media from './videojs-v10-media';
 import PerfMarks from './perf-marks';
@@ -52,14 +54,21 @@ const PLAYER_SOFTWARE_NAME: Record<VideojsV10Engine, string> = {
   spf: 'videojs-react-mux-video-spf',
 };
 
-const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio = DEFAULT_PLAYER_ASPECT_RATIO, shareUrl, engine, color, startTime, autoplay, preload, perf }: Props) => {
+const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio = DEFAULT_PLAYER_ASPECT_RATIO, shareUrl, streamType, engine, color, startTime, autoplay, preload, perf }: Props) => {
+  // Live content gets the live preset (live badge / jump-to-live, no
+  // scrubber, no rate/quality menus), decided server-side from the playlists
+  // so it's in the initial HTML. Both skins share the poster/placeholder
+  // rendering and the accent variable. (CJP)
+  const isLive = streamType === 'live';
+  const Player = isLive ? LiveVideoPlayer : VideoPlayer;
+  const Skin = isLive ? LiveVideoSkin : VideoSkin;
 
   return (
     <Layout metaTitle={META_TITLE} image={poster} aspectRatio={aspectRatio} darkMode>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center' }}>
         <div style={{ marginTop: 40, marginBottom: 40, height: 0, flexGrow: 1, flexShrink: 1 }}>
-          <VideoPlayer poster={poster}>
-            <VideoSkin
+          <Player poster={poster}>
+            <Skin
               // The blurup placeholder is a background on the poster <img>, via
               // `renderPoster`. The element form (not a function) keeps it
               // passable from a server component. Same fit as the skin's
@@ -96,7 +105,6 @@ const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio = D
                   customDomain: process.env.NEXT_PUBLIC_MUX_BYO_DOMAIN || undefined,
                 }}
                 crossOrigin="anonymous"
-                streamType="on-demand"
                 preload={preload ?? 'metadata'}
                 autoPlay={autoplay || undefined}
                 muted={autoplay || undefined}
@@ -112,8 +120,8 @@ const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio = D
                   player_name: 'stream.new',
                 }}
               />
-            </VideoSkin>
-          </VideoPlayer>
+            </Skin>
+          </Player>
         </div>
         <PlayerActions playbackId={playbackId} shareUrl={shareUrl} />
         {perf ? <PerfMarks /> : null}
