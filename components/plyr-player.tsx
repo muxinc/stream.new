@@ -48,11 +48,13 @@ const PlyrPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoaded
 
       playerRef.current.on('ready', () => onLoaded());
 
-      if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        // This will run in safari, where HLS is supported natively
-        video.src = src;
-      } else if (Hls.isSupported()) {
-        // This will run in all other modern browsers
+      // Prefer hls.js (MSE) whenever it's supported and fall back to native HLS
+      // only where it isn't (iOS < 17.1) — the same order the video.js v10
+      // adapter uses. The previous native-first check broke in Chrome ≥ ~152:
+      // it now answers `canPlayType('application/vnd.apple.mpegurl') === 'maybe'`
+      // for its built-in HLS player, then fails Mux streams with
+      // MEDIA_ERR_SRC_NOT_SUPPORTED. (CJP)
+      if (Hls.isSupported()) {
         hls = new Hls();
         hls.loadSource(src);
         hls.attachMedia(video);
@@ -62,6 +64,9 @@ const PlyrPlayer: React.FC<Props> = ({ playbackId, poster, currentTime, onLoaded
             videoError(new ErrorEvent('HLS.js fatal error'));
           }
         });
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Native HLS (Safari without MSE/ManagedMediaSource)
+        video.src = src;
       } else {
         console.error( // eslint-disable-line no-console
           'This is an old browser that does not support MSE https://developer.mozilla.org/en-US/docs/Web/API/Media_Source_Extensions_API',
