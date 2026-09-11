@@ -43,7 +43,7 @@ type Props = Omit<PlaybackProps, 'playerType'> & {
  * Mux Data `player_software_name`, derived from the import path of the media
  * component in use (façade + media + engine), mirroring how Mux Player reports
  * its package name (`mux-player-react`). The v10 extension has no default of
- * its own (friction log item 9); the version is left to the library default.
+ * its own (v10 friction log item 9); the version is left to the library default.
  * Render path / engine / stream.new player type bisecting belongs in Mux Data
  * custom dimensions (follow-up), not in this name. (CJP)
  */

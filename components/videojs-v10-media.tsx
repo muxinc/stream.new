@@ -8,7 +8,8 @@
  * the server component does NOT split them — measured: both engines shipped to
  * both /v routes, 2,065KB decoded JS each). next/dynamic inside a client
  * component is what actually keeps each engine in its own lazy chunk, and it
- * still SSRs (no `ssr: false` — see the friction log's CLS findings). (CJP)
+ * still SSRs (no `ssr: false` — see the v10 friction log's CLS findings, kept
+ * outside this repo; VIDEOJS_V10_INTEGRATION_NOTES.md says where). (CJP)
  */
 import dynamic from 'next/dynamic';
 import { useRef } from 'react';
@@ -25,7 +26,7 @@ type Props = Omit<ComponentProps<typeof MuxVideoSpf>, 'ref'> & {
   engine: 'spf' | 'hlsjs';
   /*
    * "Start at t seconds" (?time=). rc.2 has no declarative start time on the
-   * media components (friction log item 4), so two mechanisms:
+   * media components (v10 friction log item 4), so two mechanisms:
    * - hls.js flavor: `source.engine.hlsJs.startPosition` — hls.js begins
    *   loading at t (no fragment-0 fetch, no visible seek). Applies on every
    *   MSE path (the adapter picks MSE whenever hls.js is supported), but not
