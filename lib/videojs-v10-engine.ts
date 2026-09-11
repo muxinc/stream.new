@@ -20,7 +20,7 @@ const mux = new Mux();
  * premium-quality on-demand video (those tiers postdate the CMAF rollout, so
  * no date check is needed), or content from a low-latency live stream
  * (always CMAF, including its recorded assets). The rules and their
- * provenance are recorded in VIDEOJS_V10_INTEGRATION_NOTES.md ("Engine
+ * provenance are recorded in the v10 integration notes (kept outside this repo; "Engine
  * selection research"). (CJP)
  */
 

@@ -34,8 +34,9 @@ export const VIDEOJS_V10_PLAYER_TYPES: string[] = [
 /*
  * The player /v/[id] renders. video.js v10 (hls.js-backed) as of 2026-09-11;
  * Mux Player remains available at /v/[id]/mux-player. The SPF-backed and
- * auto-selected v10 types stay opt-in until the fast-follow items in
- * VIDEOJS_V10_INTEGRATION_NOTES.md ("Default player switch") land. (CJP)
+ * auto-selected v10 types stay opt-in until the fast-follow items recorded in
+ * the v10 integration notes (working docs kept outside this repo, "Default
+ * player switch" section) land. (CJP)
  */
 export const DEFAULT_PLAYER_TYPE = VIDEOJS_V10_HLSJS_TYPE;
 export type PlayerTypes =
