@@ -8,8 +8,8 @@
  * the server component does NOT split them — measured: both engines shipped to
  * both /v routes, 2,065KB decoded JS each). next/dynamic inside a client
  * component is what actually keeps each engine in its own lazy chunk, and it
- * still SSRs (no `ssr: false` — see the v10 friction log's CLS findings, kept
- * outside this repo; VIDEOJS_V10_INTEGRATION_NOTES.md says where). (CJP)
+ * still SSRs (no `ssr: false` — see the v10 friction log's CLS findings; the
+ * v10 working docs are kept outside this repo). (CJP)
  */
 import dynamic from 'next/dynamic';
 import { useRef } from 'react';

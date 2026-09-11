@@ -5,7 +5,7 @@
  * ?perf is present. Records nav-anchored (performance.now) timestamps for the
  * media element's startup lifecycle plus the first *rendered* frame via
  * requestVideoFrameCallback — the only engine-neutral first-frame signal (see
- * VIDEOJS_V10_INTEGRATION_NOTES.md, "Symmetric warm-start harness") — and
+ * the v10 integration notes (kept outside this repo), "Symmetric warm-start harness") — and
  * exposes them at window.__perfMarks for harnesses to poll. rsAtMount flags
  * runs where this leaf attached after playback had already begun. (CJP)
  */
