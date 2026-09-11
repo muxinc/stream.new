@@ -21,7 +21,7 @@ import type { VideojsV10Engine } from '../lib/videojs-v10-engine';
 
 import '@videojs/react/video/skin.css';
 import { VideoPlayer, VideoSkin } from '@videojs/react/video';
-import { MuxData } from '@videojs/react/media/mux-data';
+import { MuxData } from '@videojs/react/extensions/mux-data';
 import VideojsV10Media from './videojs-v10-media';
 import PerfMarks from './perf-marks';
 
@@ -45,10 +45,23 @@ const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, sh
     <Layout metaTitle={META_TITLE} image={poster} aspectRatio={aspectRatio} darkMode>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center' }}>
         <div style={{ marginTop: 40, marginBottom: 40, height: 0, flexGrow: 1, flexShrink: 1 }}>
-          <VideoPlayer>
+          <VideoPlayer poster={poster}>
             <VideoSkin
-              poster={poster}
-              placeholder={blurDataURL && toCssUnquotedUrlSafe(blurDataURL)}
+              // rc.2: the skin's `placeholder` prop is gone; the blurup goes on
+              // the poster <img> as a background via `renderPoster`. The element
+              // form (not a function) keeps this passable from a server
+              // component. Same fit as the skin's object-fit so the two images
+              // don't jump when the poster arrives. (CJP)
+              renderPoster={
+                blurDataURL ? (
+                  <img
+                    alt=""
+                    style={{
+                      background: `url(${toCssUnquotedUrlSafe(blurDataURL)}) var(--media-object-position, center) / contain no-repeat`,
+                    }}
+                  />
+                ) : undefined
+              }
               style={{
                 '--media-accent-color': color,
                 aspectRatio: `${aspectRatio}`,

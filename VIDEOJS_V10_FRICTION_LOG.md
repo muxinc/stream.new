@@ -270,6 +270,14 @@ global).
 
 ## 6. `VideoSkin`'s `placeholder` prop silently invalidates the host's inline styles ✅ resolved (app-side workaround)
 
+> **rc.2 update (2026-09-11):** the `placeholder` prop no longer exists — `VideoSkin`
+> now exposes `renderPoster` and the app draws the blurup itself as a `background:
+> url(...)` on the poster `<img>` (the docs' "plain image" recipe). That removes the
+> upstream interpolation this item was about; the app keeps `toCssUnquotedUrlSafe()`
+> because the SSR'd style attribute has the same bad-url-token hazard for *our* url().
+> Upstream candidate narrows to: the `renderPoster` docs' recipe should show an escaped
+> or percent-encoded data URI.
+
 **Found while verifying item 5:** the SSR'd `?color=` value was present in the skin's
 `style` *attribute* but never took effect — and neither did anything else in it:
 `el.style.length` was **0** and `aspect-ratio` computed to `auto`. The entire inline

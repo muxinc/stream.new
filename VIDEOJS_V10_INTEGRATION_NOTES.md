@@ -391,3 +391,35 @@ Parked 2026-08-21 to return to primary integration efforts. When resumed:
   `chromium.launch({ channel: 'chrome' })`, fresh context per cold run, poll
   `window.__perfMarks` (the `?perf` leaf). Script copy in the 2026-08-20 session
   scratchpad; trivially re-derivable from the notes above.
+
+## Upgrade to `@videojs/react@10.0.0-rc.2` (2026-09-11)
+
+First release candidate; upgraded from `10.0.0-beta.27`. Breaking API deltas that hit
+this app (all in `components/videojs-v10-player-page.tsx`):
+
+- **Media adapters are now optional peer deps.** `@videojs/react/media/mux-video/*`
+  import `@videojs/mux-video`, and Mux Data lives in `@videojs/mux-data` — both must be
+  installed explicitly (`npm i @videojs/mux-video @videojs/mux-data`); npm doesn't
+  auto-install optional peers and the failure is a module-not-found at build time.
+- **`MuxData` moved**: `@videojs/react/media/mux-data` → `@videojs/react/extensions/mux-data`.
+  Props unchanged for our usage (`envKey`, `beaconCollectionDomain`,
+  `playerSoftwareName`, `metadata`).
+- **`poster` moved from `VideoSkin` to `VideoPlayer`** (`MediaContentValue`; a URL
+  string still works). The skin's `<img class="media-poster-image">` gets its `src` from
+  the player and the `src` *is* server-rendered (relevant because the skin CSS hides a
+  poster image without `src`/`srcset`).
+- **`VideoSkin.placeholder` removed → `renderPoster`.** The blurup is now our own
+  `background: url(...)` on the poster `<img>`. `renderPoster` accepts either a render
+  function or a React *element* (`renderElement()` clones it and merges `style`); the
+  element form is what keeps this passable from the server component without a client
+  wrapper. Friction item 6's percent-encoding stays (same SSR'd style-attribute hazard).
+
+Verified on the production build (Playwright, Chrome), test playback ID
+`BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM`:
+`/v/[id]/videojs-v10` (→ hls.js fallback, foreign-env asset), `/videojs-v10-spf`,
+`/videojs-v10-hlsjs?autoplay`, `?color=ff0000`: SSR'd `<video>`, poster `src`,
+blurup background and intact skin inline styles (aspect-ratio included) on every
+route; playback advances on both engines (SPF via MSE blob src, no `window.Hls`
+global on the SPF route; muted autoplay honored); Mux Data beacons POST to
+`data.stream.new`; CLS 0; zero console errors. `/v/[id]` (mux-player) and `/embed`
+unaffected. `tsc`, eslint, jest all green.
