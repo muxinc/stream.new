@@ -463,6 +463,17 @@ Verified on the production build (Playwright, Chrome): `/v/[id]` SSRs the v10 pa
 plays via hls.js, beacons to `data.stream.new`; `/v/[id]/mux-player` renders Mux Player;
 `/embed` unchanged.
 
+**PR #238 review findings (Cursor Bugbot, 2026-09-11).** (a) *Sharing metadata*: real,
+but pre-existing — `Layout` emits `twitter:player` / the oembed `<link rel="alternate">`
+via `next/head`, a no-op under the App Router, so neither player path had them in the
+SSR'd head since the migration. Fixed for both paths in `generateMetadata` via the shared
+`getPlayerPageMetadata()` (lib/player-page-utils.ts): Twitter player card (embed URL,
+HLS stream URL, 480×h from the aspect ratio) + oembed alternate. The `Layout` `<Head>`
+block is now dead code on app/ routes (left alone; out of scope). (b) *`aspect-ratio:
+undefined`* when the thumbnail probe fails: real; `DEFAULT_PLAYER_ASPECT_RATIO` (16/9,
+constants.ts) is the fallback for the skin box, the twitter:player dims, and matches the
+/embed page's assumption.
+
 **Mux Data naming (2026-09-11, friction item 9).** The v10 page now reports
 `player_software_name` derived from the media import path — `videojs-react-mux-video-hls-js`
 / `videojs-react-mux-video-spf` — with `player_name: 'stream.new'` like the other

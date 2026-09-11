@@ -1,7 +1,8 @@
 import { getImageDimensions } from './image-dimensions';
 import { createBlurUp } from '@mux/blurup';
 import { getImageBaseUrl, getStreamBaseUrl } from './urlutils';
-import { HOST_URL } from '../constants';
+import type { Metadata } from 'next';
+import { HOST_URL, DEFAULT_PLAYER_ASPECT_RATIO } from '../constants';
 import type { PlayerTypes } from '../constants';
 import logger from './logger';
 
@@ -94,4 +95,45 @@ export async function getPropsFromPlaybackId(
     props.aspectRatio = dimensions.aspectRatio;
   }
   return props;
+}
+
+/*
+ * Social/sharing metadata for the /v pages (both /v/[id] and
+ * /v/[id]/[playerType]): Open Graph image, Twitter *player* card pointing at
+ * the /embed route, and the oembed discovery link for /api/oembed.
+ *
+ * This is the App Router home for what PlayerPage/Layout emit via `next/head`
+ * — which is a no-op under app/, so those tags never reached the SSR'd head on
+ * any player path. (Flagged on the default-player PR; pre-existing since the
+ * App Router migration.) (CJP)
+ */
+export async function getPlayerPageMetadata(playbackId: string): Promise<Metadata> {
+  const props = await getPropsFromPlaybackId(playbackId);
+  const pageUrl = `${HOST_URL}/v/${playbackId}`;
+  const width = 480;
+  const height = Math.round(width / (props.aspectRatio ?? DEFAULT_PLAYER_ASPECT_RATIO));
+  return {
+    title: 'View this video created on stream.new',
+    openGraph: {
+      images: [props.poster],
+    },
+    twitter: {
+      card: 'player',
+      site: '@muxhq',
+      images: [props.poster],
+      players: [
+        {
+          playerUrl: `${pageUrl}/embed`,
+          streamUrl: `${getStreamBaseUrl()}/${playbackId}.m3u8`,
+          width,
+          height,
+        },
+      ],
+    },
+    alternates: {
+      types: {
+        'application/json+oembed': `${HOST_URL}/api/oembed?url=${encodeURIComponent(pageUrl)}`,
+      },
+    },
+  };
 }

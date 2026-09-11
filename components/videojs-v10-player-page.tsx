@@ -14,7 +14,7 @@
  */
 import Layout from './layout';
 import PlayerActions from './player-actions';
-import { MUX_DATA_CUSTOM_DOMAIN } from '../constants';
+import { MUX_DATA_CUSTOM_DOMAIN, DEFAULT_PLAYER_ASPECT_RATIO } from '../constants';
 import { toCssUnquotedUrlSafe } from '../lib/css-url';
 import type { Props as PlaybackProps } from '../lib/player-page-utils';
 import type { VideojsV10Engine } from '../lib/videojs-v10-engine';
@@ -52,7 +52,7 @@ const PLAYER_SOFTWARE_NAME: Record<VideojsV10Engine, string> = {
   spf: 'videojs-react-mux-video-spf',
 };
 
-const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, shareUrl, engine, color, startTime, autoplay, preload, perf }: Props) => {
+const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio = DEFAULT_PLAYER_ASPECT_RATIO, shareUrl, engine, color, startTime, autoplay, preload, perf }: Props) => {
 
   return (
     <Layout metaTitle={META_TITLE} image={poster} aspectRatio={aspectRatio} darkMode>
