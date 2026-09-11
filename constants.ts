@@ -47,3 +47,10 @@ export type PlayerTypes =
   | typeof VIDEOJS_V10_SPF_TYPE
   | typeof VIDEOJS_V10_HLSJS_TYPE;
 export const MUX_DATA_CUSTOM_DOMAIN = 'data.stream.new';
+/*
+ * Used when the thumbnail probe yields no dimensions (network hiccup, brand-new
+ * asset): keeps a reserved box for the server-rendered player and the
+ * twitter:player card instead of emitting `aspect-ratio: undefined`. Matches
+ * the /embed page's assumption. (CJP)
+ */
+export const DEFAULT_PLAYER_ASPECT_RATIO = 16 / 9;

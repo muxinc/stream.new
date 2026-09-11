@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import PlayerPage from '../../../../components/player-page';
 import VideojsV10PlayerPage from '../../../../components/videojs-v10-player-page';
-import { getPropsFromPlaybackId, getV10PagePropsFromSearchParams } from '../../../../lib/player-page-utils';
+import { getPropsFromPlaybackId, getV10PagePropsFromSearchParams, getPlayerPageMetadata } from '../../../../lib/player-page-utils';
 import { getV10EngineForPlayerType } from '../../../../lib/videojs-v10-engine';
 import { VIDEOJS_V10_PLAYER_TYPES } from '../../../../constants';
 import type { PlayerTypes } from '../../../../constants';
@@ -10,17 +10,7 @@ export const dynamicParams = true;
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const props = await getPropsFromPlaybackId(id);
-  return {
-    title: 'View this video created on stream.new',
-    openGraph: {
-      images: [props.poster],
-    },
-    twitter: {
-      card: 'player' as const,
-      images: [props.poster],
-    },
-  };
+  return getPlayerPageMetadata(id);
 }
 
 export default async function PlayerTypePage({
