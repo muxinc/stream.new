@@ -190,6 +190,16 @@ attribute; the v10 media components have no declarative equivalent. A `startTime
 the media components (or on the skin/player) that handles the engine differences
 internally would remove this boilerplate from every host app.
 
+*Sharpened after the rc.2 re-check (2026-09-11), not urgent:* `HlsJsAdapter` is already
+the wrapper that owns both paths — it constructs `HlsJsOnlyAdapter` (MSE, given
+`withDrmSystems(engine.hlsJs, drm)`) or `NativeHlsAdapter` (given only `drm` +
+`engine.nativeHls`; `engine.hlsJs` is read there solely for the DRM warning and otherwise
+dropped) at engine-construction time. So it is the one place that knows which path won,
+and a `startTime` on the adapter could map to `startPosition` on MSE and to a
+metadata-time seek on native — exactly the two-mechanism dance hosts currently have to
+write themselves (`components/videojs-v10-media.tsx`). The SPF flavor would need its own
+equivalent.
+
 ## 5. `?color=` (accent color) support was missed in the initial integration ✅ resolved (app-side)
 
 **The miss.** stream.new's player routes accept `?color=<hex>`; `PlayerPage` parses it and
