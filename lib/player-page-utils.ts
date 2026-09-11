@@ -16,7 +16,7 @@ export type Props = {
   aspectRatio?: number;
   videoExists: boolean;
   // Decided server-side from the HLS playlists (see getStreamInfoAsync) so the
-  // server-rendered v10 page can pick the live skin before any client code
+  // server-rendered video.js page can pick the live skin before any client code
   // runs. Optional only because the client-rendered PlayerPage path doesn't
   // use it; getPropsFromPlaybackId always sets it.
   streamType?: StreamType;
@@ -53,12 +53,12 @@ export function getStartTimeFromQueryValue(
 }
 
 /*
- * Query params the server-rendered v10 pages honor: ?time= and ?color= (the
+ * Query params the server-rendered video.js pages honor: ?time= and ?color= (the
  * documented ones, see README) plus the testing affordances (?autoplay,
  * ?preload= — see the integration notes' A/B methodology section).
  * Shared by /v/[id] and /v/[id]/[playerType]. (CJP)
  */
-export function getV10PagePropsFromSearchParams(sp: SearchParams) {
+export function getVideojsPagePropsFromSearchParams(sp: SearchParams) {
   return {
     startTime: getStartTimeFromQueryValue(sp.time),
     color: getColorFromQueryValue(sp.color),

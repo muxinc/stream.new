@@ -7,46 +7,46 @@ export const MUX_VIDEO_TYPE = 'mux-video';
 export const MUX_PLAYER_TYPE = 'mux-player';
 export const MUX_PLAYER_CLASSIC_TYPE = 'classic';
 export const WINAMP_PLAYER_TYPE = 'winamp';
-export const VIDEOJS_V10_SPF_TYPE = 'videojs-v10-spf';
-export const VIDEOJS_V10_HLSJS_TYPE = 'videojs-v10-hlsjs';
+export const VIDEOJS_SPF_TYPE = 'videojs-spf';
+export const VIDEOJS_HLSJS_TYPE = 'videojs-hlsjs';
 // Auto: the engine (SPF vs hls.js) is selected server-side per playback ID
-// (see lib/videojs-v10-engine.ts); the explicit types above stay as overrides.
-export const VIDEOJS_V10_TYPE = 'videojs-v10';
+// (see lib/videojs-engine.ts); the explicit types above stay as overrides.
+export const VIDEOJS_TYPE = 'videojs';
 export const VALID_PLAYER_TYPES = [
   PLYR_TYPE,
   MUX_VIDEO_TYPE,
   MUX_PLAYER_TYPE,
   MUX_PLAYER_CLASSIC_TYPE,
   WINAMP_PLAYER_TYPE,
-  VIDEOJS_V10_SPF_TYPE,
-  VIDEOJS_V10_HLSJS_TYPE,
+  VIDEOJS_SPF_TYPE,
+  VIDEOJS_HLSJS_TYPE,
 ];
 /*
  * Player types whose /v pages are fully server-rendered (see
- * components/videojs-v10-player-page.tsx) rather than rendered client-side via
+ * components/videojs-player-page.tsx) rather than rendered client-side via
  * PlayerPage/PlayerLoader.
  */
-export const VIDEOJS_V10_PLAYER_TYPES: string[] = [
-  VIDEOJS_V10_TYPE,
-  VIDEOJS_V10_SPF_TYPE,
-  VIDEOJS_V10_HLSJS_TYPE,
+export const VIDEOJS_PLAYER_TYPES: string[] = [
+  VIDEOJS_TYPE,
+  VIDEOJS_SPF_TYPE,
+  VIDEOJS_HLSJS_TYPE,
 ];
 /*
- * The player /v/[id] renders. video.js v10 (hls.js-backed) as of 2026-09-11;
+ * The player /v/[id] renders. video.js (hls.js-backed) as of 2026-09-11;
  * Mux Player remains available at /v/[id]/mux-player. The SPF-backed and
- * auto-selected v10 types stay opt-in until the fast-follow items recorded in
- * the v10 integration notes (working docs kept outside this repo, "Default
+ * auto-selected video.js types stay opt-in until the fast-follow items recorded in
+ * the video.js integration notes (working docs kept outside this repo, "Default
  * player switch" section) land. (CJP)
  */
-export const DEFAULT_PLAYER_TYPE = VIDEOJS_V10_HLSJS_TYPE;
+export const DEFAULT_PLAYER_TYPE = VIDEOJS_HLSJS_TYPE;
 export type PlayerTypes =
   | typeof PLYR_TYPE
   | typeof MUX_VIDEO_TYPE
   | typeof MUX_PLAYER_TYPE
   | typeof MUX_PLAYER_CLASSIC_TYPE
   | typeof WINAMP_PLAYER_TYPE
-  | typeof VIDEOJS_V10_SPF_TYPE
-  | typeof VIDEOJS_V10_HLSJS_TYPE;
+  | typeof VIDEOJS_SPF_TYPE
+  | typeof VIDEOJS_HLSJS_TYPE;
 export const MUX_DATA_CUSTOM_DOMAIN = 'data.stream.new';
 /*
  * Used when the thumbnail probe yields no dimensions (network hiccup, brand-new

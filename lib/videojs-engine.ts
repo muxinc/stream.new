@@ -1,14 +1,14 @@
 import Mux from '@mux/mux-node';
 import type { Asset } from '@mux/mux-node/resources/video/assets';
 import logger from './logger';
-import { VIDEOJS_V10_HLSJS_TYPE, VIDEOJS_V10_SPF_TYPE } from '../constants';
+import { VIDEOJS_HLSJS_TYPE, VIDEOJS_SPF_TYPE } from '../constants';
 
-export type VideojsV10Engine = 'spf' | 'hlsjs';
+export type VideojsEngine = 'spf' | 'hlsjs';
 
 const mux = new Mux();
 
 /*
- * Engine selection for the auto video.js v10 player type.
+ * Engine selection for the auto video.js player type.
  *
  * SPF cannot play MPEG-TS segments, so pick it only when the content is
  * confidently CMAF/fMP4. hls.js plays both containers, so it is the safe
@@ -20,7 +20,7 @@ const mux = new Mux();
  * premium-quality on-demand video (those tiers postdate the CMAF rollout, so
  * no date check is needed), or content from a low-latency live stream
  * (always CMAF, including its recorded assets). The rules and their
- * provenance are recorded in the v10 integration notes (kept outside this repo; "Engine
+ * provenance are recorded in the video.js integration notes (kept outside this repo; "Engine
  * selection research"). (CJP)
  */
 
@@ -32,10 +32,10 @@ type LatencyMode = 'low' | 'reduced' | 'standard';
  * stream, and the asset carries no latency echo — pass the parent stream's
  * latency_mode when known; when it isn't, the answer is hls.js.
  */
-export function getV10EngineFromAsset(
+export function getVideojsEngineFromAsset(
   asset: Asset,
   { liveStreamLatencyMode }: { liveStreamLatencyMode?: LatencyMode } = {}
-): VideojsV10Engine {
+): VideojsEngine {
   // stream.new has no DRM wiring, and DRM'd media won't play on either
   // engine without it; hls.js is simply the do-no-extra-harm default.
   if (asset.playback_ids?.some((p) => p.policy === 'drm')) return 'hlsjs';
@@ -70,17 +70,17 @@ export function getV10EngineFromAsset(
  * asset (e.g. /api/assets/[id]): performs the parent-live-stream join only
  * when the asset needs it.
  */
-export async function getV10EngineForAsset(
+export async function getVideojsEngineForAsset(
   asset: Asset
-): Promise<VideojsV10Engine> {
-  if (!asset.live_stream_id) return getV10EngineFromAsset(asset);
+): Promise<VideojsEngine> {
+  if (!asset.live_stream_id) return getVideojsEngineFromAsset(asset);
   try {
     const stream = await mux.video.liveStreams.retrieve(asset.live_stream_id);
-    return getV10EngineFromAsset(asset, {
+    return getVideojsEngineFromAsset(asset, {
       liveStreamLatencyMode: stream.latency_mode,
     });
   } catch (e) {
-    logger.warn('videojs-v10 engine selection fell back to hls.js:', e);
+    logger.warn('videojs engine selection fell back to hls.js:', e);
     return 'hlsjs';
   }
 }
@@ -90,9 +90,9 @@ export async function getV10EngineForAsset(
  * NOTE: only playback IDs in this environment (MUX_TOKEN_ID/SECRET) are
  * visible; anything else 400s and lands on the hls.js fallback.
  */
-export async function getV10EngineForPlaybackId(
+export async function getVideojsEngineForPlaybackId(
   playbackId: string
-): Promise<VideojsV10Engine> {
+): Promise<VideojsEngine> {
   try {
     const { policy, object } = await mux.video.playbackIds.retrieve(playbackId);
     if (policy === 'drm') return 'hlsjs';
@@ -103,23 +103,23 @@ export async function getV10EngineForPlaybackId(
     }
 
     const asset = await mux.video.assets.retrieve(object.id);
-    return await getV10EngineForAsset(asset);
+    return await getVideojsEngineForAsset(asset);
   } catch (e) {
-    logger.warn('videojs-v10 engine selection fell back to hls.js:', e);
+    logger.warn('videojs engine selection fell back to hls.js:', e);
     return 'hlsjs';
   }
 }
 
 /*
- * Engine for a v10 player type: the explicit types force their engine; the
- * auto type (videojs-v10) resolves it from the playback ID's metadata. Shared
+ * Engine for a video.js player type: the explicit types force their engine; the
+ * auto type (videojs) resolves it from the playback ID's metadata. Shared
  * by /v/[id] and /v/[id]/[playerType] so the two stay symmetric.
  */
-export async function getV10EngineForPlayerType(
+export async function getVideojsEngineForPlayerType(
   playerType: string,
   playbackId: string
-): Promise<VideojsV10Engine> {
-  if (playerType === VIDEOJS_V10_SPF_TYPE) return 'spf';
-  if (playerType === VIDEOJS_V10_HLSJS_TYPE) return 'hlsjs';
-  return getV10EngineForPlaybackId(playbackId);
+): Promise<VideojsEngine> {
+  if (playerType === VIDEOJS_SPF_TYPE) return 'spf';
+  if (playerType === VIDEOJS_HLSJS_TYPE) return 'hlsjs';
+  return getVideojsEngineForPlaybackId(playbackId);
 }

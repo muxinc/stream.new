@@ -1,15 +1,15 @@
 'use client';
 
 /*
- * Client leaf that selects the video.js v10 MuxVideo engine flavor via
+ * Client leaf that selects the video.js MuxVideo engine flavor via
  * next/dynamic. This exists purely for code-splitting: client references
  * reachable from a server component's module graph are merged into the route's
  * client chunks whether or not they render (a conditional `await import()` in
  * the server component does NOT split them — measured: both engines shipped to
  * both /v routes, 2,065KB decoded JS each). next/dynamic inside a client
  * component is what actually keeps each engine in its own lazy chunk, and it
- * still SSRs (no `ssr: false` — see the v10 friction log's CLS findings; the
- * v10 working docs are kept outside this repo). (CJP)
+ * still SSRs (no `ssr: false` — see the video.js friction log's CLS findings; the
+ * video.js working docs are kept outside this repo). (CJP)
  */
 import dynamic from 'next/dynamic';
 import { useRef } from 'react';
@@ -26,7 +26,7 @@ type Props = Omit<ComponentProps<typeof MuxVideoSpf>, 'ref'> & {
   engine: 'spf' | 'hlsjs';
   /*
    * "Start at t seconds" (?time=). The media components have no declarative
-   * start time (v10 friction log item 4), so two mechanisms:
+   * start time (video.js friction log item 4), so two mechanisms:
    * - hls.js flavor: `source.engine.hlsJs.startPosition` — hls.js begins
    *   loading at t (no fragment-0 fetch, no visible seek). Applies on every
    *   MSE path (the adapter picks MSE whenever hls.js is supported), but not
@@ -39,7 +39,7 @@ type Props = Omit<ComponentProps<typeof MuxVideoSpf>, 'ref'> & {
   startTime?: number;
 };
 
-const VideojsV10Media = ({ engine, startTime, onLoadedMetadata, source, ...mediaProps }: Props) => {
+const VideojsMedia = ({ engine, startTime, onLoadedMetadata, source, ...mediaProps }: Props) => {
   const didSeekRef = useRef(false);
 
   const handleLoadedMetadata = (evt: SyntheticEvent<HTMLVideoElement>) => {
@@ -60,4 +60,4 @@ const VideojsV10Media = ({ engine, startTime, onLoadedMetadata, source, ...media
   return <MuxVideoSpf {...mediaProps} source={source} onLoadedMetadata={handleLoadedMetadata} />;
 };
 
-export default VideojsV10Media;
+export default VideojsMedia;

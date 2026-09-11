@@ -211,11 +211,11 @@ When a video is uploaded:
 
 # Player variants
 
-`/v/:id` renders the default player: [video.js v10](https://github.com/videojs/video.js) (`@videojs/react`) with the hls.js-backed Mux media component, server-rendered. Other players are available at `/v/:id/:playerType`:
+`/v/:id` renders the default player: [video.js](https://github.com/videojs/video.js) (`@videojs/react`) with the hls.js-backed Mux media component, server-rendered. Other players are available at `/v/:id/:playerType`:
 
 - `mux-player` — Mux Player (the previous default)
-- `videojs-v10-spf` — video.js v10 with the SPF-backed Mux media component (opt-in for now)
-- `videojs-v10` — video.js v10 with the engine (SPF vs hls.js) selected server-side per asset
+- `videojs-spf` — video.js with the SPF-backed Mux media component (opt-in for now)
+- `videojs` — video.js with the engine (SPF vs hls.js) selected server-side per asset
 - `classic`, `plyr`, `mux-video`, `winamp`
 
 `/v/:id/embed` still renders Mux Player.
