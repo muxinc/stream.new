@@ -6,6 +6,8 @@ import { HOST_URL, DEFAULT_PLAYER_ASPECT_RATIO } from '../constants';
 import type { PlayerTypes } from '../constants';
 import logger from './logger';
 
+export type StreamType = 'live' | 'on-demand';
+
 export type Props = {
   blurDataURL?: string;
   playbackId: string;
@@ -13,6 +15,11 @@ export type Props = {
   poster: string;
   aspectRatio?: number;
   videoExists: boolean;
+  // Decided server-side from the HLS playlists (see getStreamInfoAsync) so the
+  // server-rendered v10 page can pick the live skin before any client code
+  // runs. Optional only because the client-rendered PlayerPage path doesn't
+  // use it; getPropsFromPlaybackId always sets it.
+  streamType?: StreamType;
   playerType?: PlayerTypes;
 };
 
@@ -64,11 +71,28 @@ export function getV10PagePropsFromSearchParams(sp: SearchParams) {
   };
 }
 
-const getVideoExistsAsync = async (playbackId: string) => {
+/*
+ * Live vs on-demand from the first media playlist — the same signal Mux
+ * Player's engine uses (an HLS playlist without `#EXT-X-ENDLIST` is live).
+ * Read from the playlists rather than the Mux API because any public playback
+ * ID can be played here, not only this environment's. (CJP)
+ */
+const getStreamTypeFromPlaylists = async (multivariant: string): Promise<StreamType> => {
+  const mediaPlaylistUrl = multivariant.match(/^https?:\/\/\S+$/m)?.[0];
+  if (!mediaPlaylistUrl) return 'on-demand';
+  const media = await fetch(mediaPlaylistUrl).then((resp) => (resp.ok ? resp.text() : ''));
+  return /^#EXT-X-ENDLIST\s*$/m.test(media) ? 'on-demand' : 'live';
+};
+
+const getStreamInfoAsync = async (
+  playbackId: string
+): Promise<{ videoExists: boolean; streamType: StreamType }> => {
   // NOTE: Would prefer to use a HEAD method request, but these appear to be not allowed (status 405) from Mux Video (CJP)
-  return fetch(`${getStreamBaseUrl()}/${playbackId}.m3u8`).then((resp) => {
-    return resp.status >= 200 && resp.status <= 399;
-  });
+  const resp = await fetch(`${getStreamBaseUrl()}/${playbackId}.m3u8`);
+  const videoExists = resp.status >= 200 && resp.status <= 399;
+  if (!videoExists) return { videoExists, streamType: 'on-demand' };
+  const streamType = await getStreamTypeFromPlaylists(await resp.text());
+  return { videoExists, streamType };
 };
 
 export async function getPropsFromPlaybackId(
@@ -83,13 +107,14 @@ export async function getPropsFromPlaybackId(
   } catch (e) {
     console.error('Error fetching blurup', e);
   }
-  const videoExists = await getVideoExistsAsync(playbackId);
+  const { videoExists, streamType } = await getStreamInfoAsync(playbackId);
   const props: Props = {
     blurDataURL,
     playbackId,
     shareUrl,
     poster,
     videoExists,
+    streamType,
   };
   if (dimensions?.aspectRatio) {
     props.aspectRatio = dimensions.aspectRatio;
