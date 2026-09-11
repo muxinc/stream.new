@@ -1,6 +1,7 @@
 import Mux from '@mux/mux-node';
 import type { Asset } from '@mux/mux-node/resources/video/assets';
 import logger from './logger';
+import { VIDEOJS_V10_HLSJS_TYPE, VIDEOJS_V10_SPF_TYPE } from '../constants';
 
 export type VideojsV10Engine = 'spf' | 'hlsjs';
 
@@ -107,4 +108,18 @@ export async function getV10EngineForPlaybackId(
     logger.warn('videojs-v10 engine selection fell back to hls.js:', e);
     return 'hlsjs';
   }
+}
+
+/*
+ * Engine for a v10 player type: the explicit types force their engine; the
+ * auto type (videojs-v10) resolves it from the playback ID's metadata. Shared
+ * by /v/[id] and /v/[id]/[playerType] so the two stay symmetric.
+ */
+export async function getV10EngineForPlayerType(
+  playerType: string,
+  playbackId: string
+): Promise<VideojsV10Engine> {
+  if (playerType === VIDEOJS_V10_SPF_TYPE) return 'spf';
+  if (playerType === VIDEOJS_V10_HLSJS_TYPE) return 'hlsjs';
+  return getV10EngineForPlaybackId(playbackId);
 }

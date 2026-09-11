@@ -207,7 +207,18 @@ When a video is uploaded:
 # Hidden playback features via query params:
 
 - `time`: will start the video at a specific timestamp in seconds, for example `?time=10` will start at 10 seconds [like this](https://stream.new/v/XQDCNm01ZPyGg81GzK4mQfL7fxFoqP8uo?time=10)
-- `color`: a hex value *without* the `#` character will theme the Mux Player with the primaryColor. It's important to omit the `#` for example `?color=f97316` [like this](https://stream.new/v/XQDCNm01ZPyGg81GzK4mQfL7fxFoqP8uo?color=f97316)
+- `color`: a hex value *without* the `#` character will theme the player's accent color. It's important to omit the `#` for example `?color=f97316` [like this](https://stream.new/v/XQDCNm01ZPyGg81GzK4mQfL7fxFoqP8uo?color=f97316)
+
+# Player variants
+
+`/v/:id` renders the default player: [video.js v10](https://github.com/videojs/video.js) (`@videojs/react`) with the hls.js-backed Mux media component, server-rendered. Other players are available at `/v/:id/:playerType`:
+
+- `mux-player` — Mux Player (the previous default)
+- `videojs-v10-spf` — video.js v10 with the SPF-backed Mux media component (opt-in for now)
+- `videojs-v10` — video.js v10 with the engine (SPF vs hls.js) selected server-side per asset
+- `classic`, `plyr`, `mux-video`, `winamp`
+
+`/v/:id/embed` still renders Mux Player.
 
 # Videos to test in development:
 
