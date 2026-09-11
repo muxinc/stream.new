@@ -2,8 +2,12 @@
 
 Working notes and measured findings for stream.new's video.js v10 integration —
 the record behind the decisions in the current implementation. Companion to
-`VIDEOJS_V10_FRICTION_LOG.md` (which tracks upstream-facing friction; this file
-tracks app-side architecture findings).
+the video.js v10 friction log (which tracks upstream-facing friction; this file
+tracks app-side architecture findings). The friction log is deliberately **not** part
+of this codebase — it lives outside the repo at
+`~/dev/muxinc/notes/stream.new/VIDEOJS_V10_FRICTION_LOG.md` (removed from the tree on
+2026-09-11; the branch history before that commit still has it). "Friction item N"
+references below and in code comments point at that file.
 
 > **Provenance:** this began as `app/vjs-spike/README.md`, the notes for the
 > client/server boundary spike (friction-log item 3). The spike routes
