@@ -1,5 +1,5 @@
 /*
- * video.js v10 skin theming custom properties, so they can be set via React's
+ * video.js skin theming custom properties, so they can be set via React's
  * inline `style` prop. @types/react's CSSProperties is closed-typed (no `--*`
  * index signature); this is the csstype-documented augmentation for custom
  * properties: https://github.com/frenic/csstype#what-should-i-do-when-i-get-type-errors

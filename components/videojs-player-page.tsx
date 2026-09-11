@@ -1,9 +1,9 @@
 /*
- * Server-first player page for the video.js v10 use cases, used by /v/[id] and
- * /v/[id]/[playerType] for the videojs-v10-* player types.
+ * Server-first player page for the video.js use cases, used by /v/[id] and
+ * /v/[id]/[playerType] for the videojs-* player types.
  *
  * NO 'use client' here: the page chrome (Layout) is an existing client
- * component composed with server children, the v10 player is
+ * component composed with server children, the video.js player is
  * server-rendered directly (the package self-declares 'use client'), and the
  * only app-level client code is the PlayerActions leaf.
  *
@@ -17,22 +17,22 @@ import PlayerActions from './player-actions';
 import { MUX_DATA_CUSTOM_DOMAIN, DEFAULT_PLAYER_ASPECT_RATIO } from '../constants';
 import { toCssUnquotedUrlSafe } from '../lib/css-url';
 import type { Props as PlaybackProps } from '../lib/player-page-utils';
-import type { VideojsV10Engine } from '../lib/videojs-v10-engine';
+import type { VideojsEngine } from '../lib/videojs-engine';
 
 import '@videojs/react/video/skin.css';
 import '@videojs/react/live-video/skin.css';
 import { VideoPlayer, VideoSkin } from '@videojs/react/video';
 import { LiveVideoPlayer, LiveVideoSkin } from '@videojs/react/live-video';
 import { MuxData } from '@videojs/react/extensions/mux-data';
-import VideojsV10Media from './videojs-v10-media';
+import VideojsMedia from './videojs-media';
 
 const META_TITLE = 'View this video created on stream.new';
 
 type Props = Omit<PlaybackProps, 'playerType'> & {
   playerType: string;
-  engine: VideojsV10Engine;
+  engine: VideojsEngine;
   color?: string;
-  startTime?: number; // ?time= (see VideojsV10Media)
+  startTime?: number; // ?time= (see VideojsMedia)
   // Testing affordances (?autoplay, ?preload=) — see the integration
   // notes' A/B methodology section. (CJP)
   autoplay?: boolean;
@@ -42,17 +42,17 @@ type Props = Omit<PlaybackProps, 'playerType'> & {
 /*
  * Mux Data `player_software_name`, derived from the import path of the media
  * component in use (façade + media + engine), mirroring how Mux Player reports
- * its package name (`mux-player-react`). The v10 extension has no default of
- * its own (v10 friction log item 9); the version is left to the library default.
+ * its package name (`mux-player-react`). The video.js Mux Data extension has no default of
+ * its own (video.js friction log item 9); the version is left to the library default.
  * Render path / engine / stream.new player type bisecting belongs in Mux Data
  * custom dimensions (follow-up), not in this name. (CJP)
  */
-const PLAYER_SOFTWARE_NAME: Record<VideojsV10Engine, string> = {
+const PLAYER_SOFTWARE_NAME: Record<VideojsEngine, string> = {
   hlsjs: 'videojs-react-mux-video-hls-js',
   spf: 'videojs-react-mux-video-spf',
 };
 
-const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio = DEFAULT_PLAYER_ASPECT_RATIO, shareUrl, streamType, engine, color, startTime, autoplay, preload }: Props) => {
+const VideojsPlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio = DEFAULT_PLAYER_ASPECT_RATIO, shareUrl, streamType, engine, color, startTime, autoplay, preload }: Props) => {
   // Live content gets the live preset (live badge / jump-to-live, no
   // scrubber, no rate/quality menus), decided server-side from the playlists
   // so it's in the initial HTML. Both skins share the poster/placeholder
@@ -95,7 +95,7 @@ const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio = D
                 height: '100%',
               }}
             >
-              <VideojsV10Media
+              <VideojsMedia
                 engine={engine}
                 startTime={startTime}
                 source={{
@@ -127,4 +127,4 @@ const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio = D
   );
 };
 
-export default VideojsV10PlayerPage;
+export default VideojsPlayerPage;

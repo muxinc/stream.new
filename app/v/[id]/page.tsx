@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation';
-import { DEFAULT_PLAYER_TYPE, VIDEOJS_V10_PLAYER_TYPES } from '../../../constants';
+import { DEFAULT_PLAYER_TYPE, VIDEOJS_PLAYER_TYPES } from '../../../constants';
 import type { PlayerTypes } from '../../../constants';
 import PlayerPage from '../../../components/player-page';
-import VideojsV10PlayerPage from '../../../components/videojs-v10-player-page';
-import { getPropsFromPlaybackId, getV10PagePropsFromSearchParams, getPlayerPageMetadata } from '../../../lib/player-page-utils';
-import { getV10EngineForPlayerType } from '../../../lib/videojs-v10-engine';
+import VideojsPlayerPage from '../../../components/videojs-player-page';
+import { getPropsFromPlaybackId, getVideojsPagePropsFromSearchParams, getPlayerPageMetadata } from '../../../lib/player-page-utils';
+import { getVideojsEngineForPlayerType } from '../../../lib/videojs-engine';
 
 export const dynamicParams = true;
 
@@ -27,13 +27,13 @@ export default async function PlaybackPage({
     notFound();
   }
 
-  // The video.js v10 player types render fully on the server; the rest render
+  // The video.js player types render fully on the server; the rest render
   // client-side via PlayerPage/PlayerLoader (which reads ?color= itself).
   // Kept symmetric with /v/[id]/[playerType]. (CJP)
-  if (VIDEOJS_V10_PLAYER_TYPES.includes(DEFAULT_PLAYER_TYPE)) {
-    const v10Props = getV10PagePropsFromSearchParams(await searchParams);
-    const engine = await getV10EngineForPlayerType(DEFAULT_PLAYER_TYPE, id);
-    return <VideojsV10PlayerPage {...props} playerType={DEFAULT_PLAYER_TYPE} engine={engine} {...v10Props} />;
+  if (VIDEOJS_PLAYER_TYPES.includes(DEFAULT_PLAYER_TYPE)) {
+    const videojsProps = getVideojsPagePropsFromSearchParams(await searchParams);
+    const engine = await getVideojsEngineForPlayerType(DEFAULT_PLAYER_TYPE, id);
+    return <VideojsPlayerPage {...props} playerType={DEFAULT_PLAYER_TYPE} engine={engine} {...videojsProps} />;
   }
 
   return (
