@@ -25,7 +25,6 @@ import { VideoPlayer, VideoSkin } from '@videojs/react/video';
 import { LiveVideoPlayer, LiveVideoSkin } from '@videojs/react/live-video';
 import { MuxData } from '@videojs/react/extensions/mux-data';
 import VideojsV10Media from './videojs-v10-media';
-import PerfMarks from './perf-marks';
 
 const META_TITLE = 'View this video created on stream.new';
 
@@ -34,11 +33,10 @@ type Props = Omit<PlaybackProps, 'playerType'> & {
   engine: VideojsV10Engine;
   color?: string;
   startTime?: number; // ?time= (see VideojsV10Media)
-  // Testing affordances (?autoplay, ?preload=, ?perf) — see the integration
+  // Testing affordances (?autoplay, ?preload=) — see the integration
   // notes' A/B methodology section. (CJP)
   autoplay?: boolean;
   preload?: 'none' | 'metadata' | 'auto';
-  perf?: boolean;
 };
 
 /*
@@ -54,7 +52,7 @@ const PLAYER_SOFTWARE_NAME: Record<VideojsV10Engine, string> = {
   spf: 'videojs-react-mux-video-spf',
 };
 
-const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio = DEFAULT_PLAYER_ASPECT_RATIO, shareUrl, streamType, engine, color, startTime, autoplay, preload, perf }: Props) => {
+const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio = DEFAULT_PLAYER_ASPECT_RATIO, shareUrl, streamType, engine, color, startTime, autoplay, preload }: Props) => {
   // Live content gets the live preset (live badge / jump-to-live, no
   // scrubber, no rate/quality menus), decided server-side from the playlists
   // so it's in the initial HTML. Both skins share the poster/placeholder
@@ -124,7 +122,6 @@ const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio = D
           </Player>
         </div>
         <PlayerActions playbackId={playbackId} shareUrl={shareUrl} />
-        {perf ? <PerfMarks /> : null}
       </div>
     </Layout>
   );
