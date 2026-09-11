@@ -55,7 +55,7 @@ export function getStartTimeFromQueryValue(
 /*
  * Query params the server-rendered v10 pages honor: ?time= and ?color= (the
  * documented ones, see README) plus the testing affordances (?autoplay,
- * ?preload=, ?perf — see the integration notes' A/B methodology section).
+ * ?preload= — see the integration notes' A/B methodology section).
  * Shared by /v/[id] and /v/[id]/[playerType]. (CJP)
  */
 export function getV10PagePropsFromSearchParams(sp: SearchParams) {
@@ -67,21 +67,25 @@ export function getV10PagePropsFromSearchParams(sp: SearchParams) {
       sp.preload === 'none' || sp.preload === 'metadata' || sp.preload === 'auto'
         ? (sp.preload as 'none' | 'metadata' | 'auto')
         : undefined,
-    perf: sp.perf !== undefined,
   };
 }
 
 /*
  * Live vs on-demand from the first media playlist — the same signal Mux
  * Player's engine uses (an HLS playlist without `#EXT-X-ENDLIST` is live).
- * Read from the playlists rather than the Mux API because any public playback
- * ID can be played here, not only this environment's. (CJP)
+ *
+ * We can't use the Mux API for this: /v/:id plays any public playback ID, and
+ * the API only sees playback IDs that belong to stream.new's own Mux
+ * environment (anything else answers "mismatching environment"). The playlist
+ * is available for every playable ID. Only a playlist we actually read can
+ * classify as live; anything else is on-demand. (CJP)
  */
 const getStreamTypeFromPlaylists = async (multivariant: string): Promise<StreamType> => {
   const mediaPlaylistUrl = multivariant.match(/^https?:\/\/\S+$/m)?.[0];
   if (!mediaPlaylistUrl) return 'on-demand';
-  const media = await fetch(mediaPlaylistUrl).then((resp) => (resp.ok ? resp.text() : ''));
-  return /^#EXT-X-ENDLIST\s*$/m.test(media) ? 'on-demand' : 'live';
+  const resp = await fetch(mediaPlaylistUrl);
+  if (!resp.ok) return 'on-demand';
+  return /^#EXT-X-ENDLIST\s*$/m.test(await resp.text()) ? 'on-demand' : 'live';
 };
 
 const getStreamInfoAsync = async (
