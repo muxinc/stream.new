@@ -423,3 +423,40 @@ route; playback advances on both engines (SPF via MSE blob src, no `window.Hls`
 global on the SPF route; muted autoplay honored); Mux Data beacons POST to
 `data.stream.new`; CLS 0; zero console errors. `/v/[id]` (mux-player) and `/embed`
 unaffected. `tsc`, eslint, jest all green.
+
+## Default player switch: `videojs-v10-hlsjs` is the `/v/[id]` default (2026-09-11)
+
+`DEFAULT_PLAYER_TYPE` (constants.ts) now points at the hls.js-backed v10 type; Mux
+Player stays reachable at `/v/[id]/mux-player` (and remains the `/embed` player). Both
+`/v` pages share `getV10EngineForPlayerType()` (lib/videojs-v10-engine.ts) and
+`getV10PagePropsFromSearchParams()` (lib/player-page-utils.ts), so the default and
+explicit routes are symmetric — flipping the default is a one-constant change.
+
+**Why hls.js and not SPF/auto this round.** SPF-preferred was judged not yet safe as a
+blanket default because three documented items compound into one invisible failure:
+the engine selector is a metadata heuristic (rare basic/premium TS-fallback assets still
+land on SPF, which can't play TS), SPF source rejections never reach the media element
+so Mux Data records *nothing* (friction item 7), and there is no runtime
+error→hls.js fallback. hls.js-backed has none of those blind spots while still putting
+the v10 skin + server-first page in production.
+
+**Fast follow (agreed 2026-09-11) before SPF-preferred becomes the default:**
+1. **Runtime SPF-error → hls.js fallback, and/or surface SPF engine errors to Mux Data**
+   (the gate). Note the app's "fallback based on feature support" does not exist yet
+   either — selection is server-side from asset metadata; a client-side
+   MediaSource/ManagedMediaSource check would be part of this item.
+2. **`?time=` parity on the v10 pages** — now a regression on the *default* URL
+   (README documents `?time=`; PlayerPage honored it, VideojsV10PlayerPage doesn't).
+3. **iOS Safari + portrait-asset pass** — all measurements so far are desktop Chrome.
+4. **Reversible rollout affordance** — cookie/query override so Mux Player is one
+   click away for support, then flip `DEFAULT_PLAYER_TYPE` to `videojs-v10`.
+
+Also still open and now on the default path: preload non-functional (item 8 — hls.js
+pre-buffers ~32s per never-played view, a bandwidth cost we can't currently turn off);
+per-playbackId caching is moot for the hls.js default (explicit types skip the Mux API
+lookup) but returns with the auto type.
+
+Verified on the production build (Playwright, Chrome): `/v/[id]` SSRs the v10 page,
+plays via hls.js, beacons to `data.stream.new`; `/v/[id]/mux-player` renders Mux Player;
+`/embed` unchanged.
+

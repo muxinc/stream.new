@@ -1,9 +1,10 @@
 import { notFound } from 'next/navigation';
-import { MUX_PLAYER_TYPE, VIDEOJS_V10_PLAYER_TYPES } from '../../../constants';
+import { DEFAULT_PLAYER_TYPE, VIDEOJS_V10_PLAYER_TYPES } from '../../../constants';
+import type { PlayerTypes } from '../../../constants';
 import PlayerPage from '../../../components/player-page';
 import VideojsV10PlayerPage from '../../../components/videojs-v10-player-page';
-import { getPropsFromPlaybackId, getColorFromQueryValue } from '../../../lib/player-page-utils';
-import { getV10EngineForPlaybackId } from '../../../lib/videojs-v10-engine';
+import { getPropsFromPlaybackId, getV10PagePropsFromSearchParams } from '../../../lib/player-page-utils';
+import { getV10EngineForPlayerType } from '../../../lib/videojs-v10-engine';
 
 export const dynamicParams = true;
 
@@ -37,13 +38,12 @@ export default async function PlaybackPage({
   }
 
   // The video.js v10 player types render fully on the server; the rest render
-  // client-side via PlayerPage/PlayerLoader (which reads ?color= itself). Wired
-  // here symmetrically with /v/[id]/[playerType] in case the default player
-  // type ever changes. (CJP)
-  if (VIDEOJS_V10_PLAYER_TYPES.includes(MUX_PLAYER_TYPE)) {
-    const color = getColorFromQueryValue((await searchParams).color);
-    const engine = await getV10EngineForPlaybackId(id);
-    return <VideojsV10PlayerPage {...props} playerType={MUX_PLAYER_TYPE} engine={engine} color={color} />;
+  // client-side via PlayerPage/PlayerLoader (which reads ?color= itself).
+  // Kept symmetric with /v/[id]/[playerType]. (CJP)
+  if (VIDEOJS_V10_PLAYER_TYPES.includes(DEFAULT_PLAYER_TYPE)) {
+    const v10Props = getV10PagePropsFromSearchParams(await searchParams);
+    const engine = await getV10EngineForPlayerType(DEFAULT_PLAYER_TYPE, id);
+    return <VideojsV10PlayerPage {...props} playerType={DEFAULT_PLAYER_TYPE} engine={engine} {...v10Props} />;
   }
 
   return (
@@ -54,7 +54,7 @@ export default async function PlaybackPage({
       poster={props.poster}
       aspectRatio={props.aspectRatio}
       blurDataURL={props.blurDataURL}
-      playerType={MUX_PLAYER_TYPE}
+      playerType={DEFAULT_PLAYER_TYPE as PlayerTypes}
     />
   );
 }

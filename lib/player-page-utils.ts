@@ -30,6 +30,25 @@ export function getColorFromQueryValue(
   return undefined;
 }
 
+type SearchParams = { [key: string]: string | string[] | undefined };
+
+/*
+ * Query params the server-rendered v10 pages honor: ?color= plus the testing
+ * affordances (?autoplay, ?preload=, ?perf — see the integration notes' A/B
+ * methodology section). Shared by /v/[id] and /v/[id]/[playerType]. (CJP)
+ */
+export function getV10PagePropsFromSearchParams(sp: SearchParams) {
+  return {
+    color: getColorFromQueryValue(sp.color),
+    autoplay: sp.autoplay !== undefined,
+    preload:
+      sp.preload === 'none' || sp.preload === 'metadata' || sp.preload === 'auto'
+        ? (sp.preload as 'none' | 'metadata' | 'auto')
+        : undefined,
+    perf: sp.perf !== undefined,
+  };
+}
+
 const getVideoExistsAsync = async (playbackId: string) => {
   // NOTE: Would prefer to use a HEAD method request, but these appear to be not allowed (status 405) from Mux Video (CJP)
   return fetch(`${getStreamBaseUrl()}/${playbackId}.m3u8`).then((resp) => {
