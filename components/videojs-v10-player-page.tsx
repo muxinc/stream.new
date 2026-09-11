@@ -60,11 +60,12 @@ const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio = D
         <div style={{ marginTop: 40, marginBottom: 40, height: 0, flexGrow: 1, flexShrink: 1 }}>
           <VideoPlayer poster={poster}>
             <VideoSkin
-              // rc.2: the skin's `placeholder` prop is gone; the blurup goes on
-              // the poster <img> as a background via `renderPoster`. The element
-              // form (not a function) keeps this passable from a server
-              // component. Same fit as the skin's object-fit so the two images
-              // don't jump when the poster arrives. (CJP)
+              // The blurup placeholder is a background on the poster <img>, via
+              // `renderPoster`. The element form (not a function) keeps it
+              // passable from a server component. Same fit as the skin's
+              // object-fit so the two images don't jump when the poster arrives.
+              // The data URI is percent-encoded because it lands in an SSR'd
+              // style attribute — see lib/css-url.ts. (CJP)
               renderPoster={
                 blurDataURL ? (
                   <img

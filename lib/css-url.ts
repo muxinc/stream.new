@@ -3,14 +3,13 @@
  * (whitespace, quotes, parens, backslash). Percent-encoding is transparent to
  * data: URI consumers, so the encoded string still renders identically.
  *
- * Originally needed because @videojs/react's <VideoSkin> (≤ beta.27)
- * interpolated its `placeholder` prop into `url(${placeholder})` verbatim;
- * @mux/blurup's SVG data URI contains raw quotes/spaces/parens, which makes
- * that declaration a CSS bad-url-token — and in the *server-rendered* style
- * attribute the parse error cascades and silently invalidates every other
- * inline style declaration on the element. Still used now that the blurup is
- * our own `background: url(...)` on the poster <img> (rc.2 `renderPoster`):
- * same hazard, same SSR'd style attribute. (CJP)
+ * Needed because the blurup placeholder is interpolated into an unquoted
+ * `url()` inside a *server-rendered* inline style attribute. @mux/blurup's
+ * SVG data URI contains raw quotes/spaces/parens, which are forbidden in an
+ * unquoted url token; the resulting bad-url-token cascades and silently
+ * invalidates every other declaration in that attribute (aspect-ratio
+ * included). Client-side React sets properties individually, so the hazard is
+ * SSR-only and invisible in dev tools. (CJP)
  */
 export const toCssUnquotedUrlSafe = (uri: string): string =>
   uri.replace(

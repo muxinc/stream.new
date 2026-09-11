@@ -22,7 +22,7 @@ export async function GET(
         playback_id: asset.playback_ids[0].id,
         // Predicted from the asset already in hand (no extra Mux API calls
         // for on-demand assets) — see lib/videojs-v10-engine.ts.
-        videojs_v10_engine: await getV10EngineForAsset(asset),
+        videojs_engine: await getV10EngineForAsset(asset),
       },
     });
   } catch (e) {
