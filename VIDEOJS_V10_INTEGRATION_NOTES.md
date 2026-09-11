@@ -445,8 +445,11 @@ the v10 skin + server-first page in production.
    (the gate). Note the app's "fallback based on feature support" does not exist yet
    either — selection is server-side from asset metadata; a client-side
    MediaSource/ManagedMediaSource check would be part of this item.
-2. **`?time=` parity on the v10 pages** — now a regression on the *default* URL
-   (README documents `?time=`; PlayerPage honored it, VideojsV10PlayerPage doesn't).
+2. ~~**`?time=` parity on the v10 pages**~~ ✅ done 2026-09-11 (`?time=` parsed
+   server-side in `getV10PagePropsFromSearchParams`; hls.js flavor →
+   `source.engine.hlsJs.startPosition`, plus a once-only `onLoadedMetadata` seek in
+   `VideojsV10Media` as the fallback for SPF and iOS native HLS; friction item 4
+   re-checked — rc.2 still has no declarative start time).
 3. **iOS Safari + portrait-asset pass** — all measurements so far are desktop Chrome.
 4. **Reversible rollout affordance** — cookie/query override so Mux Player is one
    click away for support, then flip `DEFAULT_PLAYER_TYPE` to `videojs-v10`.

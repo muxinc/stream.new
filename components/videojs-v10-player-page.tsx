@@ -7,7 +7,7 @@
  * server-rendered directly (the package self-declares 'use client'), and the
  * only app-level client code is the PlayerActions leaf.
  *
- * Deliberate deviations from PlayerPage (for now): no ?time= seek param,
+ * Deliberate deviations from PlayerPage (for now):
  * no onLoaded/FullpageLoader loading state (SSR makes it unnecessary —
  * the player markup is in the initial HTML), errors are left to the skin's own
  * error dialog, and opening the report form doesn't unmount the player. (CJP)
@@ -31,6 +31,7 @@ type Props = Omit<PlaybackProps, 'playerType'> & {
   playerType: string;
   engine: VideojsV10Engine;
   color?: string;
+  startTime?: number; // ?time= (see VideojsV10Media)
   // Testing affordances (?autoplay, ?preload=, ?perf) — see the integration
   // notes' A/B methodology section. (CJP)
   autoplay?: boolean;
@@ -51,7 +52,7 @@ const PLAYER_SOFTWARE_NAME: Record<VideojsV10Engine, string> = {
   spf: 'videojs-react-mux-video-spf',
 };
 
-const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, shareUrl, engine, color, autoplay, preload, perf }: Props) => {
+const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, shareUrl, engine, color, startTime, autoplay, preload, perf }: Props) => {
 
   return (
     <Layout metaTitle={META_TITLE} image={poster} aspectRatio={aspectRatio} darkMode>
@@ -88,6 +89,7 @@ const VideojsV10PlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio, sh
             >
               <VideojsV10Media
                 engine={engine}
+                startTime={startTime}
                 source={{
                   playbackId,
                   customDomain: process.env.NEXT_PUBLIC_MUX_BYO_DOMAIN || undefined,

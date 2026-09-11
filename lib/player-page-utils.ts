@@ -33,12 +33,26 @@ export function getColorFromQueryValue(
 type SearchParams = { [key: string]: string | string[] | undefined };
 
 /*
- * Query params the server-rendered v10 pages honor: ?color= plus the testing
- * affordances (?autoplay, ?preload=, ?perf — see the integration notes' A/B
- * methodology section). Shared by /v/[id] and /v/[id]/[playerType]. (CJP)
+ * Mirrors PlayerPage's ?time= parsing (parseFloat, falsy → no seek) for the
+ * server-rendered player pages. (CJP)
+ */
+export function getStartTimeFromQueryValue(
+  value: string | string[] | undefined
+): number | undefined {
+  if (typeof value !== 'string') return undefined;
+  const t = parseFloat(value);
+  return Number.isFinite(t) && t > 0 ? t : undefined;
+}
+
+/*
+ * Query params the server-rendered v10 pages honor: ?time= and ?color= (the
+ * documented ones, see README) plus the testing affordances (?autoplay,
+ * ?preload=, ?perf — see the integration notes' A/B methodology section).
+ * Shared by /v/[id] and /v/[id]/[playerType]. (CJP)
  */
 export function getV10PagePropsFromSearchParams(sp: SearchParams) {
   return {
+    startTime: getStartTimeFromQueryValue(sp.time),
     color: getColorFromQueryValue(sp.color),
     autoplay: sp.autoplay !== undefined,
     preload:
