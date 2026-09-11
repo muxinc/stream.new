@@ -175,6 +175,16 @@ instead of the `useRef` + `loadedmetadata` seek?
 mechanism uniform across both engines (MSE + native) and both flavors (SPF + hls.js), and
 using `startPosition` would still require the ref as a Safari fallback.
 
+> **rc.2 re-check (2026-09-11):** still no declarative start time — the only `startTime`
+> in the `@videojs/*` types is the text-cue field. The server-first page now honors
+> `?time=` two ways in the media leaf (`components/videojs-v10-media.tsx`): the hls.js
+> flavor gets `source.engine.hlsJs.startPosition` (verified: `engine.hlsJs` is passed
+> untouched to `new Hls(config)`, and the adapter picks MSE whenever `Hls.isSupported()`
+> unless `preferPlayback: 'native'`, so this covers every MSE path incl. desktop Safari —
+> hls.js begins loading at t, no fragment-0 fetch, no visible seek), and both flavors get
+> a once-only seek in `onLoadedMetadata` as the fallback for iOS native HLS and SPF (safe
+> under SSR because every flavor sets `src` client-side after hydration).
+
 **Upstream candidate.** `@mux/mux-video` (media-chrome) has a first-class `startTime`
 attribute; the v10 media components have no declarative equivalent. A `startTime` prop on
 the media components (or on the skin/player) that handles the engine differences
