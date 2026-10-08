@@ -22,7 +22,7 @@ const MuxVideoHlsjs = dynamic(() =>
   import('@videojs/react/media/mux-video/hls-js').then((m) => m.MuxVideo)
 );
 
-type Props = Omit<ComponentProps<typeof MuxVideoSpf>, 'ref'> & {
+type Props = Omit<ComponentProps<typeof MuxVideoSpf>, 'ref' | 'mediaRef'> & {
   engine: 'spf' | 'hlsjs';
   /*
    * "Start at t seconds" (?time=). The media components have no declarative
