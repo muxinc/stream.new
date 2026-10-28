@@ -1,5 +1,5 @@
-import type { ModerateJobOutputs } from '@mux/mux-node/resources/robots-preview/jobs/moderate';
-import Mux from '@mux/mux-node';
+import type { ModerateJobOutputs } from '@mux/ts/resources/robots/jobs/moderate';
+import Mux from '@mux/ts';
 
 const mux = new Mux();
 

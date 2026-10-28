@@ -1,5 +1,5 @@
-import Mux from '@mux/mux-node';
-import type { Asset } from '@mux/mux-node/resources/video/assets';
+import Mux from '@mux/ts';
+import type { Asset } from '@mux/ts/resources/video/assets';
 import logger from './logger';
 import { VIDEOJS_HLSJS_TYPE, VIDEOJS_SPF_TYPE } from '../constants';
 

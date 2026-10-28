@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Mux from '@mux/mux-node';
+import Mux from '@mux/ts';
 
 const mux = new Mux();
 
