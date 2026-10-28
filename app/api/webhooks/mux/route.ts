@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Mux from '@mux/mux-node';
+import Mux from '@mux/ts';
 import { start, resumeHook } from 'workflow/api';
 import {
   moderateAndSummarize,
@@ -13,25 +13,11 @@ import type { RobotsJobHookPayload, CaptionHookPayload } from '../../../../types
 const webhookSignatureSecret = process.env.MUX_WEBHOOK_SIGNATURE_SECRET;
 const mux = new Mux();
 
-type RobotsTerminalEventType = 
-  Mux.Webhooks.RobotsJobAskQuestionsCancelledWebhookEvent
-  | Mux.Webhooks.RobotsJobAskQuestionsErroredWebhookEvent
-  | Mux.Webhooks.RobotsJobAskQuestionsCompletedWebhookEvent
-  | Mux.Webhooks.RobotsJobFindKeyMomentsCancelledWebhookEvent
-  | Mux.Webhooks.RobotsJobFindKeyMomentsErroredWebhookEvent
-  | Mux.Webhooks.RobotsJobFindKeyMomentsCompletedWebhookEvent
-  | Mux.Webhooks.RobotsJobGenerateChaptersCancelledWebhookEvent
-  | Mux.Webhooks.RobotsJobGenerateChaptersErroredWebhookEvent
-  | Mux.Webhooks.RobotsJobGenerateChaptersCompletedWebhookEvent
-  | Mux.Webhooks.RobotsJobModerateCancelledWebhookEvent
-  | Mux.Webhooks.RobotsJobModerateErroredWebhookEvent
-  | Mux.Webhooks.RobotsJobModerateCompletedWebhookEvent
-  | Mux.Webhooks.RobotsJobSummarizeCancelledWebhookEvent
-  | Mux.Webhooks.RobotsJobSummarizeErroredWebhookEvent
-  | Mux.Webhooks.RobotsJobSummarizeCompletedWebhookEvent
-  | Mux.Webhooks.RobotsJobTranslateCaptionsCancelledWebhookEvent
-  | Mux.Webhooks.RobotsJobTranslateCaptionsErroredWebhookEvent
-  | Mux.Webhooks.RobotsJobTranslateCaptionsCompletedWebhookEvent;
+// `robots.job.*` (v0) still arrives for jobs started before the v1 cutover.
+type RobotsTerminalEventType = Extract<
+  Mux.Webhooks.UnwrapWebhookEvent,
+  { type: `robots.${'' | 'v1.'}job.${'moderate' | 'summarize' | 'ask_questions'}.${'completed' | 'errored' | 'cancelled'}` }
+>;
 
 // Robots job webhook data — we only read the fields we need. Everything else is
 // ignored; the workflow calls `.retrieve()` for authoritative outputs rather than
@@ -111,9 +97,9 @@ export async function POST(request: NextRequest) {
   }
 
   // Handle Robots job terminal events — resume the workflow's matching hook.
-  // Event type form: `robots.job.<workflow>.<status>`, e.g. `robots.job.moderate.completed`.
+  // Event type form: `robots.v1.job.<workflow>.<status>`, e.g. `robots.v1.job.moderate.completed`.
   // We only care about terminal statuses; pending/processing fall through.
-  const robotsMatch = /^robots\.job\.(moderate|summarize|ask_questions)\.(completed|errored|cancelled)$/.exec(event.type);
+  const robotsMatch = /^robots\.(?:v1\.)?job\.(moderate|summarize|ask_questions)\.(completed|errored|cancelled)$/.exec(event.type);
   if (robotsMatch) {
     const eventWithType = event as RobotsTerminalEventType;
     const jobData = eventWithType.data;
