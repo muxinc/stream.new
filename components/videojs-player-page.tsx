@@ -40,16 +40,16 @@ type Props = Omit<PlaybackProps, 'playerType'> & {
 };
 
 /*
- * Mux Data `player_software_name`, derived from the import path of the media
- * component in use (façade + media + engine), mirroring how Mux Player reports
- * its package name (`mux-player-react`). The video.js Mux Data extension has no default of
- * its own (video.js friction log item 9); the version is left to the library default.
- * Render path / engine / stream.new player type bisecting belongs in Mux Data
- * custom dimensions (follow-up), not in this name. (CJP)
+ * Mux Data `player_software_name`, following the Video.js 10 convention
+ * `videojs-<framework>-<engine>` (decided in #project-vjs10, Oct 22 2026; engines
+ * are spelled `hlsjs` and `spf`), the same names player.mux.com reports with
+ * `html` as the framework. @videojs/mux-data 10.3+ reports a name of this shape
+ * by default; keep the explicit value until the dependency is bumped and the
+ * SPF engine name upstream matches (today it reports `spf-hls-video`).
  */
 const PLAYER_SOFTWARE_NAME: Record<VideojsEngine, string> = {
-  hlsjs: 'videojs-react-mux-video-hls-js',
-  spf: 'videojs-react-mux-video-spf',
+  hlsjs: 'videojs-react-hlsjs',
+  spf: 'videojs-react-spf',
 };
 
 const VideojsPlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio = DEFAULT_PLAYER_ASPECT_RATIO, shareUrl, streamType, engine, color, startTime, autoplay, preload }: Props) => {
