@@ -25,7 +25,10 @@ test('returns false when AUTO_DELETE_ENABLED is not set, even if moderation exce
   const moderationResult: ModerateJobOutputs = {
     exceeds_threshold: true,
     max_scores: { sexual: 0.95, violence: 0.92 },
+    thumbnail_moderation: { status: 'completed' },
     thumbnail_scores: [],
+    transcript_moderation: { status: 'completed' },
+    transcript_scores: [],
   };
 
   const didDelete = await checkAndAutoDelete({
@@ -51,7 +54,10 @@ test('deletes and records when AUTO_DELETE_ENABLED=1 and moderation exceeds', as
   const moderationResult: ModerateJobOutputs = {
     exceeds_threshold: true,
     max_scores: { sexual: 0.95, violence: 0.92 },
+    thumbnail_moderation: { status: 'completed' },
     thumbnail_scores: [],
+    transcript_moderation: { status: 'completed' },
+    transcript_scores: [],
   };
 
   const didDelete = await checkAndAutoDelete({
@@ -71,7 +77,10 @@ test('does not delete when moderation does not exceed threshold', async () => {
   const moderationResult: ModerateJobOutputs = {
     exceeds_threshold: false,
     max_scores: { sexual: 0.40, violence: 0.25 },
+    thumbnail_moderation: { status: 'completed' },
     thumbnail_scores: [],
+    transcript_moderation: { status: 'completed' },
+    transcript_scores: [],
   };
 
   const didDelete = await checkAndAutoDelete({
@@ -97,7 +106,10 @@ test('still returns true if Airtable recording fails', async () => {
   const moderationResult: ModerateJobOutputs = {
     exceeds_threshold: true,
     max_scores: { sexual: 0.95, violence: 0.92 },
+    thumbnail_moderation: { status: 'completed' },
     thumbnail_scores: [],
+    transcript_moderation: { status: 'completed' },
+    transcript_scores: [],
   };
 
   const didDelete = await checkAndAutoDelete({

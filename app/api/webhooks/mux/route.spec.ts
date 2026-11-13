@@ -107,3 +107,38 @@ test('video.asset.ready starts the AI workflow', async () => {
   expect(start).toHaveBeenCalledWith(expect.anything(), [assetId]);
   expect(resumeHook).not.toHaveBeenCalled();
 });
+
+describe('generated caption track events', () => {
+  function trackEvent(type: string, extra: Record<string, unknown> = {}) {
+    return {
+      type,
+      data: {
+        id: 'track-1',
+        asset_id: assetId,
+        type: 'text',
+        text_type: 'subtitles',
+        text_source: 'generated_vod',
+        ...extra,
+      },
+    };
+  }
+
+  test.each([
+    ['video.asset.track.ready', true],
+    ['video.asset.track.errored', false],
+    ['video.asset.track.skipped', false],
+  ])('%s resumes the caption hook with includeTranscript=%s', async (type, includeTranscript) => {
+    await post(trackEvent(type));
+
+    expect(resumeHook).toHaveBeenCalledWith(`captions:${assetId}`, { includeTranscript });
+  });
+
+  test.each(['video.asset.track.ready', 'video.asset.track.errored', 'video.asset.track.skipped'])(
+    '%s for an uploaded text track is ignored',
+    async (type) => {
+      await post(trackEvent(type, { text_source: 'uploaded' }));
+
+      expect(resumeHook).not.toHaveBeenCalled();
+    }
+  );
+});
