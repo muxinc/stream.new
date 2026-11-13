@@ -52,7 +52,7 @@ const PLAYER_SOFTWARE_NAME: Record<VideojsEngine, string> = {
   spf: 'videojs-react-spf',
 };
 
-const VideojsPlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio = DEFAULT_PLAYER_ASPECT_RATIO, shareUrl, streamType, engine, color, startTime, autoplay, preload }: Props) => {
+const VideojsPlayerPage = ({ playbackId, playerType, poster, blurDataURL, aspectRatio = DEFAULT_PLAYER_ASPECT_RATIO, shareUrl, streamType, engine, color, startTime, autoplay, preload }: Props) => {
   // Live content gets the live preset (live badge / jump-to-live, no
   // scrubber, no rate/quality menus), decided server-side from the playlists
   // so it's in the initial HTML. Both skins share the poster/placeholder
@@ -97,6 +97,8 @@ const VideojsPlayerPage = ({ playbackId, poster, blurDataURL, aspectRatio = DEFA
             >
               <VideojsMedia
                 engine={engine}
+                playerType={playerType}
+                playbackId={playbackId}
                 startTime={startTime}
                 source={{
                   playbackId,

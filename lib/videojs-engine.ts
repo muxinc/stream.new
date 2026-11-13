@@ -2,6 +2,7 @@ import Mux from '@mux/ts';
 import type { Asset } from '@mux/ts/resources/video/assets';
 import logger from './logger';
 import { VIDEOJS_HLSJS_TYPE, VIDEOJS_SPF_TYPE } from '../constants';
+import type { StreamType } from './player-page-utils';
 
 export type VideojsEngine = 'spf' | 'hlsjs';
 
@@ -10,103 +11,87 @@ const mux = new Mux();
 /*
  * Engine selection for the auto video.js player type.
  *
- * SPF cannot play MPEG-TS segments, so pick it only when the content is
- * confidently CMAF/fMP4. hls.js plays both containers, so it is the safe
- * answer for every ambiguity: plus/smart-quality assets (TS unless an
- * environment-level flag we cannot see), clips, audio-only, standard- and
- * reduced-latency live, playback IDs from other environments (no API
- * visibility), legacy assets that predate the quality tiers, deleted parent
- * live streams, and API errors. Confident CMAF means: basic- or
- * premium-quality on-demand video (those tiers postdate the CMAF rollout, so
- * no date check is needed), or content from a low-latency live stream
- * (always CMAF, including its recorded assets). The rules and their
- * provenance are recorded in the video.js integration notes (kept outside this repo; "Engine
- * selection research"). (CJP)
+ * SPF is the default answer. Since video.js #9554 the Mux SPF media plays
+ * MPEG-TS on-demand content (H.264 + AAC, transmuxed to fMP4 in the client)
+ * as well as CMAF, so every quality tier, clips and audio-only assets go to
+ * SPF. hls.js is picked only for what the SPF engine documents it cannot
+ * (fully) play — the sources are in the video.js repo:
+ *
+ * - Live, any latency mode (and assets still recording from a live stream).
+ *   Standard- and reduced-latency Mux live is MPEG-TS, and the transmuxer
+ *   covers on-demand TS only: "Not covered: ... what live TS needs (a PES
+ *   split across segments, PTS rollover, discontinuities)"
+ *   (packages/spf/docs/reference/features/mpeg-ts-transmux.md). Low-latency
+ *   live is CMAF and does play, but LL-HLS itself is not implemented — it
+ *   degrades to standard-live latency
+ *   (internal/design/spf/features/ll-hls-support.md) — and growing-window
+ *   (EVENT / DVR) playlists have known failures
+ *   (internal/design/spf/features/dvr-event-stream-support.md).
+ * - Assets recorded from a live stream, any latency mode. Recordings keep
+ *   the live packager's segments, so they can carry discontinuities, which
+ *   no SPF source handles, and for standard/reduced latency they are
+ *   live-packaged MPEG-TS (the "live TS" traits above, on demand).
+ * - DRM playback IDs. SPF does implement DRM, but stream.new has no DRM
+ *   wiring, so neither engine can play these; hls.js is the unchanged,
+ *   do-no-extra-harm answer.
+ *
+ * - Anything whose media playlist has an #EXT-X-DISCONTINUITY, whatever the
+ *   API says about it (covers other environments' recordings, and clips cut
+ *   from them).
+ *
+ * Unknowns: when the Mux API can't describe the playback ID (another
+ * environment's public ID, or an API error), on-demand content without
+ * discontinuities still goes to SPF — the common cases all play there, and
+ * an unsupported source fails loudly (reported to Sentry, see components/videojs-media.tsx). The explicit
+ * player types (videojs-hlsjs, videojs-spf, mux-player) remain as overrides.
  */
-
-type LatencyMode = 'low' | 'reduced' | 'standard';
 
 /*
  * The synchronous core: predict the engine from an asset object already in
- * hand. For assets recorded from a live stream the container follows the
- * stream, and the asset carries no latency echo — pass the parent stream's
- * latency_mode when known; when it isn't, the answer is hls.js.
+ * hand (e.g. /api/assets/[id]). No further API calls are needed.
  */
-export function getVideojsEngineFromAsset(
-  asset: Asset,
-  { liveStreamLatencyMode }: { liveStreamLatencyMode?: LatencyMode } = {}
-): VideojsEngine {
-  // stream.new has no DRM wiring, and DRM'd media won't play on either
-  // engine without it; hls.js is simply the do-no-extra-harm default.
+export function getVideojsEngineForAsset(asset: Asset): VideojsEngine {
   if (asset.playback_ids?.some((p) => p.policy === 'drm')) return 'hlsjs';
 
-  // Recorded-from-live assets keep their stream's container ("assets created
-  // from a lowlatency stream continue to use CMAF to avoid retranscoding").
-  if (asset.live_stream_id) {
-    return liveStreamLatencyMode === 'low' ? 'spf' : 'hlsjs';
-  }
+  // Still recording (a growing EVENT window), or recorded from a live stream.
+  if (asset.is_live || asset.live_stream_id) return 'hlsjs';
 
-  // Clips and audio-only/video-only assets are (or can be) forced to TS
-  // regardless of quality tier.
-  if (asset.ingest_type === 'on_demand_clip' || asset.source_asset_id) {
-    return 'hlsjs';
-  }
-  const tracks = asset.tracks ?? [];
-  const hasVideo = tracks.some((t) => t.type === 'video');
-  const hasAudio = tracks.some((t) => t.type === 'audio');
-  if (!hasVideo || !hasAudio) return 'hlsjs';
-
-  // video_quality is not a required field; the deprecated encoding_tier is.
-  const quality =
-    asset.video_quality ??
-    ({ baseline: 'basic', smart: 'plus', premium: 'premium' } as const)[
-      asset.encoding_tier
-    ];
-  return quality === 'basic' || quality === 'premium' ? 'spf' : 'hlsjs';
+  // Everything else on demand: basic/plus/premium, clips, audio-only.
+  return 'spf';
 }
 
-/*
- * Async wrapper over the sync core for callers that already retrieved the
- * asset (e.g. /api/assets/[id]): performs the parent-live-stream join only
- * when the asset needs it.
- */
-export async function getVideojsEngineForAsset(
-  asset: Asset
-): Promise<VideojsEngine> {
-  if (!asset.live_stream_id) return getVideojsEngineFromAsset(asset);
-  try {
-    const stream = await mux.video.liveStreams.retrieve(asset.live_stream_id);
-    return getVideojsEngineFromAsset(asset, {
-      liveStreamLatencyMode: stream.latency_mode,
-    });
-  } catch (e) {
-    logger.warn('videojs engine selection fell back to hls.js:', e);
-    return 'hlsjs';
-  }
-}
+type PlaylistFacts = { streamType?: StreamType; hasDiscontinuity?: boolean };
 
 /*
  * Full lookup for callers that only have a playback ID (the /v pages).
+ *
+ * `streamType` and `hasDiscontinuity` are the playlist-derived facts the page
+ * already has (lib/player-page-utils.ts); they work for every public playback
+ * ID, including ones the API can't see, and decide without the API.
+ *
  * NOTE: only playback IDs in this environment (MUX_TOKEN_ID/SECRET) are
- * visible; anything else 400s and lands on the hls.js fallback.
+ * visible to the API; anything else 400s and is treated as plain on-demand
+ * content (SPF).
  */
 export async function getVideojsEngineForPlaybackId(
-  playbackId: string
+  playbackId: string,
+  { streamType, hasDiscontinuity }: PlaylistFacts = {}
 ): Promise<VideojsEngine> {
+  if (streamType === 'live' || hasDiscontinuity) return 'hlsjs';
+
   try {
     const { policy, object } = await mux.video.playbackIds.retrieve(playbackId);
     if (policy === 'drm') return 'hlsjs';
 
-    if (object.type === 'live_stream') {
-      const stream = await mux.video.liveStreams.retrieve(object.id);
-      return stream.latency_mode === 'low' ? 'spf' : 'hlsjs';
-    }
+    // A live stream's playback ID that didn't classify as live above (idle
+    // stream, or no streamType passed).
+    if (object.type === 'live_stream') return 'hlsjs';
 
     const asset = await mux.video.assets.retrieve(object.id);
-    return await getVideojsEngineForAsset(asset);
+    return getVideojsEngineForAsset(asset);
   } catch (e) {
-    logger.warn('videojs engine selection fell back to hls.js:', e);
-    return 'hlsjs';
+    logger.warn('videojs engine selection: no API metadata, using SPF:', e);
+    return 'spf';
   }
 }
 
@@ -117,9 +102,10 @@ export async function getVideojsEngineForPlaybackId(
  */
 export async function getVideojsEngineForPlayerType(
   playerType: string,
-  playbackId: string
+  playbackId: string,
+  options: PlaylistFacts = {}
 ): Promise<VideojsEngine> {
   if (playerType === VIDEOJS_SPF_TYPE) return 'spf';
   if (playerType === VIDEOJS_HLSJS_TYPE) return 'hlsjs';
-  return getVideojsEngineForPlaybackId(playbackId);
+  return getVideojsEngineForPlaybackId(playbackId, options);
 }

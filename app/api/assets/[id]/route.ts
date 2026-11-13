@@ -20,9 +20,9 @@ export async function GET(
         status: asset.status,
         errors: asset.errors,
         playback_id: asset.playback_ids[0].id,
-        // Predicted from the asset already in hand (no extra Mux API calls
-        // for on-demand assets) — see lib/videojs-engine.ts.
-        videojs_engine: await getVideojsEngineForAsset(asset),
+        // Predicted from the asset already in hand (no extra Mux API calls)
+        // — see lib/videojs-engine.ts.
+        videojs_engine: getVideojsEngineForAsset(asset),
       },
     });
   } catch (e) {
