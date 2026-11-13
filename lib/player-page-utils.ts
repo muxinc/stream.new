@@ -5,8 +5,10 @@ import type { Metadata } from 'next';
 import { HOST_URL, DEFAULT_PLAYER_ASPECT_RATIO } from '../constants';
 import type { PlayerTypes } from '../constants';
 import logger from './logger';
+import { getPlaylistFacts, UNREAD_PLAYLIST } from './playlist-facts';
+import type { PlaylistFacts, PlaylistInfo, StreamType } from './playlist-facts';
 
-export type StreamType = 'live' | 'on-demand';
+export type { PlaylistFacts, StreamType };
 
 export type Props = {
   blurDataURL?: string;
@@ -20,9 +22,9 @@ export type Props = {
   // runs. Optional only because the client-rendered PlayerPage path doesn't
   // use it; getPropsFromPlaybackId always sets it.
   streamType?: StreamType;
-  // The first media playlist carries #EXT-X-DISCONTINUITY. Read from the same
-  // playlist as streamType; an input to lib/videojs-engine.ts.
-  hasDiscontinuity?: boolean;
+  // What the playlists say about the content beyond live/on-demand; the
+  // input to lib/videojs-engine.ts.
+  playlist?: PlaylistFacts;
   playerType?: PlayerTypes;
 };
 
@@ -83,20 +85,12 @@ export function getVideojsPagePropsFromSearchParams(sp: SearchParams) {
  * is available for every playable ID. Only a playlist we actually read can
  * classify as live; anything else is on-demand. (CJP)
  */
-type PlaylistInfo = { streamType: StreamType; hasDiscontinuity: boolean };
-
-const UNREAD_PLAYLIST: PlaylistInfo = { streamType: 'on-demand', hasDiscontinuity: false };
-
 const getPlaylistInfo = async (multivariant: string): Promise<PlaylistInfo> => {
   const mediaPlaylistUrl = multivariant.match(/^https?:\/\/\S+$/m)?.[0];
   if (!mediaPlaylistUrl) return UNREAD_PLAYLIST;
   const resp = await fetch(mediaPlaylistUrl);
   if (!resp.ok) return UNREAD_PLAYLIST;
-  const playlist = await resp.text();
-  return {
-    streamType: /^#EXT-X-ENDLIST\s*$/m.test(playlist) ? 'on-demand' : 'live',
-    hasDiscontinuity: /^#EXT-X-DISCONTINUITY\s*$/m.test(playlist),
-  };
+  return getPlaylistFacts(multivariant, await resp.text());
 };
 
 const getStreamInfoAsync = async (
@@ -121,7 +115,7 @@ export async function getPropsFromPlaybackId(
   } catch (e) {
     console.error('Error fetching blurup', e);
   }
-  const { videoExists, streamType, hasDiscontinuity } = await getStreamInfoAsync(playbackId);
+  const { videoExists, streamType, playlist } = await getStreamInfoAsync(playbackId);
   const props: Props = {
     blurDataURL,
     playbackId,
@@ -129,7 +123,7 @@ export async function getPropsFromPlaybackId(
     poster,
     videoExists,
     streamType,
-    hasDiscontinuity,
+    playlist,
   };
   if (dimensions?.aspectRatio) {
     props.aspectRatio = dimensions.aspectRatio;
