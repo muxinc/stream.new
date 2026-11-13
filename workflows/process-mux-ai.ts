@@ -107,7 +107,7 @@ async function checkCaptionStatus(assetId: string): Promise<CaptionStatus> {
     return { done: true, includeTranscript: true };
   }
 
-  if (captionTrack.status === 'errored') {
+  if (captionTrack.status === 'errored' || captionTrack.status === 'skipped') {
     return { done: true, includeTranscript: false };
   }
 

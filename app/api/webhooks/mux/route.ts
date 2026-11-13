@@ -41,6 +41,10 @@ function buildRobotsHookPayload(data: RobotsJobWebhookData, terminalStatus: stri
   return { status: 'completed' };
 }
 
+function isGeneratedCaptionTrack(track: Mux.Webhooks.WebhookAssetTrack) {
+  return track.type === 'text' && track.text_type === 'subtitles' && track.text_source === 'generated_vod';
+}
+
 export async function POST(request: NextRequest) {
   // Get raw body as text (NOT json) for signature verification and parsing
   const rawBody = await request.text();
@@ -138,7 +142,7 @@ export async function POST(request: NextRequest) {
     const eventWithType = event as Mux.Webhooks.VideoAssetTrackReadyWebhookEvent;
     const track = eventWithType.data;
 
-    if (track.type === 'text' && track.text_type === 'subtitles' && track.text_source === 'generated_vod') {
+    if (isGeneratedCaptionTrack(track)) {
       const assetId = track.asset_id!; // our types currently don't mark asset_id as required
       const token = captionHookToken(assetId);
 
@@ -159,23 +163,26 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: 'Track type not relevant for AI processing' });
   }
 
-  // Handle video.asset.track.errored — resume caption hook without transcript
-  if (event.type === 'video.asset.track.errored') {
-    const eventWithType = event as Mux.Webhooks.VideoAssetTrackErroredWebhookEvent;
+  // Handle video.asset.track.errored / .skipped — resume caption hook without transcript.
+  // Mux reports `skipped` (not `errored`) when the asset has no audio to caption.
+  if (event.type === 'video.asset.track.errored' || event.type === 'video.asset.track.skipped') {
+    const eventWithType = event as
+      | Mux.Webhooks.VideoAssetTrackErroredWebhookEvent
+      | Mux.Webhooks.VideoAssetTrackSkippedWebhookEvent;
     const track = eventWithType.data;
+    const outcome = eventWithType.type === 'video.asset.track.skipped' ? 'skipped' : 'errored';
 
-    if (track.type === 'text' && track.text_type === 'subtitles' && track.text_source === 'generated_vod') {
+    if (isGeneratedCaptionTrack(track)) {
       const assetId = track.asset_id!; // our types currently don't mark asset_id as required
-      const errorMessages: string[] = track.error?.messages || [];
       const token = captionHookToken(assetId);
 
-      const isExpectedError = errorMessages.includes('Asset does not have an audio track') ||
-        errorMessages.includes('Failed to generate caption track');
-
-      if (isExpectedError) {
-        console.log(`Track errored for asset ${assetId} (${errorMessages.join(', ')}), resuming hook without transcript`); // eslint-disable-line no-console
+      if (outcome === 'skipped') {
+        console.log(`Caption track skipped for asset ${assetId}, resuming hook without transcript`); // eslint-disable-line no-console
       } else {
-        console.log(`Track errored for asset ${assetId} with unhandled error: ${errorMessages.join(', ')}`); // eslint-disable-line no-console
+        const errorMessages: string[] = track.error?.messages || [];
+        const isExpectedError = errorMessages.includes('Failed to generate caption track');
+        const detail = isExpectedError ? errorMessages.join(', ') : `unhandled error: ${errorMessages.join(', ')}`;
+        console.log(`Caption track errored for asset ${assetId} (${detail}), resuming hook without transcript`); // eslint-disable-line no-console
       }
 
       try {
@@ -185,7 +192,7 @@ export async function POST(request: NextRequest) {
       }
 
       return NextResponse.json({
-        message: 'Caption hook resumed (track errored)',
+        message: `Caption hook resumed (track ${outcome})`,
         asset_id: assetId,
         track_id: track.id,
       });

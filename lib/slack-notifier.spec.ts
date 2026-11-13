@@ -12,7 +12,10 @@ test('it sends a moderation result request to the slack webhook', async () => {
   const mockModerationResult: ModerateJobOutputs = {
     max_scores: { sexual: 0.1, violence: 0.2 },
     exceeds_threshold: false,
+    thumbnail_moderation: { status: 'completed' },
     thumbnail_scores: [],
+    transcript_moderation: { status: 'completed' },
+    transcript_scores: [],
   };
 
   await sendSlackModerationResult({
