@@ -43,9 +43,14 @@ type Props = Omit<PlaybackProps, 'playerType'> & {
  * Mux Data `player_software_name`, following the Video.js 10 convention
  * `videojs-<framework>-<engine>` (decided in #project-vjs10, Oct 22 2026; engines
  * are spelled `hlsjs` and `spf`), the same names player.mux.com reports with
- * `html` as the framework. @videojs/mux-data 10.3+ reports a name of this shape
- * by default; keep the explicit value until the dependency is bumped and the
- * SPF engine name upstream matches (today it reports `spf-hls-video`).
+ * `html` as the framework. Kept explicit: @videojs/mux-data derives a name of
+ * this shape from the media's `engineName`, but the default (SPF) Mux media
+ * names its engine `spf-hls-video-mpeg-ts`, which would report
+ * `videojs-react-spf-hls-video-mpeg-ts` and split SPF views from the rest.
+ *
+ * This is the server's engine choice. On the rare client that falls back
+ * from SPF to hls.js (no Media Source Extensions, see
+ * components/videojs-media.tsx) the view is still reported as `spf`.
  */
 const PLAYER_SOFTWARE_NAME: Record<VideojsEngine, string> = {
   hlsjs: 'videojs-react-hlsjs',

@@ -49,6 +49,10 @@ const mux = new Mux();
 /*
  * The synchronous core: predict the engine from an asset object already in
  * hand (e.g. /api/assets/[id]). No further API calls are needed.
+ *
+ * This is a prediction from asset metadata alone: unlike the /v pages it
+ * does not read the playlist, so it can't see discontinuities. The pages
+ * decide for themselves; nothing renders from this value.
  */
 export function getVideojsEngineForAsset(asset: Asset): VideojsEngine {
   if (asset.playback_ids?.some((p) => p.policy === 'drm')) return 'hlsjs';

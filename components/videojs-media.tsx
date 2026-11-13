@@ -18,24 +18,17 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ComponentProps, SyntheticEvent } from 'react';
 import * as Sentry from '@sentry/nextjs';
 import type { VideojsEngine } from '../lib/videojs-engine';
+import { resolveClientEngine } from '../lib/videojs-client-engine';
+import type { ClientEngine } from '../lib/videojs-client-engine';
 
 /*
- * ENGINE IMPORT SPECIFIERS — the one place to change them.
- *
- * TODO(videojs default flip): the SPF path is meant to exercise the DEFAULT
- * Mux media import. In the pinned build (video.js main @ e5a87f1) that
- * specifier doesn't exist for React and `@videojs/mux-video`'s default is
- * still hls.js, so the explicit `/spf` flavor is used for now. Once
- * package.json points at the build of the video.js PR that makes SPF the
- * default, change the SPF import below to:
- *
- *   import('@videojs/react/media/mux-video').then((m) => m.MuxVideo)
- *
- * and confirm the hls.js subpath name (`/hls-js` today) still matches that
- * build's exports. Specifiers must stay string literals for next/dynamic.
+ * ENGINE IMPORT SPECIFIERS — the one place to change them. The default Mux
+ * media import is the SPF-backed one (the same class as `/spf`); hls.js is
+ * the explicit `/hls-js` flavor. Specifiers must stay string literals for
+ * next/dynamic, and each stays its own lazy chunk.
  */
 const MuxVideoSpf = dynamic(() =>
-  import('@videojs/react/media/mux-video/spf').then((m) => m.MuxVideo)
+  import('@videojs/react/media/mux-video').then((m) => m.MuxVideo)
 );
 const MuxVideoHlsjs = dynamic(() =>
   import('@videojs/react/media/mux-video/hls-js').then((m) => m.MuxVideo)
@@ -57,6 +50,7 @@ type ErrorReportingMedia = EventTarget & {
 type Props = Omit<ComponentProps<typeof MuxVideoSpf>, 'ref' | 'mediaRef' | 'crossOrigin'> & {
   // The two flavors type this differently (SPF also takes null).
   crossOrigin?: 'anonymous' | 'use-credentials';
+  // The server's choice; the client may correct it (see below).
   engine: VideojsEngine;
   // Sentry tags only.
   playerType: string;
@@ -87,23 +81,42 @@ const describeErrorData = (data: unknown): Record<string, unknown> | undefined =
   return Object.keys(out).length ? out : undefined;
 };
 
-const VideojsMedia = ({ engine, playerType, playbackId, startTime, onLoadedMetadata, source, ...mediaProps }: Props) => {
+const VideojsMedia = ({ engine: serverEngine, playerType, playbackId, startTime, onLoadedMetadata, source, ...mediaProps }: Props) => {
   const didSeekRef = useRef(false);
   const [media, setMedia] = useState<ErrorReportingMedia | null>(null);
   const mediaRef = useCallback((m: unknown) => setMedia(m as ErrorReportingMedia | null), []);
 
   /*
+   * The server picks the engine without seeing the browser; SPF needs Media
+   * Source Extensions and has no native-HLS fallback, so a browser without
+   * them gets the hls.js flavor instead (lib/videojs-client-engine.ts).
+   *
+   * Decided after mount so hydration renders what the server rendered. Until
+   * then the SPF media gets no source — it loads on source assignment, and
+   * loading is what throws without MSE — so the unsupported engine never
+   * starts. That costs supported browsers one extra render, no request.
+   */
+  const [clientEngine, setClientEngine] = useState<ClientEngine | null>(null);
+  useEffect(() => setClientEngine(resolveClientEngine(serverEngine)), [serverEngine]);
+  const engine = clientEngine?.engine ?? serverEngine;
+  const fallback = clientEngine?.fallback;
+  const sourceReady = serverEngine !== 'spf' || clientEngine !== null;
+
+  /*
    * Tag everything Sentry captures while this player is on the page with the
    * engine in use, so unrelated errors (hydration, chunk loads, unhandled
    * rejections inside an engine) can still be sliced by SPF vs hls.js.
+   * `videojs_engine` is the engine actually used; `videojs_engine_fallback`
+   * marks pages where that isn't the server's choice.
    */
   useEffect(() => {
+    if (!clientEngine) return;
     const scope = Sentry.getCurrentScope();
-    scope.setTags({ videojs_engine: engine, player_type: playerType, playback_id: playbackId });
+    scope.setTags({ videojs_engine: engine, videojs_engine_fallback: fallback, player_type: playerType, playback_id: playbackId });
     return () => {
-      scope.setTags({ videojs_engine: undefined, player_type: undefined, playback_id: undefined });
+      scope.setTags({ videojs_engine: undefined, videojs_engine_fallback: undefined, player_type: undefined, playback_id: undefined });
     };
-  }, [engine, playerType, playbackId]);
+  }, [clientEngine, engine, fallback, playerType, playbackId]);
 
   /*
    * Report fatal playback errors. Neither engine throws them — they surface
@@ -127,6 +140,7 @@ const VideojsMedia = ({ engine, playerType, playbackId, startTime, onLoadedMetad
       Sentry.withScope((scope) => {
         scope.setTags({
           videojs_engine: engine,
+          videojs_engine_fallback: fallback,
           player_type: playerType,
           playback_id: playbackId,
           media_error_code: String(code),
@@ -145,7 +159,7 @@ const VideojsMedia = ({ engine, playerType, playbackId, startTime, onLoadedMetad
 
     media.addEventListener('error', onError);
     return () => media.removeEventListener('error', onError);
-  }, [media, engine, playerType, playbackId]);
+  }, [media, engine, fallback, playerType, playbackId]);
 
   const handleLoadedMetadata = (evt: SyntheticEvent<HTMLVideoElement>) => {
     onLoadedMetadata?.(evt);
@@ -162,7 +176,7 @@ const VideojsMedia = ({ engine, playerType, playbackId, startTime, onLoadedMetad
       : source;
     return <MuxVideoHlsjs {...mediaProps} mediaRef={mediaRef} source={hlsjsSource} onLoadedMetadata={handleLoadedMetadata} />;
   }
-  return <MuxVideoSpf {...mediaProps} mediaRef={mediaRef} source={source} onLoadedMetadata={handleLoadedMetadata} />;
+  return <MuxVideoSpf {...mediaProps} mediaRef={mediaRef} source={sourceReady ? source : undefined} onLoadedMetadata={handleLoadedMetadata} />;
 };
 
 export default VideojsMedia;
