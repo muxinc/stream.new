@@ -9,24 +9,27 @@ export type VideojsEngine = 'spf' | 'hlsjs';
 const mux = new Mux();
 
 /*
- * Engine selection for the auto video.js player type, in terms of what Mux
- * Video delivers.
+ * Engine selection for the auto video.js player type, for any Mux Video
+ * playback ID — /v/:id plays IDs from every environment, not only
+ * stream.new's own uploads.
  *
  * SPF plays on-demand assets of every quality tier: basic and premium are
  * CMAF, plus is MPEG-TS, which SPF transmuxes since video.js #9554. That
- * includes clips, audio-only assets and assets the API can't describe
- * (another environment's playback ID, an API error).
+ * includes clips and audio-only assets.
  *
- * hls.js gets:
+ * hls.js gets, from the playlist (works for every playback ID):
  * - Live streams and assets still recording. Standard- and reduced-latency
  *   live is MPEG-TS, which SPF's transmuxer doesn't cover for live, and
  *   low-latency live plays on SPF without the low latency (no LL-HLS).
+ * - Recordings with a discontinuity (the stream's encoder reconnected),
+ *   which SPF doesn't handle.
+ * - MPEG-TS assets ending in a very short segment, a known SPF bug (see
+ *   endsWithShortTsSegment in lib/player-page-utils.ts).
+ *
+ * and, from the Mux API (this environment's playback IDs only):
  * - Assets recorded from a standard- or reduced-latency live stream (the
  *   same live-packaged MPEG-TS). Recordings of low-latency streams are CMAF
  *   and go to SPF.
- * - DRM playback IDs: stream.new has no DRM wiring.
- * - MPEG-TS assets ending in a very short segment, a known SPF bug (see
- *   endsWithShortTsSegment in lib/player-page-utils.ts).
  *
  * Browsers without Media Source Extensions fall back to hls.js in the
  * client (lib/videojs-client-engine.ts).
@@ -44,10 +47,6 @@ export function getVideojsEngineFromAsset(
   asset: Asset,
   { liveStreamLatencyMode }: { liveStreamLatencyMode?: LatencyMode } = {}
 ): VideojsEngine {
-  // stream.new has no DRM wiring, and DRM'd media won't play on either
-  // engine without it; hls.js is simply the do-no-extra-harm default.
-  if (asset.playback_ids?.some((p) => p.policy === 'drm')) return 'hlsjs';
-
   // Recorded-from-live assets keep their stream's container ("assets created
   // from a lowlatency stream continue to use CMAF to avoid retranscoding").
   if (asset.live_stream_id) {
@@ -78,7 +77,11 @@ export async function getVideojsEngineForAsset(
 }
 
 // What the page already read from the playlists (lib/player-page-utils.ts).
-type PlaylistInfo = { streamType?: StreamType; endsWithShortTsSegment?: boolean };
+type PlaylistInfo = {
+  streamType?: StreamType;
+  hasDiscontinuity?: boolean;
+  endsWithShortTsSegment?: boolean;
+};
 
 /*
  * Full lookup for callers that only have a playback ID (the /v pages).
@@ -87,13 +90,13 @@ type PlaylistInfo = { streamType?: StreamType; endsWithShortTsSegment?: boolean 
  */
 export async function getVideojsEngineForPlaybackId(
   playbackId: string,
-  { streamType, endsWithShortTsSegment }: PlaylistInfo = {}
+  { streamType, hasDiscontinuity, endsWithShortTsSegment }: PlaylistInfo = {}
 ): Promise<VideojsEngine> {
-  if (streamType === 'live' || endsWithShortTsSegment) return 'hlsjs';
+  if (streamType === 'live' || hasDiscontinuity || endsWithShortTsSegment) return 'hlsjs';
 
   try {
-    const { policy, object } = await mux.video.playbackIds.retrieve(playbackId);
-    if (policy === 'drm' || object.type === 'live_stream') return 'hlsjs';
+    const { object } = await mux.video.playbackIds.retrieve(playbackId);
+    if (object.type === 'live_stream') return 'hlsjs';
 
     const asset = await mux.video.assets.retrieve(object.id);
     return await getVideojsEngineForAsset(asset);

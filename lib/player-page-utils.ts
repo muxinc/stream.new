@@ -20,7 +20,8 @@ export type Props = {
   // runs. Optional only because the client-rendered PlayerPage path doesn't
   // use it; getPropsFromPlaybackId always sets it.
   streamType?: StreamType;
-  // See endsWithShortTsSegment; an input to lib/videojs-engine.ts.
+  // Inputs to lib/videojs-engine.ts, read from the same playlist.
+  hasDiscontinuity?: boolean;
   endsWithShortTsSegment?: boolean;
   playerType?: PlayerTypes;
 };
@@ -82,9 +83,13 @@ export function getVideojsPagePropsFromSearchParams(sp: SearchParams) {
  * is available for every playable ID. Only a playlist we actually read can
  * classify as live; anything else is on-demand. (CJP)
  */
-type PlaylistInfo = { streamType: StreamType; endsWithShortTsSegment: boolean };
+type PlaylistInfo = { streamType: StreamType; hasDiscontinuity: boolean; endsWithShortTsSegment: boolean };
 
-const UNREAD_PLAYLIST: PlaylistInfo = { streamType: 'on-demand', endsWithShortTsSegment: false };
+const UNREAD_PLAYLIST: PlaylistInfo = {
+  streamType: 'on-demand',
+  hasDiscontinuity: false,
+  endsWithShortTsSegment: false,
+};
 
 /*
  * TODO: remove once fixed in video.js SPF. A Mux MPEG-TS (plus quality)
@@ -108,6 +113,9 @@ const getPlaylistInfo = async (multivariant: string): Promise<PlaylistInfo> => {
   const mediaPlaylist = await resp.text();
   return {
     streamType: /^#EXT-X-ENDLIST\s*$/m.test(mediaPlaylist) ? 'on-demand' : 'live',
+    // Mux writes a discontinuity into a recording where the live stream's
+    // encoder reconnected. SPF doesn't handle discontinuities.
+    hasDiscontinuity: /^#EXT-X-DISCONTINUITY\s*$/m.test(mediaPlaylist),
     endsWithShortTsSegment: endsWithShortTsSegment(mediaPlaylist),
   };
 };
@@ -134,7 +142,7 @@ export async function getPropsFromPlaybackId(
   } catch (e) {
     console.error('Error fetching blurup', e);
   }
-  const { videoExists, streamType, endsWithShortTsSegment } = await getStreamInfoAsync(playbackId);
+  const { videoExists, streamType, hasDiscontinuity, endsWithShortTsSegment } = await getStreamInfoAsync(playbackId);
   const props: Props = {
     blurDataURL,
     playbackId,
@@ -142,6 +150,7 @@ export async function getPropsFromPlaybackId(
     poster,
     videoExists,
     streamType,
+    hasDiscontinuity,
     endsWithShortTsSegment,
   };
   if (dimensions?.aspectRatio) {

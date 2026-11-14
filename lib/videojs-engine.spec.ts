@@ -53,9 +53,9 @@ describe('getVideojsEngineFromAsset', () => {
     expect(getVideojsEngineFromAsset(makeAsset(overrides))).toBe('spf');
   });
 
-  test('picks hls.js for DRM playback IDs', () => {
+  test('applies no DRM rule', () => {
     const asset = makeAsset({ playback_ids: [{ id: 'playback-1', policy: 'drm' }] });
-    expect(getVideojsEngineFromAsset(asset)).toBe('hlsjs');
+    expect(getVideojsEngineFromAsset(asset)).toBe('spf');
   });
 
   test('routes live recordings by their stream latency mode', () => {
@@ -84,6 +84,12 @@ describe('getVideojsEngineForPlaybackId', () => {
     await expect(getVideojsEngineForPlaybackId('playback-1', { streamType: 'live' })).resolves.toBe('hlsjs');
   });
 
+  test('picks hls.js for a recording with a discontinuity', async () => {
+    await expect(
+      getVideojsEngineForPlaybackId('playback-1', { streamType: 'on-demand', hasDiscontinuity: true })
+    ).resolves.toBe('hlsjs');
+  });
+
   test('picks hls.js for an MPEG-TS asset ending in a short segment', async () => {
     await expect(
       getVideojsEngineForPlaybackId('playback-1', { streamType: 'on-demand', endsWithShortTsSegment: true })
@@ -97,11 +103,6 @@ describe('getVideojsEngineForPlaybackId', () => {
     // The answer came from the asset, not from the no-metadata fallback.
     scopes.forEach((scope) => expect(scope.isDone()).toBe(true));
     expect(console.warn).not.toHaveBeenCalled();
-  });
-
-  test('picks hls.js for a DRM playback ID', async () => {
-    mockPlaybackId({ id: 'asset-1', type: 'asset' }, 'drm');
-    await expect(getVideojsEngineForPlaybackId('playback-1')).resolves.toBe('hlsjs');
   });
 
   test('picks hls.js for a live stream playback ID', async () => {
