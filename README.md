@@ -211,11 +211,12 @@ When a video is uploaded:
 
 # Player variants
 
-`/v/:id` renders the default player: [video.js](https://github.com/videojs/video.js) (`@videojs/react`) with the hls.js-backed Mux media component, server-rendered. Other players are available at `/v/:id/:playerType`:
+`/v/:id` renders the default player: [video.js](https://github.com/videojs/video.js) (`@videojs/react`), server-rendered, with the playback engine selected server-side per playback ID — the SPF-backed Mux media component for everything SPF supports (CMAF and MPEG-TS on-demand content), the hls.js-backed one for the rest (live, recordings of standard-latency live streams or with discontinuities). See `lib/videojs-engine.ts`. Other players are available at `/v/:id/:playerType`:
 
-- `mux-player` — Mux Player (the previous default)
-- `videojs-spf` — video.js with the SPF-backed Mux media component (opt-in for now)
-- `videojs` — video.js with the engine (SPF vs hls.js) selected server-side per asset
+- `mux-player` — Mux Player
+- `videojs` — the default, addressable explicitly
+- `videojs-spf` — video.js, always the SPF-backed Mux media component
+- `videojs-hlsjs` — video.js, always the hls.js-backed Mux media component
 - `classic`, `plyr`, `mux-video`, `winamp`
 
 `/v/:id/embed` still renders Mux Player.

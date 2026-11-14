@@ -31,7 +31,7 @@ export default async function PlayerTypePage({
   // client-side via PlayerPage/PlayerLoader (which reads ?color= itself). (CJP)
   if (VIDEOJS_PLAYER_TYPES.includes(playerType)) {
     const videojsProps = getVideojsPagePropsFromSearchParams(await searchParams);
-    const engine = await getVideojsEngineForPlayerType(playerType, id);
+    const engine = await getVideojsEngineForPlayerType(playerType, id, props);
     return <VideojsPlayerPage {...props} playerType={playerType} engine={engine} {...videojsProps} />;
   }
 

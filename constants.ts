@@ -32,13 +32,14 @@ export const VIDEOJS_PLAYER_TYPES: string[] = [
   VIDEOJS_HLSJS_TYPE,
 ];
 /*
- * The player /v/[id] renders. video.js (hls.js-backed) as of 2026-09-11;
- * Mux Player remains available at /v/[id]/mux-player. The SPF-backed and
- * auto-selected video.js types stay opt-in until the fast-follow items recorded in
- * the video.js integration notes (working docs kept outside this repo, "Default
- * player switch" section) land. (CJP)
+ * The player /v/[id] renders: video.js with the engine auto-selected per
+ * playback ID (SPF for everything it supports, including MPEG-TS on-demand
+ * content; hls.js for the rest — see lib/videojs-engine.ts). To roll back,
+ * point this at VIDEOJS_HLSJS_TYPE (the previous default) or MUX_PLAYER_TYPE.
+ * Every player stays reachable at /v/[id]/<type>, including the explicit
+ * videojs-spf / videojs-hlsjs engines and mux-player.
  */
-export const DEFAULT_PLAYER_TYPE = VIDEOJS_HLSJS_TYPE;
+export const DEFAULT_PLAYER_TYPE: string = VIDEOJS_TYPE;
 export type PlayerTypes =
   | typeof PLYR_TYPE
   | typeof MUX_VIDEO_TYPE
