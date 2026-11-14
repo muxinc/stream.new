@@ -32,7 +32,7 @@ export default async function PlaybackPage({
   // Kept symmetric with /v/[id]/[playerType]. (CJP)
   if (VIDEOJS_PLAYER_TYPES.includes(DEFAULT_PLAYER_TYPE)) {
     const videojsProps = getVideojsPagePropsFromSearchParams(await searchParams);
-    const engine = await getVideojsEngineForPlayerType(DEFAULT_PLAYER_TYPE, id, { streamType: props.streamType, playlist: props.playlist });
+    const engine = await getVideojsEngineForPlayerType(DEFAULT_PLAYER_TYPE, id, props);
     return <VideojsPlayerPage {...props} playerType={DEFAULT_PLAYER_TYPE} engine={engine} {...videojsProps} />;
   }
 

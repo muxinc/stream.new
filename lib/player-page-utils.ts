@@ -5,10 +5,8 @@ import type { Metadata } from 'next';
 import { HOST_URL, DEFAULT_PLAYER_ASPECT_RATIO } from '../constants';
 import type { PlayerTypes } from '../constants';
 import logger from './logger';
-import { getPlaylistFacts, UNREAD_PLAYLIST } from './playlist-facts';
-import type { PlaylistFacts, PlaylistInfo, StreamType } from './playlist-facts';
 
-export type { PlaylistFacts, StreamType };
+export type StreamType = 'live' | 'on-demand';
 
 export type Props = {
   blurDataURL?: string;
@@ -22,9 +20,8 @@ export type Props = {
   // runs. Optional only because the client-rendered PlayerPage path doesn't
   // use it; getPropsFromPlaybackId always sets it.
   streamType?: StreamType;
-  // What the playlists say about the content beyond live/on-demand; the
-  // input to lib/videojs-engine.ts.
-  playlist?: PlaylistFacts;
+  // See endsWithShortTsSegment; an input to lib/videojs-engine.ts.
+  endsWithShortTsSegment?: boolean;
   playerType?: PlayerTypes;
 };
 
@@ -85,12 +82,34 @@ export function getVideojsPagePropsFromSearchParams(sp: SearchParams) {
  * is available for every playable ID. Only a playlist we actually read can
  * classify as live; anything else is on-demand. (CJP)
  */
+type PlaylistInfo = { streamType: StreamType; endsWithShortTsSegment: boolean };
+
+const UNREAD_PLAYLIST: PlaylistInfo = { streamType: 'on-demand', endsWithShortTsSegment: false };
+
+/*
+ * TODO: remove once fixed in video.js SPF. A Mux MPEG-TS (plus quality)
+ * asset whose last segment is very short never reaches `ended` on SPF: it
+ * stalls just before the end. Reproduced on playback ID
+ * g4HJ5zGUrtjtPOUZjXz5tJ2E3bBxQ1f6n01UQATLdBNc (last segment 0.078s); an
+ * asset ending in a 0.558s segment is fine. MPEG-TS playlists are the ones
+ * without an #EXT-X-MAP init segment.
+ */
+export const endsWithShortTsSegment = (mediaPlaylist: string): boolean => {
+  if (/^#EXT-X-MAP:/m.test(mediaPlaylist)) return false;
+  const last = mediaPlaylist.match(/^#EXTINF:[\d.]+/gm)?.pop();
+  return last !== undefined && parseFloat(last.slice('#EXTINF:'.length)) < 0.5;
+};
+
 const getPlaylistInfo = async (multivariant: string): Promise<PlaylistInfo> => {
   const mediaPlaylistUrl = multivariant.match(/^https?:\/\/\S+$/m)?.[0];
   if (!mediaPlaylistUrl) return UNREAD_PLAYLIST;
   const resp = await fetch(mediaPlaylistUrl);
   if (!resp.ok) return UNREAD_PLAYLIST;
-  return getPlaylistFacts(multivariant, await resp.text());
+  const mediaPlaylist = await resp.text();
+  return {
+    streamType: /^#EXT-X-ENDLIST\s*$/m.test(mediaPlaylist) ? 'on-demand' : 'live',
+    endsWithShortTsSegment: endsWithShortTsSegment(mediaPlaylist),
+  };
 };
 
 const getStreamInfoAsync = async (
@@ -115,7 +134,7 @@ export async function getPropsFromPlaybackId(
   } catch (e) {
     console.error('Error fetching blurup', e);
   }
-  const { videoExists, streamType, playlist } = await getStreamInfoAsync(playbackId);
+  const { videoExists, streamType, endsWithShortTsSegment } = await getStreamInfoAsync(playbackId);
   const props: Props = {
     blurDataURL,
     playbackId,
@@ -123,7 +142,7 @@ export async function getPropsFromPlaybackId(
     poster,
     videoExists,
     streamType,
-    playlist,
+    endsWithShortTsSegment,
   };
   if (dimensions?.aspectRatio) {
     props.aspectRatio = dimensions.aspectRatio;
